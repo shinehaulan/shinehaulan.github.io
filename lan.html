@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 人相學 - 三停五官全格局分析</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #0d0f12;
+      color: #e6edf3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 { margin-bottom: 6px; font-size: 1.4rem; color: #e5a93b; text-align: center; }
+    .container {
+      position: relative;
+      width: 100%;
+      max-width: 580px;
+      aspect-ratio: 4 / 3;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #000;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    }
+    video, canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+    }
+    .guide-box {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 20, 25, 0.85);
+      border: 1px solid #30363d;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      z-index: 10;
+      white-space: nowrap;
+    }
+    .status-warning { color: #f85149; font-weight: bold; }
+    .status-ok { color: #3fb950; font-weight: bold; }
+    .report-card {
+      width: 100%;
+      max-width: 580px;
+      margin-top: 14px;
+      background: #161b22;
+      border-radius: 10px;
+      padding: 16px;
+      box-sizing: border-box;
+      border: 1px solid #30363d;
+    }
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: #e5a93b;
+      margin-bottom: 8px;
+      border-left: 3px solid #e5a93b;
+      padding-left: 8px;
+    }
+    .metric { margin: 6px 0; font-size: 0.88rem; }
+    .bar {
+      height: 6px;
+      background: #21262d;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .bar-fill {
+      height: 100%;
+      background: #e5a93b;
+      width: 0%;
+      transition: width 0.2s ease;
+    }
+    .feature-box {
+      background: #0d1117;
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 8px;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      border: 1px solid #21262d;
+    }
+    .disclaimer {
+      font-size: 0.72rem;
+      color: #8b949e;
+      margin-top: 14px;
+      line-height: 1.4;
+      text-align: justify;
+    }
+    button {
+      margin-top: 12px;
+      padding: 10px 24px;
+      font-size: 0.95rem;
+      background: #e5a93b;
+      border: none;
+      border-radius: 6px;
+      color: #0d0f12;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>AI 傳統人相格局儀</h1>
+  <div class="container">
+    <video id="webcam" autoplay playsinline></video>
+    <canvas id="output_canvas"></canvas>
+    <div id="guide-text" class="guide-box">模型載入中...</div>
+  </div>
+
+  <button id="webcamButton">啟動相學分析</button>
+
+  <div class="report-card">
+    <div class="section-title">大局流年：三停氣象</div>
+    <div class="metric">上停（初年智慮）：<span id="upper-ratio">-</span>
+      <div class="bar"><div id="upper-bar" class="bar-fill"></div></div>
+    </div>
+    <div class="metric">中停（中年實業）：<span id="middle-ratio">-</span>
+      <div class="bar"><div id="middle-bar" class="bar-fill"></div></div>
+    </div>
+    <div class="metric">下停（晚運蓄勢）：<span id="lower-ratio">-</span>
+      <div class="bar"><div id="lower-bar" class="bar-fill"></div></div>
+    </div>
+
+    <div class="section-title" style="margin-top: 16px;">十二宮位與五官形局</div>
+    <div class="feature-box">
+      <div><strong>【田宅宮（眉眼）】</strong>：<span id="tianzhai-text">待測量</span></div>
+      <div style="margin-top: 4px;"><strong>【財帛宮（鼻翼）】</strong>：<span id="nose-text">待測量</span></div>
+      <div style="margin-top: 4px;"><strong>【出納官（口唇）】</strong>：<span id="mouth-text">待測量</span></div>
+    </div>
+
+    <div class="disclaimer">
+      【商用與合規說明】：運算皆在使用者本機端完成，不儲存、不上傳任何人臉特徵與影像。分析內容屬於傳統相學文化統計與休閒娛樂範疇，不構成任何命理與人生決策依據。
+    </div>
+  </div>
+
+  <script type="module">
+    import {
+      FaceLandmarker,
+      FilesetResolver
+    } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
+
+    const video = document.getElementById("webcam");
+    const canvas = document.getElementById("output_canvas");
+    const ctx = canvas.getContext("2d");
+    const guideText = document.getElementById("guide-text");
+    const webcamButton = document.getElementById("webcamButton");
+
+    const upperRatioEl = document.getElementById("upper-ratio");
+    const middleRatioEl = document.getElementById("middle-ratio");
+    const lowerRatioEl = document.getElementById("lower-ratio");
+    const upperBar = document.getElementById("upper-bar");
+    const middleBar = document.getElementById("middle-bar");
+    const lowerBar = document.getElementById("lower-bar");
+
+    const tianzhaiText = document.getElementById("tianzhai-text");
+    const noseText = document.getElementById("nose-text");
+    const mouthText = document.getElementById("mouth-text");
+
+    let faceLandmarker;
+    let lastVideoTime = -1;
+
+    async function init() {
+      const filesetResolver = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
+      );
+      faceLandmarker = await FaceLandmarker.createFromOptions(filesetResolver, {
+        baseOptions: {
+          modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
+          delegate: "GPU"
+        },
+        runningMode: "VIDEO",
+        numFaces: 1
+      });
+      guideText.innerText = "模型載入完畢，請點擊按鈕開啟鏡頭";
+    }
+    init();
+
+    webcamButton.addEventListener("click", async () => {
+      if (!faceLandmarker) return;
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: 640, height: 480 }
+        });
+        video.srcObject = stream;
+        video.addEventListener("loadeddata", predictLoop);
+        webcamButton.style.display = "none";
+      } catch (err) {
+        alert("無法開啟攝影機，請檢查瀏覽器設定。");
+      }
+    });
+
+    async function predictLoop() {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      if (lastVideoTime !== video.currentTime) {
+        lastVideoTime = video.currentTime;
+        const results = faceLandmarker.detectForVideo(video, performance.now());
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (results.faceLandmarks && results.faceLandmarks.length > 0) {
+          const lm = results.faceLandmarks[0];
+
+          // 防呆轉向判斷（耳根與鼻尖相對距離）
+          const leftEar = lm[234];
+          const rightEar = lm[454];
+          const noseTip = lm[1];
+          const yawRatio = Math.abs(noseTip.x - leftEar.x) / (Math.abs(noseTip.x - rightEar.x) + 0.0001);
+
+          if (yawRatio < 0.68 || yawRatio > 1.45) {
+            guideText.innerHTML = '<span class="status-warning">⚠️ 請正對鏡頭（偏頭中）</span>';
+          } else {
+            guideText.innerHTML = '<span class="status-ok">✔ 格局鎖定，即時解析中</span>';
+
+            // 1. 三停幾何換算
+            const pTop = lm[10], pBrow = lm[168], pNose = lm[1], pChin = lm[152];
+            const dUpper = Math.hypot(pBrow.x - pTop.x, pBrow.y - pTop.y);
+            const dMiddle = Math.hypot(pNose.x - pBrow.x, pNose.y - pBrow.y);
+            const dLower = Math.hypot(pChin.x - pNose.x, pChin.y - pNose.y);
+            const total = dUpper + dMiddle + dLower;
+
+            const uPct = Math.round((dUpper / total) * 100);
+            const mPct = Math.round((dMiddle / total) * 100);
+            const lPct = Math.round((dLower / total) * 100);
+
+            upperRatioEl.innerText = `${uPct}%`;
+            middleRatioEl.innerText = `${mPct}%`;
+            lowerRatioEl.innerText = `${lPct}%`;
+            upperBar.style.width = `${uPct * 2}%`;
+            middleBar.style.width = `${mPct * 2}%`;
+            lowerBar.style.width = `${lPct * 2}%`;
+
+            // 2. 田宅宮量測
+            const eyeH = Math.hypot(lm[159].x - lm[145].x, lm[159].y - lm[145].y);
+            const browEyeDist = Math.hypot(lm[105].x - lm[159].x, lm[105].y - lm[159].y);
+            const tzRatio = browEyeDist / (eyeH + 0.0001);
+            if (tzRatio > 1.25) {
+              tianzhaiText.innerText = "廣開富藏：眉眼舒展，格局開朗，得厚道家運。";
+            } else if (tzRatio < 0.8) {
+              tianzhaiText.innerText = "緊實幹練：自力開創，思慮周密，善抓轉機。";
+            } else {
+              tianzhaiText.innerText = "清秀規矩：分寸得體，家宅平穩，循序漸進。";
+            }
+
+            // 3. 財帛宮（鼻翼比例）
+            const noseW = Math.hypot(lm[278].x - lm[48].x, lm[278].y - lm[48].y);
+            const eyeGap = Math.hypot(lm[362].x - lm[133].x, lm[362].y - lm[133].y);
+            const noseRatio = noseW / (eyeGap + 0.0001);
+            if (noseRatio > 1.15) {
+              noseText.innerText = "庫容充盈：鼻準有勢，聚富敢為，偏財機敏。";
+            } else if (noseRatio < 0.92) {
+              noseText.innerText = "精明謹慎：積蓄有道，防範未然，重守城之德。";
+            } else {
+              noseText.innerText = "端整中和：正財豐沛，收支相配，不負辛勞。";
+            }
+
+            // 4. 出納官（唇形朝向）
+            const lipTilt = lm[0].y - ((lm[61].y + lm[291].y) / 2);
+            if (lipTilt > 0.004) {
+              mouthText.innerText = "仰月生輝：常帶和氣，善於言語調和，貴人臨門。";
+            } else if (lipTilt < -0.004) {
+              mouthText.innerText = "深沉剛正：原則堅定，言出必踐，掌威信與主導。";
+            } else {
+              mouthText.innerText = "平正端莊：言行相符，衣食自足，行事踏實。";
+            }
+
+            // 視覺回饋繪點
+            [pTop, pBrow, pNose, pChin, lm[468], lm[473], lm[48], lm[278], lm[61], lm[291]].forEach(pt => {
+              drawPoint(ctx, pt, "#e5a93b");
+            });
+          }
+        }
+      }
+      requestAnimationFrame(predictLoop);
+    }
+
+    function drawPoint(ctx, pt, color) {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(pt.x * canvas.width, pt.y * canvas.height, 3, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+  </script>
+</body>
+</html>
