@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>下半臉黃金比例促單助手 (合規展示版)</title>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 20px; background: #f8fafc; }
+    .container { display: flex; gap: 20px; max-width: 1000px; margin: auto; }
+    .preview-box { position: relative; width: 480px; height: 360px; }
+    video, canvas { position: absolute; top: 0; left: 0; width: 480px; height: 360px; border-radius: 8px; }
+    .report-card { flex: 1; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    .disclaimer { font-size: 11px; color: #64748b; margin-top: 15px; border-top: 1px dashed #cbd5e1; padding-top: 10px; }
+    .metric { margin-bottom: 12px; }
+    .metric-val { font-weight: bold; color: #0284c7; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="preview-box">
+    <video id="webcam" playsinline></video>
+    <canvas id="output_canvas"></canvas>
+  </div>
+
+  <div class="report-card">
+    <h3>下半臉黃金美學測量</h3>
+    <div class="metric">上下唇厚度比例：<span id="lipRatio" class="metric-val">--</span> (標準約 1 : 1.4)</div>
+    <div class="metric">下顎角/顴骨寬度比：<span id="jawRatio" class="metric-val">--</span> (柔和輪廓約 0.72 - 0.76)</div>
+    <div class="metric">下庭縱向比例：<span id="lowerFaceRatio" class="metric-val">--</span></div>
+
+    <div class="disclaimer">
+      <strong>法規免責宣告：</strong><br>
+      本工具僅作為臉部幾何特徵輔助測量與美學視覺化參考，不具醫療器材效能，亦不構成任何醫療診斷或療程決策依據。
+    </div>
+  </div>
+</div>
+
+<script>
+const videoElement = document.getElementById('webcam');
+const canvasElement = document.getElementById('output_canvas');
+const canvasCtx = canvasElement.getContext('2d');
+
+function calcDistance(p1, p2) {
+  return Math.hypot(p1.x - p2.x, p1.y - p2.y);
+}
+
+const faceMesh = new FaceMesh({locateFile: (file) => {
+  return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+}});
+
+faceMesh.setOptions({
+  maxNumFaces: 1,
+  refineLandmarks: true, // 啟用 478 點 (含虹膜)
+  minDetectionConfidence: 0.5,
+  minTrackingConfidence: 0.5
+});
+
+faceMesh.onResults((results) => {
+  canvasCtx.save();
+  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+  if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+    const lm = results.multiFaceLandmarks[0];
+
+    // 1. 上下唇厚度比 (點 0-13 為上唇中央，點 14-17 為下唇中央)
+    const upperLip = calcDistance(lm[0], lm[13]);
+    const lowerLip = calcDistance(lm[14], lm[17]);
+    const lipRatio = upperLip > 0 ? (lowerLip / upperLip).toFixed(2) : "--";
+    document.getElementById('lipRatio').innerText = `1 : ${lipRatio}`;
+
+    // 2. 輪廓比例 (顴骨寬: 234-454, 雙側下顎寬: 172-397)
+    const cheekWidth = calcDistance(lm[234], lm[454]);
+    const jawWidth = calcDistance(lm[172], lm[397]);
+    const jawRatio = cheekWidth > 0 ? (jawWidth / cheekWidth).toFixed(2) : "--";
+    document.getElementById('jawRatio').innerText = jawRatio;
+
+    // 3. 繪製下半臉關鍵參考線
+    canvasCtx.strokeStyle = '#00F0FF';
+    canvasCtx.lineWidth = 2;
+    // 繪製下顎線輪廓標註點
+    [172, 152, 397, 0, 17].forEach(idx => {
+      canvasCtx.beginPath();
+      canvasCtx.arc(lm[idx].x * canvasElement.width, lm[idx].y * canvasElement.height, 3, 0, 2 * Math.PI);
+      canvasCtx.fillStyle = '#FF0055';
+      canvasCtx.fill();
+    });
+  }
+  canvasCtx.restore();
+});
+
+const camera = new Camera(videoElement, {
+  onFrame: async () => {
+    await faceMesh.send({image: videoElement});
+  },
+  width: 480,
+  height: 360
+});
+camera.start();
+</script>
+</body>
+</html>
