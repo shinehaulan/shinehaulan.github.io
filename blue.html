@@ -184,7 +184,66 @@
     });
 
     // 3. 畫面即時預測與相學推算
-    async function predictWebcam() {
+    async function predictWebcam(// landmarks 為 MediaPipe 回傳的 478 個特徵點陣列
+
+// 1. 田宅宮分析（眉毛下緣至上眼瞼的距離）
+const leftBrowBottom = landmarks[105];
+const leftUpperLid = landmarks[159];
+const leftIris = landmarks[468];
+const leftEyeTop = landmarks[159];
+const leftEyeBottom = landmarks[145];
+
+// 以左眼垂直高度作為基準尺度（標準化單位，避免距離鏡頭遠近影響）
+const eyeHeight = Math.hypot(leftEyeTop.x - leftEyeBottom.x, leftEyeTop.y - leftEyeBottom.y);
+const tianZhaiDist = Math.hypot(leftBrowBottom.x - leftUpperLid.x, leftBrowBottom.y - leftUpperLid.y);
+const tianZhaiRatio = tianZhaiDist / (eyeHeight + 0.0001);
+
+let tianZhaiVerdict = "";
+if (tianZhaiRatio > 1.25) {
+  tianZhaiVerdict = "田宅宮開闊：心性寬厚，得祖蔭長輩緣，利房產田宅積累。";
+} else if (tianZhaiRatio < 0.75) {
+  tianZhaiVerdict = "田宅宮緊湊：作風務實明快，注重眼前效益，自立白手起家。";
+} else {
+  tianZhaiVerdict = "田宅宮端正：進退有據，資產配置穩健平衡。";
+}
+
+// 2. 財帛宮鼻翼分析（鼻翼寬度 vs 兩眼眼距）
+const noseLeft = landmarks[48];   // 左鼻翼邊緣
+const noseRight = landmarks[278]; // 右鼻翼邊緣
+const innerEyeLeft = landmarks[133];  // 左眼內眥
+const innerEyeRight = landmarks[362]; // 右眼內眥
+
+const noseWidth = Math.hypot(noseRight.x - noseLeft.x, noseRight.y - noseLeft.y);
+const interEyeDist = Math.hypot(innerEyeRight.x - innerEyeLeft.x, innerEyeRight.y - innerEyeLeft.y);
+const noseRatio = noseWidth / (interEyeDist + 0.0001);
+
+let noseVerdict = "";
+if (noseRatio >= 0.95 && noseRatio <= 1.15) {
+  noseVerdict = "財帛豐挺：鼻翼與內眥比例稱衡，庫守得宜，正財進退有法。";
+} else if (noseRatio > 1.15) {
+  noseVerdict = "財庫隆厚：魄力充足，偏財與社交運旺，敢於開創投資。";
+} else {
+  noseVerdict = "聚財內斂：行事謹慎精算，善用小資源，不喜無謂鋪張。";
+}
+
+// 3. 出納官唇角朝向（仰月唇 vs 覆舟唇）
+const mouthLeft = landmarks[61];   // 左嘴角
+const mouthRight = landmarks[291]; // 右嘴角
+const mouthCenter = landmarks[0];  // 上唇中央點
+
+// 計算嘴角平均高度相較於上唇中點的相對位置
+const cornersAvgY = (mouthLeft.y + mouthRight.y) / 2;
+const mouthTilt = mouthCenter.y - cornersAvgY; // 正值表示嘴角高於唇中（嘴角上揚）
+
+let mouthVerdict = "";
+if (mouthTilt > 0.004) {
+  mouthVerdict = "仰月之相：嘴角微揚，得人緣貴助，處事樂觀善於調和。";
+} else if (mouthTilt < -0.004) {
+  mouthVerdict = "嚴謹肅毅：嘴角深沉堅毅，自律極高，原則分明不隨波逐流。";
+} else {
+  mouthVerdict = "出納端平：言辭謹慎、誠信立足，晚運衣祿無虞。";
+}
+) {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
 
