@@ -1,98 +1,563 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <title>幾何外觀比例分析</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>AuraMetric - 人體幾何美學與比例分析</title>
+  
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Google MediaPipe (Apache 2.0 商用授權) -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+
   <style>
-    body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #121212; color: #fff; }
-    .container { position: relative; width: 640px; height: 480px; }
-    video, canvas { position: absolute; left: 0; top: 0; width: 640px; height: 480px; border-radius: 8px; }
-    #status-box { margin-top: 10px; padding: 12px; border-radius: 6px; background: #222; width: 616px; font-size: 14px; }
-    .warning { color: #ffb74d; }
+    @keyframes scan-glow {
+      0% { top: 0%; opacity: 0.9; }
+      50% { opacity: 0.2; }
+      100% { top: 100%; opacity: 0.9; }
+    }
+    .scanner-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #06b6d4, transparent);
+      box-shadow: 0 0 12px #06b6d4;
+      animation: scan-glow 2.2s ease-in-out infinite;
+    }
+    .guide-box {
+      border: 2px dashed rgba(6, 182, 212, 0.4);
+      transition: all 0.3s ease;
+    }
+    .guide-box.ready {
+      border: 2px solid #10b981;
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.25) inset;
+    }
   </style>
 </head>
-<body>
-  <h2>外觀幾何對稱與比例參考工具</h2>
-  <div class="container">
-    <video id="webcam" playsinline></video>
-    <canvas id="output_canvas"></canvas>
-  </div>
-  <div id="status-box">
-    <div>狀態：<span id="guide-text">正在載入模型...</span></div>
-    <div>對稱性指數：<span id="symmetry-score">--</span></div>
-    <p class="warning">免責聲明：本工具僅供視覺造型參考，運算完全於本機進行，非醫療診斷依據。</p>
-  </div>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center p-3 sm:p-6 selection:bg-cyan-500 selection:text-black">
+
+  <!-- Header -->
+  <header class="w-full max-w-4xl flex items-center justify-between pb-4 border-b border-slate-800">
+    <div class="flex items-center space-x-2">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center font-bold text-white shadow-lg shadow-cyan-500/20">
+        A
+      </div>
+      <div>
+        <h1 class="text-base sm:text-lg font-bold tracking-wide">AuraMetric</h1>
+        <p class="text-[10px] text-slate-400">客觀人體幾何特徵與比例測量</p>
+      </div>
+    </div>
+    
+    <!-- 模式切換鈕 -->
+    <div class="flex bg-slate-900 border border-slate-800 p-1 rounded-xl text-xs">
+      <button id="btn-mode-face" class="px-3 py-1.5 rounded-lg bg-cyan-600 text-white font-medium transition-all">全臉對稱</button>
+      <button id="btn-mode-body" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all">全身比例</button>
+    </div>
+  </header>
+
+  <!-- 主分析區塊 -->
+  <main class="w-full max-w-4xl mt-4 grid grid-cols-1 md:grid-cols-3 gap-5">
+    
+    <!-- 鏡頭與 HUD (佔 2 欄) -->
+    <div class="md:col-span-2 flex flex-col items-center">
+      <div class="relative w-full aspect-[3/4] sm:aspect-[4/3] rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl flex items-center justify-center">
+        
+        <video id="webcam" class="absolute inset-0 w-full h-full object-cover transform -scale-x-100" playsinline></video>
+        <canvas id="output-canvas" class="absolute inset-0 w-full h-full object-cover transform -scale-x-100"></canvas>
+        <div id="scan-line" class="scanner-line pointer-events-none hidden"></div>
+
+        <!-- 幾何輪廓指引遮罩 -->
+        <div id="guide-frame" class="guide-box absolute w-56 h-72 rounded-[45%] pointer-events-none"></div>
+
+        <!-- 即時提示膠囊 -->
+        <div id="status-pill" class="absolute top-4 bg-slate-900/90 backdrop-blur-md border border-slate-700 text-slate-200 text-xs px-4 py-2 rounded-full flex items-center space-x-2 shadow-lg">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+          <span id="guide-msg">啟動高精度模型中...</span>
+        </div>
+      </div>
+
+      <!-- 防呆驗證指示燈 (三個條件全部亮綠燈才允許測量) -->
+      <div class="w-full grid grid-cols-3 gap-2 mt-3 text-[11px]">
+        <div id="badge-yaw" class="flex items-center justify-center space-x-1.5 p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400">
+          <i data-lucide="compass" class="w-3.5 h-3.5"></i>
+          <span>視角擺正</span>
+        </div>
+        <div id="badge-dist" class="flex items-center justify-center space-x-1.5 p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400">
+          <i data-lucide="maximize" class="w-3.5 h-3.5"></i>
+          <span>距離合適</span>
+        </div>
+        <div id="badge-stable" class="flex items-center justify-center space-x-1.5 p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400">
+          <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
+          <span>靜止防抖</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 數據儀表板與合規圖卡產出 -->
+    <div class="flex flex-col space-y-4">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between h-full">
+        <div>
+          <div class="flex items-center justify-between">
+            <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="bar-chart-3" class="w-4 h-4 text-cyan-400"></i>
+              幾何比例即時指標
+            </h2>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800/50">本地運算</span>
+          </div>
+
+          <!-- 圓形儀表板 -->
+          <div class="mt-6 flex flex-col items-center">
+            <div class="relative w-36 h-36 flex items-center justify-center">
+              <svg class="w-full h-full transform -rotate-90">
+                <circle cx="72" cy="72" r="56" stroke="currentColor" stroke-width="8" class="text-slate-800 fill-none" />
+                <circle id="meter-circle" cx="72" cy="72" r="56" stroke="currentColor" stroke-width="8" stroke-dasharray="351.8" stroke-dashoffset="351.8" stroke-linecap="round" class="text-cyan-400 fill-none transition-all duration-300" />
+              </svg>
+              <div class="absolute flex flex-col items-center text-center">
+                <span id="primary-metric-val" class="text-3xl font-bold tracking-tight">--</span>
+                <span id="primary-metric-label" class="text-[10px] text-slate-400 tracking-wider">中軸對稱指數</span>
+              </div>
+            </div>
+
+            <!-- 細項指標 -->
+            <div class="w-full space-y-2.5 mt-5 text-xs">
+              <div class="flex justify-between items-center py-1.5 border-b border-slate-800/80">
+                <span id="sub-metric-1-lbl" class="text-slate-400">水平傾斜角度</span>
+                <span id="sub-metric-1-val" class="font-mono text-slate-200">--°</span>
+              </div>
+              <div class="flex justify-between items-center py-1.5 border-b border-slate-800/80">
+                <span id="sub-metric-2-lbl" class="text-slate-400">外側輪廓平衡比</span>
+                <span id="sub-metric-2-val" class="font-mono text-slate-200">--</span>
+              </div>
+              <div class="flex justify-between items-center py-1.5 border-b border-slate-800/80">
+                <span id="sub-metric-3-lbl" class="text-slate-400">中軸基準偏移</span>
+                <span id="sub-metric-3-val" class="font-mono text-slate-200">--</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 導出合法圖卡 -->
+        <div class="mt-6 pt-3 border-t border-slate-800">
+          <button id="export-card-btn" disabled class="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 disabled:opacity-30 disabled:cursor-not-allowed font-medium rounded-xl text-xs transition-all shadow-lg shadow-cyan-500/10 flex items-center justify-center space-x-2">
+            <i data-lucide="file-badge" class="w-4 h-4"></i>
+            <span>產出並下載合規圖卡 (PNG)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 隱私與法務前置宣告 -->
+  <footer class="w-full max-w-4xl mt-5 p-4 rounded-xl bg-slate-900/60 border border-slate-800 text-[11px] text-slate-500 leading-relaxed space-y-1">
+    <p class="font-semibold text-slate-400">【非醫療用途聲明與免責條款】</p>
+    <p>1. 本系統採用開源幾何視覺模型（MediaPipe，遵循 Apache 2.0 商業授權），數值僅供美學造型、穿搭剪裁、眼鏡對稱配戴及人機工程等日常休閒用途參考。</p>
+    <p>2. 本工具非醫療器材，不具備疾病診斷、骨骼結構病理判定、顏面神經評估或微整形施作建議之功能。請勿將量測數據作為任何醫療處置依據。</p>
+    <p>3. 影像完全在使用者端（Client-side）記憶體內即時處理完畢，伺服器不接收、不儲存任何臉部或身體生物辨識資訊，符合《個人資料保護法》高規格規範。</p>
+  </footer>
 
   <script>
-    const video = document.getElementById('webcam');
-    const canvas = document.getElementById('output_canvas');
-    const ctx = canvas.getContext('2d');
-    const guideText = document.getElementById('guide-text');
-    const symmetryScore = document.getElementById('symmetry-score');
+    lucide.createIcons();
 
+    // DOM 元素
+    const video = document.getElementById('webcam');
+    const canvas = document.getElementById('output-canvas');
+    const ctx = canvas.getContext('2d');
+    const guideMsg = document.getElementById('guide-msg');
+    const guideFrame = document.getElementById('guide-frame');
+    const scanLine = document.getElementById('scan-line');
+    const exportBtn = document.getElementById('export-card-btn');
+
+    const badgeYaw = document.getElementById('badge-yaw');
+    const badgeDist = document.getElementById('badge-dist');
+    const badgeStable = document.getElementById('badge-stable');
+
+    const primaryVal = document.getElementById('primary-metric-val');
+    const primaryLabel = document.getElementById('primary-metric-label');
+    const meterCircle = document.getElementById('meter-circle');
+    const sub1Lbl = document.getElementById('sub-metric-1-lbl');
+    const sub1Val = document.getElementById('sub-metric-1-val');
+    const sub2Lbl = document.getElementById('sub-metric-2-lbl');
+    const sub2Val = document.getElementById('sub-metric-2-val');
+    const sub3Lbl = document.getElementById('sub-metric-3-lbl');
+    const sub3Val = document.getElementById('sub-metric-3-val');
+
+    let currentMode = 'face'; // 'face' | 'body'
+    let stableFrameCount = 0;
+    const CIRCUMFERENCE = 2 * Math.PI * 56; // 351.8
+
+    // 儲存最新一次合格的幾何數據供生成圖卡
+    let latestReport = {
+      mode: '全臉對稱分析',
+      primaryScore: 0,
+      sub1: '--',
+      sub2: '--',
+      sub3: '--'
+    };
+
+    // 1. 初始化 FaceMesh (478 點含虹膜)
     const faceMesh = new FaceMesh({
       locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
     });
-
     faceMesh.setOptions({
       maxNumFaces: 1,
-      refineLandmarks: true, // 啟用 478 點 (含虹膜)
-      minDetectionConfidence: 0.7,
-      minTrackingConfidence: 0.7
+      refineLandmarks: true,
+      minDetectionConfidence: 0.65,
+      minTrackingConfidence: 0.65
     });
+    faceMesh.onResults(onFaceResults);
 
-    faceMesh.onResults((results) => {
+    // 2. 初始化 Pose (33 點骨架)
+    const pose = new Pose({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+    });
+    pose.setOptions({
+      modelComplexity: 1,
+      smoothLandmarks: true,
+      minDetectionConfidence: 0.6,
+      minTrackingConfidence: 0.6
+    });
+    pose.onResults(onPoseResults);
+
+    // 臉部處理邏輯
+    function onFaceResults(results) {
+      if (currentMode !== 'face') return;
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) {
-        guideText.innerText = "未檢測到臉部，請正對鏡頭";
-        symmetryScore.innerText = "--";
+        handleNoTarget("請正對鏡頭並將臉部移入提示框");
         return;
       }
 
-      const landmarks = results.multiFaceLandmarks[0];
+      const lm = results.multiFaceLandmarks[0];
+      const nose = lm[1];
+      const leftIris = lm[468];
+      const rightIris = lm[473];
+      const leftCheek = lm[234];
+      const rightCheek = lm[454];
 
-      // 關鍵點索引：1=鼻尖, 468=左虹膜中心, 473=右虹膜中心, 234=左臉頰, 454=右臉頰
-      const nose = landmarks[1];
-      const leftIris = landmarks[468];
-      const rightIris = landmarks[473];
-
-      // 防呆：檢測視角偏轉 (Yaw 簡化判斷：鼻尖與兩側虹膜中點水平偏離)
+      // 防呆 1：水平擺正 (Yaw)
       const midEyeX = (leftIris.x + rightIris.x) / 2;
-      const yawOffset = Math.abs(nose.x - midEyeX);
+      const yawDelta = Math.abs(nose.x - midEyeX);
+      const isYawOk = yawDelta < 0.025;
+      updateBadge(badgeYaw, isYawOk, "擺正良好", "角度偏斜");
 
-      if (yawOffset > 0.03) {
-        guideText.innerText = "角度偏差過大，請將臉部擺正";
+      // 防呆 2：雙眼距離 (FOV 距離)
+      const eyeSpan = Math.hypot(leftIris.x - rightIris.x, leftIris.y - rightIris.y);
+      const isDistOk = eyeSpan >= 0.16 && eyeSpan <= 0.32;
+      updateBadge(badgeDist, isDistOk, "距離標準", eyeSpan < 0.16 ? "請稍微靠近" : "請稍後退");
+
+      // 指標計算
+      const tiltDeg = (Math.atan2(rightIris.y - leftIris.y, rightIris.x - leftIris.x) * (180 / Math.PI)).toFixed(1);
+      const leftDist = Math.hypot(leftCheek.x - nose.x, leftCheek.y - nose.y);
+      const rightDist = Math.hypot(rightCheek.x - nose.x, rightCheek.y - nose.y);
+      const symmetry = (Math.min(leftDist, rightDist) / Math.max(leftDist, rightDist)) * 100;
+      const ratio = (leftDist / rightDist).toFixed(2);
+
+      // UI 賦值
+      sub1Val.innerText = `${Math.abs(tiltDeg)}°`;
+      sub2Val.innerText = `${ratio} : 1`;
+      sub3Val.innerText = `${(yawDelta * 100).toFixed(1)} %`;
+      const score = Math.round(symmetry);
+      primaryVal.innerText = score;
+      meterCircle.style.strokeDashoffset = CIRCUMFERENCE - (score / 100) * CIRCUMFERENCE;
+
+      // 防呆 3：防抖
+      evaluateStability(isYawOk && isDistOk);
+
+      // 繪製非醫療客觀幾何拓撲
+      drawFaceGeometry(ctx, lm, canvas.width, canvas.height);
+
+      latestReport = {
+        mode: '全臉幾何對稱指標',
+        primaryScore: score,
+        sub1: `水平傾斜：${Math.abs(tiltDeg)}°`,
+        sub2: `輪廓比：${ratio} : 1`,
+        sub3: `中軸偏離：${(yawDelta * 100).toFixed(1)}%`
+      };
+    }
+
+    // 全身處理邏輯 (肩膀與臀部比例)
+    function onPoseResults(results) {
+      if (currentMode !== 'body') return;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (!results.poseLandmarks) {
+        handleNoTarget("請退後使全身（含雙肩與雙腳）入鏡");
         return;
       }
 
-      guideText.innerText = "姿態標準，正在測量";
+      const lm = results.poseLandmarks;
+      // 關鍵點：11=左肩, 12=右肩, 23=左髖, 24=右髖, 27=左腳踝, 28=右腳踝
+      const leftShoulder = lm[11];
+      const rightShoulder = lm[12];
+      const leftHip = lm[23];
+      const rightHip = lm[24];
+      const leftAnkle = lm[27];
 
-      // 計算左右臉寬對稱比 (鼻尖至左右側外耳下顎緣)
-      const leftDist = Math.hypot(landmarks[234].x - nose.x, landmarks[234].y - nose.y);
-      const rightDist = Math.hypot(landmarks[454].x - nose.x, landmarks[454].y - nose.y);
-      const ratio = (Math.min(leftDist, rightDist) / Math.max(leftDist, rightDist)) * 100;
-      symmetryScore.innerText = `${ratio.toFixed(1)}%`;
+      // 防呆 1：全身可見度 (雙肩與腳踝 confidence)
+      const isVisible = leftShoulder.visibility > 0.65 && rightShoulder.visibility > 0.65 && leftAnkle.visibility > 0.5;
+      updateBadge(badgeDist, isVisible, "全身完整入鏡", "全身未完整入鏡");
 
-      // 繪製幾何線條圖卡效果 (非病態特徵標註)
-      ctx.strokeStyle = '#00e5ff';
-      ctx.lineWidth = 1.5;
+      // 防呆 2：身體傾角 (Roll)
+      const shoulderTilt = Math.abs(leftShoulder.y - rightShoulder.y);
+      const isYawOk = shoulderTilt < 0.05;
+      updateBadge(badgeYaw, isYawOk, "水平平穩", "請站直立正");
+
+      // 計算肩臀寬度與比例 (Shoulder-to-Hip Ratio, SHR)
+      const shoulderSpan = Math.hypot(leftShoulder.x - rightShoulder.x, leftShoulder.y - rightShoulder.y);
+      const hipSpan = Math.hypot(leftHip.x - rightHip.x, leftHip.y - rightHip.y);
+      const shr = (shoulderSpan / hipSpan).toFixed(2);
+
+      // 骨架對稱度評分
+      const bodySymmetry = Math.max(0, Math.min(100, Math.round((1 - shoulderTilt * 3) * 100)));
+
+      // UI 賦值
+      primaryVal.innerText = shr;
+      meterCircle.style.strokeDashoffset = CIRCUMFERENCE - (Math.min(shr / 2, 1)) * CIRCUMFERENCE;
+      sub1Val.innerText = `${(shoulderSpan * 100).toFixed(0)} 基準單位`;
+      sub2Val.innerText = `${(hipSpan * 100).toFixed(0)} 基準單位`;
+      sub3Val.innerText = `${bodySymmetry} 分`;
+
+      // 防抖
+      evaluateStability(isVisible && isYawOk);
+
+      // 繪製軀幹幾何骨架線
+      drawBodyGeometry(ctx, lm, canvas.width, canvas.height);
+
+      latestReport = {
+        mode: '肩臀跨距比例報告',
+        primaryScore: shr,
+        sub1: `雙肩橫跨：${(shoulderSpan * 100).toFixed(0)}`,
+        sub2: `雙臀橫跨：${(hipSpan * 100).toFixed(0)}`,
+        sub3: `肩平對稱度：${bodySymmetry} 分`
+      };
+    }
+
+    function evaluateStability(conditionOk) {
+      if (conditionOk) {
+        stableFrameCount++;
+        updateBadge(badgeStable, stableFrameCount > 20, "姿態平穩", "保持靜止");
+      } else {
+        stableFrameCount = Math.max(0, stableFrameCount - 2);
+        updateBadge(badgeStable, false, "保持靜止", "等待校準");
+      }
+
+      const allReady = conditionOk && (stableFrameCount > 20);
+      if (allReady) {
+        guideMsg.innerText = "採集標準達成，數據已鎖定";
+        guideFrame.classList.add('ready');
+        scanLine.classList.remove('hidden');
+        exportBtn.disabled = false;
+      } else {
+        guideFrame.classList.remove('ready');
+        scanLine.classList.add('hidden');
+        exportBtn.disabled = true;
+      }
+    }
+
+    function handleNoTarget(msg) {
+      guideMsg.innerText = msg;
+      updateBadge(badgeYaw, false, "", "等待目標");
+      updateBadge(badgeDist, false, "", "等待目標");
+      updateBadge(badgeStable, false, "", "等待目標");
+      primaryVal.innerText = "--";
+      meterCircle.style.strokeDashoffset = CIRCUMFERENCE;
+      exportBtn.disabled = true;
+      scanLine.classList.add('hidden');
+    }
+
+    function updateBadge(el, isOk, okText, badText) {
+      if (isOk) {
+        el.className = "flex items-center justify-center space-x-1.5 p-2 rounded-xl bg-emerald-950/40 border border-emerald-800 text-emerald-400 font-medium";
+        el.querySelector('span').innerText = okText;
+      } else {
+        el.className = "flex items-center justify-center space-x-1.5 p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400";
+        el.querySelector('span').innerText = badText;
+      }
+    }
+
+    // 向量拓撲繪製 (無任何病態瑕疵標籤，純粹幾何美學)
+    function drawFaceGeometry(ctx, lm, w, h) {
+      ctx.strokeStyle = "rgba(6, 182, 212, 0.4)";
+      ctx.lineWidth = 1.2;
+      ctx.setLineDash([4, 4]);
+
+      // 雙眼平行基準
       ctx.beginPath();
-      ctx.moveTo(leftIris.x * canvas.width, leftIris.y * canvas.height);
-      ctx.lineTo(rightIris.x * canvas.width, rightIris.y * canvas.height);
+      ctx.moveTo(lm[468].x * w, lm[468].y * h);
+      ctx.lineTo(lm[473].x * w, lm[473].y * h);
       ctx.stroke();
-    });
 
+      // 中軸縱垂線
+      ctx.beginPath();
+      ctx.moveTo(lm[10].x * w, lm[10].y * h);
+      ctx.lineTo(lm[152].x * w, lm[152].y * h);
+      ctx.stroke();
+
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#22d3ee";
+      [10, 152, 234, 454, 1, 468, 473].forEach(idx => {
+        ctx.beginPath();
+        ctx.arc(lm[idx].x * w, lm[idx].y * h, 3, 0, 2 * Math.PI);
+        ctx.fill();
+      });
+    }
+
+    function drawBodyGeometry(ctx, lm, w, h) {
+      ctx.strokeStyle = "#06b6d4";
+      ctx.lineWidth = 2;
+
+      // 肩膀橫線
+      ctx.beginPath();
+      ctx.moveTo(lm[11].x * w, lm[11].y * h);
+      ctx.lineTo(lm[12].x * w, lm[12].y * h);
+      ctx.stroke();
+
+      // 臀部橫線
+      ctx.beginPath();
+      ctx.moveTo(lm[23].x * w, lm[23].y * h);
+      ctx.lineTo(lm[24].x * w, lm[24].y * h);
+      ctx.stroke();
+
+      // 軀幹外框連線
+      ctx.strokeStyle = "rgba(6, 182, 212, 0.3)";
+      ctx.beginPath();
+      ctx.moveTo(lm[11].x * w, lm[11].y * h);
+      ctx.lineTo(lm[23].x * w, lm[23].y * h);
+      ctx.lineTo(lm[24].x * w, lm[24].y * h);
+      ctx.lineTo(lm[12].x * w, lm[12].y * h);
+      ctx.closePath();
+      ctx.stroke();
+    }
+
+    // 模式切換事件
+    document.getElementById('btn-mode-face').onclick = () => {
+      currentMode = 'face';
+      document.getElementById('btn-mode-face').className = "px-3 py-1.5 rounded-lg bg-cyan-600 text-white font-medium transition-all";
+      document.getElementById('btn-mode-body').className = "px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all";
+      guideFrame.className = "guide-box absolute w-56 h-72 rounded-[45%] pointer-events-none";
+      primaryLabel.innerText = "中軸對稱指數";
+      sub1Lbl.innerText = "水平傾斜角度";
+      sub2Lbl.innerText = "外側輪廓平衡比";
+      sub3Lbl.innerText = "中軸基準偏移";
+    };
+
+    document.getElementById('btn-mode-body').onclick = () => {
+      currentMode = 'body';
+      document.getElementById('btn-mode-body').className = "px-3 py-1.5 rounded-lg bg-cyan-600 text-white font-medium transition-all";
+      document.getElementById('btn-mode-face').className = "px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all";
+      guideFrame.className = "guide-box absolute w-64 h-[85%] rounded-2xl pointer-events-none";
+      primaryLabel.innerText = "肩臀跨距比 (SHR)";
+      sub1Lbl.innerText = "肩峰橫向跨距";
+      sub2Lbl.innerText = "髖部橫向跨距";
+      sub3Lbl.innerText = "軀幹垂直平衡";
+    };
+
+    // 啟動相機串流
     const camera = new Camera(video, {
-      onFrame: async () => { await faceMesh.send({ image: video }); },
+      onFrame: async () => {
+        if (currentMode === 'face') {
+          await faceMesh.send({ image: video });
+        } else {
+          await pose.send({ image: video });
+        }
+      },
       width: 640,
       height: 480
     });
     camera.start();
+
+    // 3. 合法圖卡生成 (Canvas 繪製專業卡片，自帶免責水印，可存成 PNG)
+    exportBtn.onclick = () => {
+      const card = document.createElement('canvas');
+      card.width = 800;
+      card.height = 1000;
+      const c = card.getContext('2d');
+
+      // 背景深色漸層
+      const grad = c.createLinearGradient(0, 0, 0, 1000);
+      grad.addColorStop(0, '#020617');
+      grad.addColorStop(1, '#0f172a');
+      c.fillStyle = grad;
+      c.fillRect(0, 0, 800, 1000);
+
+      // 外框與裝飾線
+      c.strokeStyle = '#1e293b';
+      c.lineWidth = 2;
+      c.strokeRect(30, 30, 740, 940);
+
+      // 標題區域
+      c.fillStyle = '#06b6d4';
+      c.font = 'bold 32px sans-serif';
+      c.fillText("AuraMetric 美學幾何分析圖卡", 60, 90);
+
+      c.fillStyle = '#94a3b8';
+      c.font = '16px sans-serif';
+      c.fillText(`分析類別：${latestReport.mode}  |  產出時間：${new Date().toLocaleDateString()}`, 60, 130);
+
+      // 主幾何數據大字
+      c.fillStyle = '#1e293b';
+      c.fillRect(60, 170, 680, 200);
+
+      c.fillStyle = '#38bdf8';
+      c.font = 'bold 76px sans-serif';
+      c.textAlign = 'center';
+      c.fillText(`${latestReport.primaryScore}`, 400, 280);
+
+      c.fillStyle = '#cbd5e1';
+      c.font = '18px sans-serif';
+      c.fillText("核心幾何平衡指標", 400, 325);
+      c.textAlign = 'left';
+
+      // 細部指標
+      c.font = '20px sans-serif';
+      c.fillStyle = '#f1f5f9';
+      c.fillText(`• ${latestReport.sub1}`, 80, 430);
+      c.fillText(`• ${latestReport.sub2}`, 80, 480);
+      c.fillText(`• ${latestReport.sub3}`, 80, 530);
+
+      // 生活美學建議 (純穿搭與造型，嚴禁醫美用語)
+      c.fillStyle = '#334155';
+      c.fillRect(60, 590, 680, 150);
+      c.fillStyle = '#38bdf8';
+      c.font = 'bold 18px sans-serif';
+      c.fillText("【穿搭造型與視覺設計建議】", 80, 630);
+      c.fillStyle = '#94a3b8';
+      c.font = '15px sans-serif';
+      const tipText = currentMode === 'face'
+        ? "建議依據面部對稱比例選擇框形適中的眼鏡，並透過髮型分線微調平衡視覺焦點。"
+        : "適合採用直筒或寬版西裝版型，突顯肩線立體剪裁，達成日常著裝的黃金平衡感。";
+      c.fillText(tipText, 80, 675);
+
+      // 底部合法防護水印 (法務免責條款)
+      c.strokeStyle = '#334155';
+      c.beginPath();
+      c.moveTo(60, 780);
+      c.lineTo(740, 780);
+      c.stroke();
+
+      c.fillStyle = '#64748b';
+      c.font = '12px sans-serif';
+      c.fillText("【合法使用與責任排除聲明】", 60, 820);
+      c.fillText("1. 本數據為純前端鏡頭座標幾何運算結果，未經醫學臨床校準，不可用於診斷或整型依據。", 60, 845);
+      c.fillText("2. 本報告僅作為穿搭造型及個人美學參考。如需骨骼、肌肉或病理諮詢請洽專科醫師。", 60, 870);
+      c.fillText("3. 系統端採即時運算不留存任何原始影像或生物特徵資訊，符合個人資料保護規範。", 60, 895);
+
+      // 觸發下載
+      const link = document.createElement('a');
+      link.download = `AuraMetric-Report-${Date.now()}.png`;
+      link.href = card.toDataURL('image/png');
+      link.click();
+    };
   </script>
 </body>
 </html>
