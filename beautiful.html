@@ -419,4 +419,160 @@
 
       // 唇寬 cm 標籤
       const wX = -((lm[61].x * w + lm[291].x * w) / 2) - 20;
-      const wY = lm[17].y * h +
+      const wY = lm[17].y * h + 20;
+      ctx.fillStyle = "#f472b6";
+      ctx.fillText(`寬 ${mouthWCm}cm`, wX, wY);
+
+      ctx.restore();
+    }
+
+    function handleReset(msg) {
+      guideMsg.innerText = msg;
+      updateBadge(badgeYaw, false, "", "等待唇部");
+      updateBadge(badgeDist, false, "", "等待唇部");
+      updateBadge(badgeStable, false, "", "等待目標");
+      primaryVal.innerText = "--";
+      meterCircle.style.strokeDashoffset = CIRCUMFERENCE;
+      metricUpperCm.innerText = "-- cm";
+      metricLowerCm.innerText = "-- cm";
+      metricWidthCm.innerText = "-- cm";
+      exportBtn.disabled = true;
+      scanLine.classList.add('hidden');
+    }
+
+    function updateBadge(el, isOk, okText, badText) {
+      if (isOk) {
+        el.className = "flex items-center justify-center space-x-1.5 p-2 rounded-xl bg-emerald-950/40 border border-emerald-800 text-emerald-400 font-medium";
+        el.querySelector('span').innerText = okText;
+      } else {
+        el.className = "flex items-center justify-center space-x-1.5 p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400";
+        el.querySelector('span').innerText = badText;
+      }
+    }
+
+    const camera = new Camera(video, {
+      onFrame: async () => {
+        await faceMesh.send({ image: video });
+      },
+      width: 640,
+      height: 480
+    });
+    camera.start();
+
+    // 導出專業圖卡 (PNG)
+    exportBtn.onclick = () => {
+      const card = document.createElement('canvas');
+      card.width = 800;
+      card.height = 1040;
+      const c = card.getContext('2d');
+
+      // 背景漸層
+      const grad = c.createLinearGradient(0, 0, 0, 1040);
+      grad.addColorStop(0, '#0f172a');
+      grad.addColorStop(1, '#020617');
+      c.fillStyle = grad;
+      c.fillRect(0, 0, 800, 1040);
+
+      // 邊框
+      c.strokeStyle = '#334155';
+      c.lineWidth = 2;
+      c.strokeRect(30, 30, 740, 980);
+
+      // 標題
+      c.fillStyle = '#ec4899';
+      c.font = 'bold 30px sans-serif';
+      c.fillText("AuraMetric 唇部美學幾何分析卡", 60, 95);
+
+      c.fillStyle = '#94a3b8';
+      c.font = '15px sans-serif';
+      c.fillText(`分析模式：唇型黃金比例 & 尺寸實測  |  日期：${new Date().toLocaleDateString()}`, 60, 135);
+
+      // 分數大區塊
+      c.fillStyle = '#1e293b';
+      c.fillRect(60, 165, 680, 150);
+
+      c.fillStyle = '#f43f5e';
+      c.font = 'bold 64px sans-serif';
+      c.textAlign = 'center';
+      c.fillText(`${reportData.score}`, 400, 245);
+
+      c.fillStyle = '#cbd5e1';
+      c.font = '15px sans-serif';
+      c.fillText("唇型黃金協調指數", 400, 285);
+      c.textAlign = 'left';
+
+      // 實測物理尺寸標示 (公分 Highlight)
+      c.fillStyle = '#172554';
+      c.fillRect(60, 335, 680, 110);
+      c.strokeStyle = '#1e40af';
+      c.strokeRect(60, 335, 680, 110);
+
+      c.fillStyle = '#60a5fa';
+      c.font = 'bold 16px sans-serif';
+      c.fillText("【實測物理尺寸估算 (基準 IPD: 6.3 cm)】", 80, 368);
+
+      c.fillStyle = '#f8fafc';
+      c.font = '18px sans-serif';
+      c.fillText(`上唇厚度：${reportData.upperCmStr}`, 80, 415);
+      c.fillText(`下唇厚度：${reportData.lowerCmStr}`, 320, 415);
+      c.fillText(`全唇寬度：${reportData.widthCmStr}`, 530, 415);
+
+      // 細節量測指標清單
+      c.font = '18px sans-serif';
+      c.fillStyle = '#f8fafc';
+      c.fillText(`• 上下唇厚度比例： ${reportData.ratioStr} (標準建議 1 : 1.3~1.5)`, 80, 490);
+      c.fillText(`• 厚度分佈： ${reportData.upperPctStr}`, 80, 535);
+      c.fillText(`• 唇鼻寬度協調比： ${reportData.widthRatioStr}`, 80, 580);
+      c.fillText(`• 左右唇峰對稱度： ${reportData.peakSymStr}`, 80, 625);
+
+      // 彩妝造型建議
+      c.fillStyle = '#1e293b';
+      c.fillRect(60, 665, 680, 140);
+      c.fillStyle = '#f472b6';
+      c.font = 'bold 17px sans-serif';
+      c.fillText("【唇彩造型與視覺焦點調整建議】", 80, 700);
+
+      c.fillStyle = '#cbd5e1';
+      c.font = '15px sans-serif';
+      wrapText(c, reportData.tip, 80, 735, 640, 24);
+
+      // 法律免責聲明
+      c.strokeStyle = '#334155';
+      c.beginPath();
+      c.moveTo(60, 830);
+      c.lineTo(740, 830);
+      c.stroke();
+
+      c.fillStyle = '#64748b';
+      c.font = '12px sans-serif';
+      c.fillText("【日常美學參考與法律免責聲明】", 60, 865);
+      c.fillText("1. 尺寸估算係依據人體標準平均瞳距推算，會因個人體態、相機距離與視角傾斜產生些許偏差。", 60, 890);
+      c.fillText("2. 本數值純供日常唇妝描繪、打亮與造型比例搭配使用，非醫療儀器檢測，切勿作任何侵入性處置依據。", 60, 915);
+      c.fillText("3. 系統端採瀏覽器即時記憶體運算，不傳輸且不儲存任何臉部特徵影像個資，嚴格保障個人隱私。", 60, 940);
+
+      const link = document.createElement('a');
+      link.download = `Lip-Metric-Report-${Date.now()}.png`;
+      link.href = card.toDataURL('image/png');
+      link.click();
+    };
+
+    function wrapText(context, text, x, y, maxWidth, lineHeight) {
+      let words = text.split('');
+      let line = '';
+      for (let n = 0; n < words.length; n++) {
+        let testLine = line + words[n];
+        let metrics = context.measureText(testLine);
+        let testWidth = metrics.width;
+        if (testWidth > maxWidth && n > 0) {
+          context.fillText(line, x, y);
+          line = words[n];
+          y += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      context.fillText(line, x, y);
+    }
+  </script>
+</body>
+</html>
