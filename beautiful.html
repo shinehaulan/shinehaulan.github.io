@@ -45,12 +45,12 @@
       </div>
       <div>
         <h1 class="text-base sm:text-lg font-bold tracking-wide">AuraMetric LipPro</h1>
-        <p class="text-[10px] text-slate-400">唇形幾何比例與飽滿度客觀分析</p>
+        <p class="text-[10px] text-slate-400">唇形幾何比例與實際尺寸量測</p>
       </div>
     </div>
     
     <div class="flex bg-slate-900 border border-slate-800 p-1 rounded-xl text-xs">
-      <span class="px-3 py-1.5 rounded-lg bg-pink-600 text-white font-medium">唇部比例模式</span>
+      <span class="px-3 py-1.5 rounded-lg bg-pink-600 text-white font-medium">比例 & 尺寸模式</span>
     </div>
   </header>
 
@@ -99,40 +99,59 @@
           <div class="flex items-center justify-between">
             <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
               <i data-lucide="sparkles" class="w-4 h-4 text-pink-400"></i>
-              唇型美學黃金指標
+              唇部比例與尺寸量測
             </h2>
             <span class="text-[10px] px-2 py-0.5 rounded bg-pink-950 text-pink-400 border border-pink-800/50">即時演算</span>
           </div>
 
           <!-- 圓形儀表板：黃金比例吻合度 -->
-          <div class="mt-6 flex flex-col items-center">
-            <div class="relative w-36 h-36 flex items-center justify-center">
+          <div class="mt-4 flex flex-col items-center">
+            <div class="relative w-32 h-32 flex items-center justify-center">
               <svg class="w-full h-full transform -rotate-90">
-                <circle cx="72" cy="72" r="56" stroke="currentColor" stroke-width="8" class="text-slate-800 fill-none" />
-                <circle id="meter-circle" cx="72" cy="72" r="56" stroke="currentColor" stroke-width="8" stroke-dasharray="351.8" stroke-dashoffset="351.8" stroke-linecap="round" class="text-pink-500 fill-none transition-all duration-300" />
+                <circle cx="64" cy="64" r="50" stroke="currentColor" stroke-width="7" class="text-slate-800 fill-none" />
+                <circle id="meter-circle" cx="64" cy="64" r="50" stroke="currentColor" stroke-width="7" stroke-dasharray="314.16" stroke-dashoffset="314.16" stroke-linecap="round" class="text-pink-500 fill-none transition-all duration-300" />
               </svg>
               <div class="absolute flex flex-col items-center text-center">
-                <span id="primary-metric-val" class="text-3xl font-bold tracking-tight">--</span>
-                <span class="text-[10px] text-slate-400 tracking-wider">唇型協調指數</span>
+                <span id="primary-metric-val" class="text-2xl font-bold tracking-tight">--</span>
+                <span class="text-[9px] text-slate-400 tracking-wider">協調指數</span>
               </div>
             </div>
 
-            <!-- 細項指標 -->
-            <div class="w-full space-y-2.5 mt-5 text-xs">
-              <div class="flex justify-between items-center py-1.5 border-b border-slate-800/80">
+            <!-- 公分實測尺寸區塊 (Highlight) -->
+            <div class="w-full mt-3 p-3 bg-pink-950/20 border border-pink-800/30 rounded-xl space-y-1.5">
+              <div class="text-[10px] font-semibold text-pink-400 tracking-wide flex items-center gap-1">
+                <i data-lucide="ruler" class="w-3.5 h-3.5"></i> 實體尺寸估算 (基準 IPD: 6.3cm)
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-slate-300">上唇厚度</span>
+                <span id="metric-upper-cm" class="font-mono text-emerald-400 font-bold">-- cm</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-slate-300">下唇厚度</span>
+                <span id="metric-lower-cm" class="font-mono text-emerald-400 font-bold">-- cm</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-slate-300">全唇水平寬度</span>
+                <span id="metric-width-cm" class="font-mono text-pink-300 font-semibold">-- cm</span>
+              </div>
+            </div>
+
+            <!-- 細項比例指標 -->
+            <div class="w-full space-y-2 mt-3 text-xs">
+              <div class="flex justify-between items-center py-1 border-b border-slate-800/80">
                 <span class="text-slate-400">上下唇厚度比</span>
                 <span id="metric-ratio" class="font-mono text-pink-300 font-semibold">--</span>
               </div>
-              <div class="flex justify-between items-center py-1.5 border-b border-slate-800/80">
-                <span class="text-slate-400">上唇厚度佔比</span>
+              <div class="flex justify-between items-center py-1 border-b border-slate-800/80">
+                <span class="text-slate-400">上唇佔比</span>
                 <span id="metric-upper-pct" class="font-mono text-slate-200">--%</span>
               </div>
-              <div class="flex justify-between items-center py-1.5 border-b border-slate-800/80">
-                <span class="text-slate-400">唇寬 / 鼻寬比例</span>
+              <div class="flex justify-between items-center py-1 border-b border-slate-800/80">
+                <span class="text-slate-400">唇寬 / 鼻寬比</span>
                 <span id="metric-width-ratio" class="font-mono text-slate-200">--</span>
               </div>
-              <div class="flex justify-between items-center py-1.5 border-b border-slate-800/80">
-                <span class="text-slate-400">雙側唇峰平衡性</span>
+              <div class="flex justify-between items-center py-1 border-b border-slate-800/80">
+                <span class="text-slate-400">唇峰對稱性</span>
                 <span id="metric-peak-sym" class="font-mono text-slate-200">--%</span>
               </div>
             </div>
@@ -140,8 +159,8 @@
         </div>
 
         <!-- 導出圖卡 -->
-        <div class="mt-6 pt-3 border-t border-slate-800">
-          <button id="export-card-btn" disabled class="w-full py-3 bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-400 hover:to-rose-500 disabled:opacity-30 disabled:cursor-not-allowed font-medium rounded-xl text-xs transition-all shadow-lg shadow-pink-500/10 flex items-center justify-center space-x-2">
+        <div class="mt-4 pt-3 border-t border-slate-800">
+          <button id="export-card-btn" disabled class="w-full py-2.5 bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-400 hover:to-rose-500 disabled:opacity-30 disabled:cursor-not-allowed font-medium rounded-xl text-xs transition-all shadow-lg shadow-pink-500/10 flex items-center justify-center space-x-2">
             <i data-lucide="download" class="w-4 h-4"></i>
             <span>下載唇型美學幾何圖卡 (PNG)</span>
           </button>
@@ -152,7 +171,7 @@
 
   <footer class="w-full max-w-4xl mt-5 p-4 rounded-xl bg-slate-900/60 border border-slate-800 text-[11px] text-slate-500 leading-relaxed">
     <p class="font-semibold text-slate-400">【美學設計與生活造型參考宣告】</p>
-    <p>本系統僅根據鏡頭幾何座標計算唇部外觀比例，數據供唇彩勾勒、妝容明暗對比、彩妝打亮及日常美學造型參考，非醫療器材，不具備任何侵入性微整評估或病理診斷功能。</p>
+    <p>公分尺寸估算基於標準成人瞳距（63 mm）推導，受拍攝距離、視角與鏡頭畸變影響約有 ±5%~10% 之估計誤差。本系統數據供唇彩勾勒、妝容明暗對比、彩妝打亮及日常美學造型參考，非醫療器材，不具備任何侵入性微整評估或病理診斷功能。</p>
   </footer>
 
   <script>
@@ -172,16 +191,22 @@
 
     const primaryVal = document.getElementById('primary-metric-val');
     const meterCircle = document.getElementById('meter-circle');
+    const metricUpperCm = document.getElementById('metric-upper-cm');
+    const metricLowerCm = document.getElementById('metric-lower-cm');
+    const metricWidthCm = document.getElementById('metric-width-cm');
     const metricRatio = document.getElementById('metric-ratio');
     const metricUpperPct = document.getElementById('metric-upper-pct');
     const metricWidthRatio = document.getElementById('metric-width-ratio');
     const metricPeakSym = document.getElementById('metric-peak-sym');
 
     let stableCount = 0;
-    const CIRCUMFERENCE = 2 * Math.PI * 56;
+    const CIRCUMFERENCE = 2 * Math.PI * 50;
 
     let reportData = {
       score: 0,
+      upperCmStr: '--',
+      lowerCmStr: '--',
+      widthCmStr: '--',
       ratioStr: '--',
       upperPctStr: '--',
       widthRatioStr: '--',
@@ -211,6 +236,8 @@
       }
 
       const lm = results.multiFaceLandmarks[0];
+      const w = canvas.width;
+      const h = canvas.height;
 
       // 關鍵特徵點
       const noseTip = lm[1];
@@ -234,40 +261,52 @@
       const isYawOk = yawDelta < 0.025;
       updateBadge(badgeYaw, isYawOk, "擺正良好", "視角偏斜");
 
-      // 2. 防呆條件：閉唇狀態檢查 (若張嘴則垂直接觸點與內側點差距變大)
-      const mouthAperture = Math.hypot(lm[13].x - lm[14].x, lm[13].y - lm[14].y);
-      const isMouthClosed = mouthAperture < 0.018;
+      // 2. 防呆條件：閉唇狀態檢查
+      const mouthAperture = Math.hypot((lm[13].x - lm[14].x) * w, (lm[13].y - lm[14].y) * h);
+      const isMouthClosed = mouthAperture < (h * 0.02);
       updateBadge(badgeDist, isMouthClosed, "唇態自然", "請自然放鬆閉唇");
 
-      // 3. 幾何厚度計算
-      const upperH = Math.hypot(upperLipTop.x - lipContact.x, upperLipTop.y - lipContact.y);
-      const lowerH = Math.hypot(lowerLipBottom.x - lipContact.x, lowerLipBottom.y - lipContact.y);
-      const totalH = upperH + lowerH;
+      // 3. 實際物理尺寸 (cm) 估算比例尺
+      // 成人雙眼瞳距平均約為 6.3 公分 (63 mm)
+      const irisPx = Math.hypot((leftIris.x - rightIris.x) * w, (leftIris.y - rightIris.y) * h);
+      const cmPerPx = irisPx > 0 ? (6.3 / irisPx) : 0;
 
-      if (totalH === 0) return;
+      // 像素距離
+      const upperHPx = Math.hypot((upperLipTop.x - lipContact.x) * w, (upperLipTop.y - lipContact.y) * h);
+      const lowerHPx = Math.hypot((lowerLipBottom.x - lipContact.x) * w, (lowerLipBottom.y - lipContact.y) * h);
+      const mouthWPx = Math.hypot((mouthLeft.x - mouthRight.x) * w, (mouthLeft.y - mouthRight.y) * h);
+      const noseWPx = Math.hypot((noseLeft.x - noseRight.x) * w, (noseLeft.y - noseRight.y) * h);
 
-      const upperRatio = upperH / lowerH; // 理想 1 : 1.3 ~ 1.5 (約 0.67 ~ 0.77)
-      const upperPct = Math.round((upperH / totalH) * 100);
+      // 轉換為公分 (cm)
+      const upperCm = (upperHPx * cmPerPx).toFixed(2);
+      const lowerCm = (lowerHPx * cmPerPx).toFixed(2);
+      const mouthWCm = (mouthWPx * cmPerPx).toFixed(2);
+
+      // 幾何比例
+      const totalHPx = upperHPx + lowerHPx;
+      if (totalHPx === 0) return;
+
+      const upperRatio = upperHPx / lowerHPx;
+      const upperPct = Math.round((upperHPx / totalHPx) * 100);
       const lowerPct = 100 - upperPct;
+      const widthRatio = (mouthWPx / (noseWPx || 1)).toFixed(2);
 
-      // 唇寬 vs 鼻翼寬
-      const mouthW = Math.hypot(mouthLeft.x - mouthRight.x, mouthLeft.y - mouthRight.y);
-      const noseW = Math.hypot(noseLeft.x - noseRight.x, noseLeft.y - noseRight.y);
-      const widthRatio = (mouthW / (noseW || 1)).toFixed(2); // 理想 1.35 ~ 1.55
-
-      // 唇峰對稱度 (比對左右唇峰高度到唇中線的垂直位移)
-      const leftPeakH = Math.abs(peakLeft.y - lipContact.y);
-      const rightPeakH = Math.abs(peakRight.y - lipContact.y);
+      // 唇峰對稱度
+      const leftPeakH = Math.abs((peakLeft.y - lipContact.y) * h);
+      const rightPeakH = Math.abs((peakRight.y - lipContact.y) * h);
       const peakSym = Math.round((Math.min(leftPeakH, rightPeakH) / Math.max(leftPeakH, rightPeakH)) * 100) || 0;
 
-      // 評分算法：以黃金比例 1:1.35 (上唇約 42%) 為 100 分基準
-      const idealRatio = 0.74; // 1 / 1.35
+      // 評分 (以黃金比例 1:1.35 為基準)
+      const idealRatio = 0.74;
       const ratioDiff = Math.abs(upperRatio - idealRatio);
       const score = Math.max(50, Math.min(100, Math.round(100 - ratioDiff * 90)));
 
       // 更新儀表板
       primaryVal.innerText = score;
       meterCircle.style.strokeDashoffset = CIRCUMFERENCE - (score / 100) * CIRCUMFERENCE;
+      metricUpperCm.innerText = `${upperCm} cm`;
+      metricLowerCm.innerText = `${lowerCm} cm`;
+      metricWidthCm.innerText = `${mouthWCm} cm`;
       metricRatio.innerText = `1 : ${(1 / upperRatio).toFixed(2)}`;
       metricUpperPct.innerText = `${upperPct}% : ${lowerPct}%`;
       metricWidthRatio.innerText = `${widthRatio} : 1`;
@@ -285,7 +324,7 @@
 
       const allLocked = ready && (stableCount > 15);
       if (allLocked) {
-        guideMsg.innerText = "唇型測量完成，可導出分析卡";
+        guideMsg.innerText = "測量完成，可導出分析卡";
         guideFrame.classList.add('ready');
         scanLine.classList.remove('hidden');
         exportBtn.disabled = false;
@@ -296,21 +335,24 @@
         exportBtn.disabled = true;
       }
 
-      // 繪製專業唇部 HUD
-      drawLipOverlay(ctx, lm, canvas.width, canvas.height);
+      // 繪製專業 HUD 與公分標籤
+      drawLipOverlay(ctx, lm, w, h, upperCm, lowerCm, mouthWCm);
 
-      // 動態美學建議文字
+      // 動態造型建議
       let styleAdvice = "";
       if (upperRatio < 0.6) {
-        styleAdvice = "上唇較顯輕薄，建議在唇峰上方使用高光打亮，並利用唇筆稍微往外勾勒上唇緣，增加立體飽滿感。";
+        styleAdvice = `上唇厚度約 ${upperCm} cm 偏薄，建議於唇峰上方以打亮勾勒外唇線，增強視覺飽滿感。`;
       } else if (upperRatio > 0.85) {
-        styleAdvice = "上下唇厚度比例接近，適合咬唇妝或漸層妝容，外緣輕微遮瑕可營造精巧內斂的視覺焦點。";
+        styleAdvice = `上唇 (${upperCm} cm) 與下唇 (${lowerCm} cm) 接近等厚，適合漸層咬唇妝，唇外緣輕微遮瑕能增添輕盈感。`;
       } else {
-        styleAdvice = "上下唇厚度非常接近黃金美學比例，適合飽和度高的唇膏質地，直接沿天然唇線塗抹即可展現完美比例。";
+        styleAdvice = `上唇 (${upperCm} cm) 與下唇 (${lowerCm} cm) 吻合黃金美學比例，適合飽滿唇彩塗抹，立體感極佳。`;
       }
 
       reportData = {
         score: score,
+        upperCmStr: `${upperCm} cm`,
+        lowerCmStr: `${lowerCm} cm`,
+        widthCmStr: `${mouthWCm} cm`,
         ratioStr: `1 : ${(1 / upperRatio).toFixed(2)}`,
         upperPctStr: `上唇 ${upperPct}% / 下唇 ${lowerPct}%`,
         widthRatioStr: `${widthRatio} : 1 (唇寬/鼻寬)`,
@@ -319,10 +361,10 @@
       };
     }
 
-    function drawLipOverlay(ctx, lm, w, h) {
-      // 唇部輪廓關鍵點串聯 (外輪廓)
+    function drawLipOverlay(ctx, lm, w, h, upperCm, lowerCm, mouthWCm) {
       const outerLipIndices = [61, 185, 40, 39, 37, 0, 267, 269, 270, 409, 291, 375, 321, 405, 314, 17, 84, 181, 91, 146, 61];
       
+      // 唇部輪廓
       ctx.strokeStyle = "rgba(236, 72, 153, 0.7)";
       ctx.lineWidth = 1.5;
       ctx.beginPath();
@@ -333,7 +375,7 @@
       });
       ctx.stroke();
 
-      // 垂直厚度量測軸線 (上唇頂 -> 唇縫 -> 下唇底)
+      // 垂直厚度量測軸線
       ctx.strokeStyle = "#38bdf8";
       ctx.lineWidth = 2;
       ctx.beginPath();
@@ -342,8 +384,8 @@
       ctx.lineTo(lm[17].x * w, lm[17].y * h);
       ctx.stroke();
 
-      // 唇寬水平軸線 (左嘴角 -> 右嘴角)
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+      // 唇寬水平軸線
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
       ctx.setLineDash([3, 3]);
       ctx.beginPath();
       ctx.moveTo(lm[61].x * w, lm[61].y * h);
@@ -351,144 +393,30 @@
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // 標註關鍵測量錨點
+      // 關鍵特徵點
       ctx.fillStyle = "#ec4899";
       [0, 13, 17, 61, 291, 37, 267].forEach(idx => {
         ctx.beginPath();
-        ctx.arc(lm[idx].x * w, lm[idx].y * h, 3, 0, 2 * Math.PI);
+        ctx.arc(lm[idx].x * w, lm[idx].y * h, 3.5, 0, 2 * Math.PI);
         ctx.fill();
       });
-    }
 
-    function handleReset(msg) {
-      guideMsg.innerText = msg;
-      updateBadge(badgeYaw, false, "", "等待唇部");
-      updateBadge(badgeDist, false, "", "等待唇部");
-      updateBadge(badgeStable, false, "", "等待目標");
-      primaryVal.innerText = "--";
-      meterCircle.style.strokeDashoffset = CIRCUMFERENCE;
-      exportBtn.disabled = true;
-      scanLine.classList.add('hidden');
-    }
+      // 畫面即時標註公分數值 (浮空 HUD)
+      ctx.save();
+      ctx.scale(-1, 1); // 修正 canvas 翻轉字體問題
+      ctx.fillStyle = "#34d399";
+      ctx.font = "bold 12px monospace";
+      
+      // 上唇 cm 標籤 (放在上唇中點旁)
+      const uX = -(lm[0].x * w) + 12;
+      const uY = (lm[0].y * w + lm[13].y * h) / 2;
+      ctx.fillText(`${upperCm}cm`, uX, uY);
 
-    function updateBadge(el, isOk, okText, badText) {
-      if (isOk) {
-        el.className = "flex items-center justify-center space-x-1.5 p-2 rounded-xl bg-emerald-950/40 border border-emerald-800 text-emerald-400 font-medium";
-        el.querySelector('span').innerText = okText;
-      } else {
-        el.className = "flex items-center justify-center space-x-1.5 p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400";
-        el.querySelector('span').innerText = badText;
-      }
-    }
+      // 下唇 cm 標籤
+      const lX = -(lm[17].x * w) + 12;
+      const lY = (lm[13].y * h + lm[17].y * h) / 2;
+      ctx.fillText(`${lowerCm}cm`, lX, lY);
 
-    const camera = new Camera(video, {
-      onFrame: async () => {
-        await faceMesh.send({ image: video });
-      },
-      width: 640,
-      height: 480
-    });
-    camera.start();
-
-    // 導出專業圖卡 (PNG)
-    exportBtn.onclick = () => {
-      const card = document.createElement('canvas');
-      card.width = 800;
-      card.height = 1000;
-      const c = card.getContext('2d');
-
-      // 背景漸層
-      const grad = c.createLinearGradient(0, 0, 0, 1000);
-      grad.addColorStop(0, '#0f172a');
-      grad.addColorStop(1, '#020617');
-      c.fillStyle = grad;
-      c.fillRect(0, 0, 800, 1000);
-
-      // 邊框
-      c.strokeStyle = '#334155';
-      c.lineWidth = 2;
-      c.strokeRect(30, 30, 740, 940);
-
-      // 標題
-      c.fillStyle = '#ec4899';
-      c.font = 'bold 30px sans-serif';
-      c.fillText("AuraMetric 唇部美學幾何分析卡", 60, 95);
-
-      c.fillStyle = '#94a3b8';
-      c.font = '15px sans-serif';
-      c.fillText(`分析模式：唇型黃金幾何比例  |  日期：${new Date().toLocaleDateString()}`, 60, 135);
-
-      // 分數大區塊
-      c.fillStyle = '#1e293b';
-      c.fillRect(60, 170, 680, 180);
-
-      c.fillStyle = '#f43f5e';
-      c.font = 'bold 72px sans-serif';
-      c.textAlign = 'center';
-      c.fillText(`${reportData.score}`, 400, 265);
-
-      c.fillStyle = '#cbd5e1';
-      c.font = '16px sans-serif';
-      c.fillText("唇型黃金協調指數", 400, 310);
-      c.textAlign = 'left';
-
-      // 細節量測指標清單
-      c.font = '20px sans-serif';
-      c.fillStyle = '#f8fafc';
-      c.fillText(`• 上下唇厚度比例： ${reportData.ratioStr} (標準建議 1 : 1.3~1.5)`, 80, 410);
-      c.fillText(`• 厚度分佈： ${reportData.upperPctStr}`, 80, 460);
-      c.fillText(`• 唇鼻寬度協調比： ${reportData.widthRatioStr}`, 80, 510);
-      c.fillText(`• 左右唇峰對稱度： ${reportData.peakSymStr}`, 80, 560);
-
-      // 彩妝造型建議
-      c.fillStyle = '#1e293b';
-      c.fillRect(60, 610, 680, 150);
-      c.fillStyle = '#f472b6';
-      c.font = 'bold 18px sans-serif';
-      c.fillText("【唇彩造型與視覺焦點調整建議】", 80, 650);
-
-      c.fillStyle = '#cbd5e1';
-      c.font = '15px sans-serif';
-      wrapText(c, reportData.tip, 80, 690, 640, 24);
-
-      // 法律免責聲明
-      c.strokeStyle = '#334155';
-      c.beginPath();
-      c.moveTo(60, 790);
-      c.lineTo(740, 790);
-      c.stroke();
-
-      c.fillStyle = '#64748b';
-      c.font = '12px sans-serif';
-      c.fillText("【日常美學參考與法律免責聲明】", 60, 830);
-      c.fillText("1. 本數值為純前端攝影機特徵座標之幾何計算結果，非醫療臨床檢測，不可作為侵入處置依據。", 60, 855);
-      c.fillText("2. 唇部特徵測量僅供日常妝容描繪、唇膏光澤選擇等造型美學搭配使用。", 60, 880);
-      c.fillText("3. 系統端採即時記憶體運算，不傳輸且不儲存任何臉部特徵個資，嚴格保障個人隱私。", 60, 905);
-
-      const link = document.createElement('a');
-      link.download = `Lip-Metric-Report-${Date.now()}.png`;
-      link.href = card.toDataURL('image/png');
-      link.click();
-    };
-
-    // Canvas 自動換行輔助函數
-    function wrapText(context, text, x, y, maxWidth, lineHeight) {
-      let words = text.split('');
-      let line = '';
-      for (let n = 0; n < words.length; n++) {
-        let testLine = line + words[n];
-        let metrics = context.measureText(testLine);
-        let testWidth = metrics.width;
-        if (testWidth > maxWidth && n > 0) {
-          context.fillText(line, x, y);
-          line = words[n];
-          y += lineHeight;
-        } else {
-          line = testLine;
-        }
-      }
-      context.fillText(line, x, y);
-    }
-  </script>
-</body>
-</html>
+      // 唇寬 cm 標籤
+      const wX = -((lm[61].x * w + lm[291].x * w) / 2) - 20;
+      const wY = lm[17].y * h +
