@@ -37,7 +37,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center p-3 sm:p-6 selection:bg-pink-500 selection:text-black">
 
-  <!-- Header -->
+  <!-- 頂部 Header -->
   <header class="w-full max-w-lg flex items-center justify-between pb-3 border-b border-slate-800">
     <div class="flex items-center space-x-2">
       <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-pink-500 to-rose-600 flex items-center justify-center font-bold text-white shadow-lg shadow-pink-500/20">
@@ -85,7 +85,7 @@
       </div>
     </div>
 
-    <!-- 診斷結果面板 -->
+    <!-- 診斷結果面板 (分析完成後呈現) -->
     <div id="result-panel" class="w-full bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
       
       <!-- 唇型判定抬頭 -->
@@ -100,7 +100,7 @@
         </div>
       </div>
 
-      <!-- 實體公分數據 -->
+      <!-- 實體公分尺寸數據 (基準 IPD: 6.3cm) -->
       <div class="grid grid-cols-3 gap-2 bg-slate-950/60 p-3 rounded-xl border border-slate-800/80 text-center font-mono">
         <div>
           <div class="text-[10px] text-slate-400">上唇厚度</div>
@@ -119,7 +119,7 @@
       <!-- 比例數值參考 -->
       <div class="grid grid-cols-2 gap-2 text-xs text-slate-400 px-1">
         <div class="flex justify-between py-1 border-b border-slate-800">
-          <span>上下唇比</span>
+          <span>上下唇厚度比</span>
           <span id="metric-ratio" class="font-mono text-slate-200">--</span>
         </div>
         <div class="flex justify-between py-1 border-b border-slate-800">
@@ -128,7 +128,7 @@
         </div>
       </div>
 
-      <!-- 彩妝與質地建議 (商用高價值區塊) -->
+      <!-- 彩妝與質地建議 -->
       <div class="bg-pink-950/20 border border-pink-900/40 rounded-xl p-3.5 space-y-2">
         <div class="text-xs font-bold text-pink-400 flex items-center space-x-1.5">
           <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
@@ -151,9 +151,10 @@
     </div>
   </main>
 
+  <!-- 底部合規聲明 -->
   <footer class="w-full max-w-lg mt-5 p-4 rounded-xl bg-slate-900/60 border border-slate-800 text-[11px] text-slate-500 leading-relaxed">
     <p class="font-semibold text-slate-400">【日常彩妝與造型設計宣告】</p>
-    <p>1. 本系統採用瀏覽器本地運算，不儲存亦不上傳任何臉部特徵，保障個人隱私。</p>
+    <p>1. 本系統採用純瀏覽器本地記憶體運算，不儲存亦不上傳任何臉部特徵個資，嚴格保障個人隱私。</p>
     <p>2. 尺寸測量係依據人體標準平均瞳距（63 mm）推導，供唇彩勾勒、彩妝明暗對比參考，非醫療器材，不具備任何侵入性微整診斷功能。</p>
   </footer>
 
@@ -214,13 +215,13 @@
       const w = canvas.width;
       const h = canvas.height;
 
-      // 瞳距反推比例尺
+      // 成人平均瞳距約 6.3 cm，反推像素比例尺
       const leftIris = lm[468];
       const rightIris = lm[473];
       const irisPx = Math.hypot((leftIris.x - rightIris.x) * w, (leftIris.y - rightIris.y) * h);
       const cmPerPx = irisPx > 0 ? (6.3 / irisPx) : 0;
 
-      // 唇部特徵點
+      // 唇部關鍵座標
       const upperHPx = Math.hypot((lm[0].x - lm[13].x) * w, (lm[0].y - lm[13].y) * h);
       const lowerHPx = Math.hypot((lm[17].x - lm[13].x) * w, (lm[17].y - lm[13].y) * h);
       const mouthWPx = Math.hypot((lm[61].x - lm[291].x) * w, (lm[61].y - lm[291].y) * h);
@@ -235,18 +236,19 @@
       const rightPeakH = Math.abs((lm[267].y - lm[13].y) * h);
       const peakSym = Math.round((Math.min(leftPeakH, rightPeakH) / Math.max(leftPeakH, rightPeakH)) * 100) || 0;
 
-      // 暫存資料
+      // 暫存此幀運算結果
       latestMetrics = { upperCm, lowerCm, widthCm, upperRatio, peakSym, lm, w, h };
 
-      // 繪製 HUD
+      // 繪製 HUD 輪廓
       drawLipOverlay(ctx, lm, w, h);
 
-      // 啟動拍照功能
+      // 啟用拍照鎖定
       snapBtn.disabled = false;
       guideFrame.classList.add('ready');
       guideMsg.innerText = "偵測良好，可點擊鎖定分析";
     }
 
+    // 風格判定與彩妝建議邏輯
     function evaluateLipProfile(upperCm, lowerCm, widthCm, upperRatio) {
       let typeName = "標準黃金唇型";
       let tip = "上下唇厚度比例均衡自然，順著原生唇線勾勒即可凸顯立體感。";
@@ -275,7 +277,7 @@
       return { typeName, tip, texture };
     }
 
-    // 點擊鎖定拍照
+    // 點擊拍照鎖定
     snapBtn.onclick = () => {
       if (!latestMetrics) return;
       isLocked = true;
@@ -312,7 +314,7 @@
       exportBtn.disabled = false;
     };
 
-    // 重新偵測
+    // 重新偵測重拍
     retakeBtn.onclick = () => {
       isLocked = false;
       snapBtn.classList.remove('hidden');
@@ -353,7 +355,7 @@
     });
     camera.start();
 
-    // 導出圖卡
+    // 導出個人化分析圖卡 (PNG)
     exportBtn.onclick = () => {
       const card = document.createElement('canvas');
       card.width = 800;
@@ -372,11 +374,11 @@
 
       c.fillStyle = '#ec4899';
       c.font = 'bold 30px sans-serif';
-      c.fillText("AuraMetric 唇部美學幾何分析卡", 60, 95);
+      c.fillText("AuraMetric 唇部美學風格分析卡", 60, 95);
 
       c.fillStyle = '#94a3b8';
       c.font = '15px sans-serif';
-      c.fillText(`風格判定：${lipTypeName.innerText}  |  日期：${new Date().toLocaleDateString()}`, 60, 135);
+      c.fillText(`風格定位：${lipTypeName.innerText}  |  日期：${new Date().toLocaleDateString()}`, 60, 135);
 
       c.fillStyle = '#1e293b';
       c.fillRect(60, 165, 680, 150);
