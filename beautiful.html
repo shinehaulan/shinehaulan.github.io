@@ -3,172 +3,134 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>AuraMirror Pro - 妝前妝後視覺對齊與色彩比對鏡</title>
+  <title>AuraLook - 個人全臉彩妝風格模擬鏡</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- 核心 MediaPipe FaceMesh，純客戶端本地運算 -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
 
   <style>
-    .split-container {
-      position: relative;
-      overflow: hidden;
-    }
-    .split-after {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      overflow: hidden;
-      border-right: 2px solid #ec4899;
+    .style-pill.active {
+      background: linear-gradient(135deg, #ec4899, #f43f5e);
+      color: #ffffff;
+      border-color: transparent;
+      box-shadow: 0 0 15px rgba(236, 72, 153, 0.4);
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center p-3 font-sans selection:bg-pink-500 selection:text-black">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center p-3 font-sans selection:bg-pink-500">
 
-  <!-- 頂部 Header -->
+  <!-- 頂部導覽列 -->
   <header class="w-full max-w-md flex items-center justify-between pb-2 border-b border-slate-800">
     <div class="flex items-center space-x-2">
-      <div class="w-7 h-7 rounded-lg bg-gradient-to-tr from-pink-500 to-rose-600 flex items-center justify-center font-bold text-white shadow-md shadow-pink-500/20 text-xs">
-        M
+      <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-pink-500 to-rose-600 flex items-center justify-center font-bold text-white shadow-lg shadow-pink-500/20 text-sm">
+        A
       </div>
       <div>
-        <h1 class="text-sm font-bold text-white tracking-wide">AuraMirror Pro</h1>
-        <p class="text-[9px] text-slate-400">妝前妝後姿態對齊與色彩比對輔助鏡</p>
+        <h1 class="text-sm font-bold text-white tracking-wide">AuraLook 智能彩妝鏡</h1>
+        <p class="text-[9px] text-slate-400">即時模擬全臉風格・找出命定妝容</p>
       </div>
     </div>
     <div class="flex items-center space-x-2">
-      <button id="open-license-btn" class="text-[10px] text-slate-400 hover:text-slate-200 underline">授權條款</button>
-      <div id="step-badge" class="px-2.5 py-0.5 rounded-full bg-slate-900 border border-slate-700 text-[10px] font-medium text-pink-400">
-        步驟 1：記錄素顏基準
-      </div>
+      <button id="open-license-btn" class="text-[10px] text-slate-400 hover:text-slate-200 underline">開源授權</button>
+      <span class="px-2.5 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-[10px] text-pink-400">
+        即時動態追蹤
+      </span>
     </div>
   </header>
 
   <main class="w-full max-w-md mt-2 flex flex-col items-center space-y-3">
     
-    <!-- 鏡頭拍攝視窗 -->
-    <div id="camera-section" class="relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-black border border-slate-800 shadow-2xl">
+    <!-- 鏡頭與即時化妝畫布 -->
+    <div class="relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-black border border-slate-800 shadow-2xl">
       <video id="webcam" class="absolute inset-0 w-full h-full object-cover transform -scale-x-100" playsinline autoplay muted></video>
-      <canvas id="ar-canvas" class="absolute inset-0 w-full h-full object-cover transform -scale-x-100 z-10"></canvas>
+      <canvas id="makeup-canvas" class="absolute inset-0 w-full h-full object-cover transform -scale-x-100 z-10"></canvas>
 
-      <!-- 吻合提示條 -->
-      <div id="alignment-bar" class="absolute top-3 inset-x-3 bg-slate-900/90 backdrop-blur-md border border-slate-700 p-2 rounded-xl flex items-center justify-between z-20 shadow-lg">
-        <div class="flex items-center space-x-2">
-          <span id="lock-dot" class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
-          <span id="align-text" class="text-xs font-bold text-slate-300">鏡頭啟動中...</span>
-        </div>
-        <div id="match-score" class="font-mono text-xs font-extrabold text-slate-400">0%</div>
+      <!-- 狀態提示標籤 -->
+      <div id="status-tag" class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md border border-slate-700/80 text-white text-[11px] px-3 py-1 rounded-full z-20 flex items-center space-x-1.5 shadow-md">
+        <span class="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></span>
+        <span id="current-style-name">韓系白開水淡妝</span>
       </div>
 
-      <!-- 操作按鈕 -->
-      <div class="absolute bottom-4 inset-x-0 flex justify-center items-center space-x-3 px-4 z-20">
-        <button id="capture-base-btn" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 text-white font-bold text-xs shadow-lg shadow-pink-500/20 flex items-center space-x-1.5 active:scale-95 transition-all">
-          <i data-lucide="sparkles" class="w-4 h-4"></i>
-          <span>記錄妝前素顏 (Before)</span>
-        </button>
-        <button id="capture-align-btn" class="hidden px-6 py-2.5 rounded-full bg-pink-600 text-white font-bold text-xs shadow-lg shadow-pink-600/30 flex items-center space-x-1.5 active:scale-95 transition-all">
-          <i data-lucide="camera" class="w-4 h-4"></i>
-          <span>拍攝完妝對照 (After)</span>
-        </button>
-      </div>
+      <!-- 長按看原本素顏按鈕 (對比核心體驗) -->
+      <button id="compare-btn" class="absolute top-3 right-3 bg-slate-900/80 hover:bg-slate-800 active:bg-pink-600 backdrop-blur-md border border-slate-700/80 text-slate-200 active:text-white text-[11px] px-3 py-1 rounded-full z-20 transition-all select-none">
+        按住看素顏
+      </button>
 
-      <!-- 相機啟用備用遮罩 -->
+      <!-- 備用鏡頭喚醒提示 -->
       <div id="start-mask" class="hidden absolute inset-0 bg-slate-950/95 flex flex-col items-center justify-center p-6 text-center space-y-3 z-30">
         <i data-lucide="camera" class="w-10 h-10 text-pink-500"></i>
-        <h3 class="text-sm font-bold text-white">啟動彩妝鏡鏡頭</h3>
-        <p class="text-xs text-slate-400">系統採純裝置端演算，不錄影、不上傳任何影像。</p>
+        <h3 class="text-sm font-bold text-white">點擊啟動前鏡頭</h3>
+        <p class="text-xs text-slate-400">影像僅於手機本機即時渲染，不上傳伺服器。</p>
         <button id="start-cam-btn" class="px-5 py-2.5 bg-pink-600 rounded-xl text-xs font-bold text-white shadow-lg">
-          允許使用前鏡頭
+          開啟相機
         </button>
       </div>
     </div>
 
-    <!-- 妝容比對與局部檢視區 -->
-    <div id="analysis-section" class="hidden w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-3">
-      <div class="flex items-center justify-between pb-2 border-b border-slate-800">
-        <div>
-          <span class="text-[9px] text-pink-400 font-semibold tracking-wider uppercase">底妝與腮紅細節比對</span>
-          <h2 class="text-sm font-bold text-white mt-0.5">臉頰妝效局部特寫 (3.5x)</h2>
-        </div>
-        <button id="toggle-blink-btn" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-pink-300 border border-slate-700 flex items-center space-x-1">
-          <i data-lucide="eye" class="w-3.5 h-3.5"></i>
-          <span>動態閃爍比對</span>
+    <!-- 風格切換面板 -->
+    <div class="w-full bg-slate-900 border border-slate-800 rounded-2xl p-3.5 shadow-xl space-y-3">
+      <div class="flex items-center justify-between text-xs">
+        <span class="font-bold text-pink-400 flex items-center space-x-1.5">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          <span>點選切換全臉妝容風格</span>
+        </span>
+      </div>
+
+      <!-- 風格按鈕清單 -->
+      <div class="grid grid-cols-2 gap-2">
+        <button class="style-pill active p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 text-left transition-all" data-style="clean">
+          <div class="text-xs font-bold">🌸 白開水淡妝</div>
+          <div class="text-[10px] text-slate-400 mt-0.5">偽素顏、清透粉唇、溫和提氣色</div>
+        </button>
+        <button class="style-pill p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 text-left transition-all text-slate-300" data-style="french">
+          <div class="text-xs font-bold">💄 法式復古紅唇</div>
+          <div class="text-[10px] text-slate-400 mt-0.5">經典正紅唇、大地眼妝、輪廓立體</div>
+        </button>
+        <button class="style-pill p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 text-left transition-all text-slate-300" data-style="peach">
+          <div class="text-xs font-bold">🍑 溫柔蜜桃奶茶</div>
+          <div class="text-[10px] text-slate-400 mt-0.5">裸橘調腮紅、柔霧奶茶唇、日系減齡</div>
+        </button>
+        <button class="style-pill p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 text-left transition-all text-slate-300" data-style="smoky">
+          <div class="text-xs font-bold">✨ 輕奢千金煙燻</div>
+          <div class="text-[10px] text-slate-400 mt-0.5">微深邃眼眸、啞光豆沙唇、立體高光</div>
         </button>
       </div>
 
-      <!-- 透視比對畫布 -->
-      <div class="relative w-full aspect-square rounded-xl overflow-hidden bg-black border border-slate-800 split-container">
-        <canvas id="roi-base-canvas" class="absolute inset-0 w-full h-full object-cover"></canvas>
-        <div id="split-wrapper" class="split-after w-1/2">
-          <canvas id="roi-target-canvas" class="absolute top-0 left-0 h-full max-w-none"></canvas>
-        </div>
-        <div class="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/75 text-[10px] text-slate-300 font-mono">妝前 (Before)</div>
-        <div class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/75 text-[10px] text-pink-400 font-mono">完妝 (After)</div>
+      <!-- 妝容濃淡度拉桿 -->
+      <div class="pt-1 flex items-center space-x-3 text-[11px] text-slate-400">
+        <span>妝感濃淡</span>
+        <input id="intensity-slider" type="range" min="0.2" max="1.2" step="0.05" value="0.75" class="w-full accent-pink-500 bg-slate-800 rounded-lg h-1.5 cursor-pointer">
       </div>
+    </div>
 
-      <!-- 滑桿控制 -->
-      <div class="space-y-1">
-        <div class="flex justify-between text-[10px] text-slate-400">
-          <span>滑動檢視遮瑕與修飾過渡</span>
-          <span id="slider-val-txt">50%</span>
-        </div>
-        <input id="split-slider" type="range" min="0" max="100" value="50" class="w-full accent-pink-500 bg-slate-800 rounded-lg h-1.5 cursor-pointer">
-      </div>
-
-      <!-- 妝效分析數據 -->
-      <div class="grid grid-cols-2 gap-2 text-xs">
-        <div class="bg-emerald-950/20 border border-emerald-900/40 p-2.5 rounded-xl">
-          <div class="text-[10px] text-slate-400 flex items-center space-x-1">
-            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-            <span>瑕疵修飾與均勻度</span>
-          </div>
-          <div id="coverage-score" class="font-bold text-emerald-400 mt-0.5 text-sm font-mono">--</div>
-        </div>
-        <div class="bg-pink-950/20 border border-pink-900/40 p-2.5 rounded-xl">
-          <div class="text-[10px] text-slate-400 flex items-center space-x-1">
-            <span class="w-2 h-2 rounded-full bg-pink-400"></span>
-            <span>彩妝顯色度提升</span>
-          </div>
-          <div id="pigment-score" class="font-bold text-pink-400 mt-0.5 text-sm font-mono">--</div>
-        </div>
-      </div>
-
-      <p class="text-[11px] text-slate-400 leading-relaxed bg-slate-950/50 p-2 rounded-lg border border-slate-800/80">
-        💡 <strong>彩妝輔助建議</strong>：綠圈代表暗沉已有效提亮校正；粉圈標記腮紅或修容層次的色彩對比變化。
+    <!-- 風格適合度點評 -->
+    <div class="w-full bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3 text-xs space-y-1">
+      <div class="text-slate-400 text-[10px]">風格特點與場合建議：</div>
+      <p id="style-desc" class="text-slate-200 leading-relaxed text-[11px]">
+        強調自然通透的原生感，適合日常通勤、面試與輕社交，不挑膚色且極度自然。
       </p>
-
-      <button id="reset-system-btn" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition-all">
-        重新對照其他妝容
-      </button>
     </div>
 
   </main>
 
-  <!-- 商業法規、隱私與非醫療免責聲明 -->
-  <footer class="w-full max-w-md mt-4 p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 text-[10px] text-slate-500 leading-relaxed space-y-1.5">
-    <div class="font-semibold text-slate-400 flex items-center space-x-1">
-      <i data-lucide="shield-check" class="w-3.5 h-3.5 text-pink-400"></i>
-      <span>個人彩妝造型輔助宣告</span>
-    </div>
-    <p>1. <strong>隱私安全承諾</strong>：本系統為純客戶端瀏覽器本機記憶體運算，絕不上傳、儲存或轉傳任何面部影像或特徵數據。</p>
-    <p>2. <strong>非醫療器材聲明</strong>：本工具僅供日常個人妝容對比、彩妝造型與顯色參考，非醫療器材，不具備任何皮膚疾病診斷、治療追蹤或病灶篩檢功能。</p>
-    <p>3. <strong>光影色差免責</strong>：比對成效可能受環境光源及裝置螢幕色域影響，建議於相同光源環境下進行妝前與完妝記錄。</p>
+  <footer class="w-full max-w-md mt-3 text-center text-[10px] text-slate-500 space-y-1">
+    <p>純本地端即時影像演算・影像絕不上傳雲端</p>
+    <p class="text-[9px] text-slate-600">免責聲明：本工具僅供日常造型美學參考，實際妝容顯色請以實體化妝品為準。</p>
   </footer>
 
-  <!-- 開源軟體授權聲明彈窗 (符合 Apache 2.0 / MIT / ISC 法律商用義務) -->
+  <!-- 開源軟體授權資訊 Modal (Apache 2.0 合規必備) -->
   <div id="license-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 max-w-sm w-full rounded-2xl p-4 shadow-2xl space-y-3">
       <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-        <h3 class="text-xs font-bold text-white">開源組件授權資訊</h3>
+        <h3 class="text-xs font-bold text-white">開源授權聲明 (Open Source Notices)</h3>
         <button id="close-license-btn" class="text-slate-400 hover:text-white">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
       <div class="text-[11px] text-slate-400 space-y-2 max-h-60 overflow-y-auto">
         <div>
-          <p class="font-bold text-slate-200">Google MediaPipe (FaceMesh)</p>
+          <p class="font-bold text-slate-200">Google MediaPipe FaceMesh</p>
           <p class="text-[10px]">Licensed under the Apache License, Version 2.0.</p>
           <p class="text-[9px] text-slate-500">Copyright Google LLC.</p>
         </div>
@@ -190,69 +152,82 @@
     lucide.createIcons();
 
     const video = document.getElementById('webcam');
-    const arCanvas = document.getElementById('ar-canvas');
-    const arCtx = arCanvas.getContext('2d');
+    const canvas = document.getElementById('makeup-canvas');
+    const ctx = canvas.getContext('2d');
 
-    const alignText = document.getElementById('align-text');
-    const matchScore = document.getElementById('match-score');
-    const lockDot = document.getElementById('lock-dot');
-    const stepBadge = document.getElementById('step-badge');
+    const currentStyleName = document.getElementById('current-style-name');
+    const styleDesc = document.getElementById('style-desc');
+    const intensitySlider = document.getElementById('intensity-slider');
+    const compareBtn = document.getElementById('compare-btn');
     const startMask = document.getElementById('start-mask');
     const startCamBtn = document.getElementById('start-cam-btn');
-
-    const captureBaseBtn = document.getElementById('capture-base-btn');
-    const captureAlignBtn = document.getElementById('capture-align-btn');
-    const cameraSection = document.getElementById('camera-section');
-    const analysisSection = document.getElementById('analysis-section');
-
-    const roiBaseCanvas = document.getElementById('roi-base-canvas');
-    const roiTargetCanvas = document.getElementById('roi-target-canvas');
-    const splitWrapper = document.getElementById('split-wrapper');
-    const splitSlider = document.getElementById('split-slider');
-    const sliderValTxt = document.getElementById('slider-val-txt');
-    const toggleBlinkBtn = document.getElementById('toggle-blink-btn');
-    const resetSystemBtn = document.getElementById('reset-system-btn');
-    const coverageScore = document.getElementById('coverage-score');
-    const pigmentScore = document.getElementById('pigment-score');
 
     const licenseModal = document.getElementById('license-modal');
     const openLicenseBtn = document.getElementById('open-license-btn');
     const closeLicenseBtn = document.getElementById('close-license-btn');
 
-    let currentPhase = 'BASELINE';
-    let baselinePose = null;
-    let baselineImage = null;
-    let baselineLandmarks = null;
-    let currentLandmarks = null;
-    let blinkInterval = null;
+    let currentStyle = 'clean';
+    let makeupIntensity = 0.75;
+    let hideMakeup = false;
     let isProcessing = false;
 
-    // 手機相機啟動 (原生串流)
+    // 四大妝容色彩配置
+    const STYLES = {
+      clean: {
+        name: "韓系白開水淡妝",
+        desc: "強調自然通透的原生感，適合日常通勤、面試與輕社交，不挑膚色且極度自然。",
+        lipColor: [244, 114, 182, 0.55], // 櫻花粉
+        blushColor: "rgba(251, 146, 60, 0.18)", // 淺蜜桃
+        eyeshadowColor: "rgba(244, 114, 182, 0.2)"
+      },
+      french: {
+        name: "法式復古紅唇妝",
+        desc: "飽滿紅唇搭配深邃輪廓，氣場強大、顯白顯氣色，適合宴會、正式聚會與拍照上鏡。",
+        lipColor: [225, 29, 72, 0.75], // 經典正紅
+        blushColor: "rgba(225, 29, 72, 0.22)", // 微醺紅
+        eyeshadowColor: "rgba(180, 83, 9, 0.3)" // 大地棕
+      },
+      peach: {
+        name: "溫柔蜜桃奶茶妝",
+        desc: "溫暖柔和的杏橘調，消腫顯嫩，非常適合偏黃肌膚，給人親切無攻擊性的甜美感。",
+        lipColor: [234, 88, 12, 0.65], // 奶茶泰橘
+        blushColor: "rgba(249, 115, 22, 0.25)", // 杏桃
+        eyeshadowColor: "rgba(249, 115, 22, 0.25)"
+      },
+      smoky: {
+        name: "輕奢千金小煙燻",
+        desc: "大地微煙燻強化眼部深邃感，搭配內斂豆沙唇，呈現高級俐落的精緻貴氣感。",
+        lipColor: [159, 18, 57, 0.65], // 復古豆沙
+        blushColor: "rgba(190, 24, 93, 0.2)", // 乾枯玫瑰
+        eyeshadowColor: "rgba(68, 64, 60, 0.4)" // 煙燻灰灰棕
+      }
+    };
+
+    // 完整的特徵點索引 (上唇、下唇、眼影、腮紅中心點)
+    const UPPER_LIP = [61, 185, 40, 39, 37, 0, 267, 269, 270, 409, 291, 308, 415, 310, 311, 312, 13, 82, 81, 80, 191, 78];
+    const LOWER_LIP = [291, 375, 321, 405, 314, 17, 84, 181, 91, 146, 61, 78, 95, 88, 178, 87, 14, 317, 402, 318, 324, 308];
+    const LEFT_EYE_LID = [226, 247, 30, 29, 27, 28, 56, 190, 243, 112, 26, 22, 23, 24, 110, 25];
+    const RIGHT_EYE_LID = [463, 414, 286, 258, 257, 259, 260, 467, 359, 255, 339, 254, 253, 252, 256, 341];
+
+    // 原生相機啟動 (支援主流手機瀏覽器)
     async function startCamera() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: 'user',
-            width: { ideal: 640 },
-            height: { ideal: 480 }
-          },
+          video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
           audio: false
         });
         video.srcObject = stream;
         await video.play();
         startMask.classList.add('hidden');
-        alignText.innerText = "載入對齊模型中...";
-        requestAnimationFrame(processVideoFrame);
+        requestAnimationFrame(renderLoop);
       } catch (err) {
         console.error("相機存取失敗:", err);
         startMask.classList.remove('hidden');
-        alignText.innerText = "需要相機權限";
       }
     }
 
     startCamBtn.onclick = startCamera;
 
-    // 初始化 FaceMesh
     const faceMesh = new FaceMesh({
       locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
     });
@@ -262,10 +237,10 @@
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5
     });
-    faceMesh.onResults(onFrameResults);
+    faceMesh.onResults(onResults);
 
-    async function processVideoFrame() {
-      if (video.readyState >= 2 && !isProcessing && currentPhase !== 'DONE') {
+    async function renderLoop() {
+      if (video.readyState >= 2 && !isProcessing) {
         isProcessing = true;
         try {
           await faceMesh.send({ image: video });
@@ -274,249 +249,138 @@
         }
         isProcessing = false;
       }
-      if (currentPhase !== 'DONE') {
-        requestAnimationFrame(processVideoFrame);
-      }
+      requestAnimationFrame(renderLoop);
     }
 
-    // 計算臉部 3D 姿態
-    function calculateFacePose(lm, w, h) {
-      const pLeftEye = lm[468];
-      const pRightEye = lm[473];
-      const pNose = lm[1];
-      const pTopNose = lm[168];
-      const pChin = lm[152];
-      const pLeftCheek = lm[234];
-      const pRightCheek = lm[454];
+    function onResults(results) {
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const eyeDistance = Math.hypot((pRightEye.x - pLeftEye.x) * w, (pRightEye.y - pLeftEye.y) * h);
-      const rollAngle = Math.atan2((pRightEye.y - pLeftEye.y) * h, (pRightEye.x - pLeftEye.x) * w);
-      const yawRatio = Math.abs(pNose.x - pLeftCheek.x) / (Math.abs(pRightCheek.x - pNose.x) || 1e-4);
-      const pitchRatio = Math.abs(pNose.y - pTopNose.y) / (Math.abs(pChin.y - pNose.y) || 1e-4);
-
-      return { eyeDistance, rollAngle, yawRatio, pitchRatio };
-    }
-
-    function onFrameResults(results) {
-      if (currentPhase === 'DONE') return;
-
-      arCanvas.width = video.videoWidth || 640;
-      arCanvas.height = video.videoHeight || 480;
-      arCtx.clearRect(0, 0, arCanvas.width, arCanvas.height);
-
-      if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) {
-        alignText.innerText = "請將臉部對準中央";
-        matchScore.innerText = "0%";
-        lockDot.className = "w-2.5 h-2.5 rounded-full bg-slate-500";
-        captureAlignBtn.disabled = true;
+      if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0 || hideMakeup) {
         return;
       }
 
       const lm = results.multiFaceLandmarks[0];
-      const w = arCanvas.width;
-      const h = arCanvas.height;
-      currentLandmarks = lm;
+      const w = canvas.width;
+      const h = canvas.height;
+      const style = STYLES[currentStyle];
 
-      const currentPose = calculateFacePose(lm, w, h);
+      // 1. 渲染自然暈染眼影
+      drawEyeShadow(ctx, lm, LEFT_EYE_LID, w, h, style.eyeshadowColor);
+      drawEyeShadow(ctx, lm, RIGHT_EYE_LID, w, h, style.eyeshadowColor);
 
-      if (currentPhase === 'BASELINE') {
-        alignText.innerText = "請放鬆閉唇，記錄妝前基準";
-        matchScore.innerText = "READY";
-        lockDot.className = "w-2.5 h-2.5 rounded-full bg-pink-500";
-        drawOutline(arCtx, lm, w, h, 'rgba(236, 72, 153, 0.4)');
-      } 
-      else if (currentPhase === 'ALIGNING' && baselinePose) {
-        // 繪製妝前半透明綠色鬼影輪廓
-        drawOutline(arCtx, baselineLandmarks, w, h, 'rgba(16, 185, 129, 0.35)');
+      // 2. 渲染透氣腮紅 (以左頰 116、右頰 345 為中心)
+      drawBlush(ctx, lm[116], w, h, style.blushColor);
+      drawBlush(ctx, lm[345], w, h, style.blushColor);
 
-        const scaleDiff = Math.abs(currentPose.eyeDistance - baselinePose.eyeDistance) / baselinePose.eyeDistance;
-        const rollDiff = Math.abs(currentPose.rollAngle - baselinePose.rollAngle);
-        const yawDiff = Math.abs(currentPose.yawRatio - baselinePose.yawRatio);
-        const pitchDiff = Math.abs(currentPose.pitchRatio - baselinePose.pitchRatio);
-
-        const totalError = (scaleDiff * 0.4) + (rollDiff * 0.2) + (yawDiff * 0.2) + (pitchDiff * 0.2);
-        const matchPercent = Math.max(0, Math.min(100, Math.round((1 - totalError * 1.8) * 100)));
-        matchScore.innerText = `${matchPercent}%`;
-
-        if (matchPercent >= 80) {
-          alignText.innerText = "角度精準重合！可拍完妝照";
-          lockDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
-          captureAlignBtn.disabled = false;
-          drawOutline(arCtx, lm, w, h, 'rgba(16, 185, 129, 0.9)');
-        } else {
-          alignText.innerText = "請微調頭部角度貼齊綠線";
-          lockDot.className = "w-2.5 h-2.5 rounded-full bg-rose-500";
-          captureAlignBtn.disabled = false;
-          drawOutline(arCtx, lm, w, h, 'rgba(244, 63, 94, 0.5)');
-        }
-      }
+      // 3. 渲染唇彩 (保留自然唇紋並支援動態濃度)
+      drawLip(ctx, lm, UPPER_LIP, LOWER_LIP, w, h, style.lipColor);
     }
 
-    function drawOutline(ctx, lm, w, h, color) {
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      const faceOval = [10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136, 172, 58, 132, 93, 234, 127, 162, 21, 54, 103, 67, 109, 10];
-      faceOval.forEach((idx, i) => {
+    function drawEyeShadow(c, lm, indices, w, h, color) {
+      c.save();
+      c.filter = 'blur(6px)';
+      c.globalCompositeOperation = 'soft-light';
+      c.fillStyle = color;
+      c.beginPath();
+      indices.forEach((idx, i) => {
         const pt = lm[idx];
-        if (i === 0) ctx.moveTo(pt.x * w, pt.y * h);
-        else ctx.lineTo(pt.x * w, pt.y * h);
+        if (i === 0) c.moveTo(pt.x * w, pt.y * h - 4);
+        else c.lineTo(pt.x * w, pt.y * h - 4);
       });
-      ctx.stroke();
+      c.closePath();
+      c.fill();
+      c.restore();
     }
 
-    // 拍下素顏基準照
-    captureBaseBtn.onclick = () => {
-      if (!currentLandmarks) return;
-      const w = video.videoWidth || 640;
-      const h = video.videoHeight || 480;
+    function drawBlush(c, pt, w, h, color) {
+      c.save();
+      const cx = pt.x * w;
+      const cy = pt.y * h;
+      const radius = 34;
 
-      const offCanvas = document.createElement('canvas');
-      offCanvas.width = w;
-      offCanvas.height = h;
-      const offCtx = offCanvas.getContext('2d');
-      offCtx.save();
-      offCtx.translate(w, 0);
-      offCtx.scale(-1, 1);
-      offCtx.drawImage(video, 0, 0, w, h);
-      offCtx.restore();
+      c.globalCompositeOperation = 'soft-light';
+      const grad = c.createRadialGradient(cx, cy, 2, cx, cy, radius);
+      grad.addColorStop(0, color);
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
 
-      baselineImage = offCanvas;
-      baselineLandmarks = JSON.parse(JSON.stringify(currentLandmarks));
-      baselinePose = calculateFacePose(baselineLandmarks, w, h);
-
-      currentPhase = 'ALIGNING';
-      stepBadge.innerText = "步驟 2：對準姿態拍完妝";
-      captureBaseBtn.classList.add('hidden');
-      captureAlignBtn.classList.remove('hidden');
-    };
-
-    // 拍下完妝照並比對
-    captureAlignBtn.onclick = () => {
-      const w = video.videoWidth || 640;
-      const h = video.videoHeight || 480;
-
-      const currentCanvas = document.createElement('canvas');
-      currentCanvas.width = w;
-      currentCanvas.height = h;
-      const cCtx = currentCanvas.getContext('2d');
-      cCtx.save();
-      cCtx.translate(w, 0);
-      cCtx.scale(-1, 1);
-      cCtx.drawImage(video, 0, 0, w, h);
-      cCtx.restore();
-
-      currentPhase = 'DONE';
-      cameraSection.classList.add('hidden');
-      analysisSection.classList.remove('hidden');
-      stepBadge.innerText = "妝效比對完成";
-
-      processMakeupROI(baselineImage, currentCanvas, baselineLandmarks, w, h);
-    };
-
-    // 彩妝修飾與顯色差分演算
-    function processMakeupROI(baseImg, targetImg, lm, w, h) {
-      const roiSize = 160;
-      // 以臉頰中心點 116 為特寫區域
-      const cheekX = Math.round((1 - lm[116].x) * w - roiSize / 2);
-      const cheekY = Math.round(lm[116].y * h - roiSize / 2);
-
-      roiBaseCanvas.width = roiSize;
-      roiBaseCanvas.height = roiSize;
-      roiTargetCanvas.width = roiSize;
-      roiTargetCanvas.height = roiSize;
-
-      const bCtx = roiBaseCanvas.getContext('2d');
-      const tCtx = roiTargetCanvas.getContext('2d');
-
-      bCtx.drawImage(baseImg, cheekX, cheekY, roiSize, roiSize, 0, 0, roiSize, roiSize);
-      tCtx.drawImage(targetImg, cheekX, cheekY, roiSize, roiSize, 0, 0, roiSize, roiSize);
-
-      const baseData = bCtx.getImageData(0, 0, roiSize, roiSize);
-      const targetData = tCtx.getImageData(0, 0, roiSize, roiSize);
-      const bPixels = baseData.data;
-      const tPixels = targetData.data;
-
-      let correctedDarkSpots = 0;
-      let colorEnhancedPixels = 0;
-
-      for (let y = 15; y < roiSize - 15; y += 4) {
-        for (let x = 15; x < roiSize - 15; x += 4) {
-          const idx = (y * roiSize + x) * 4;
-          const bR = bPixels[idx], bG = bPixels[idx+1], bB = bPixels[idx+2];
-          const tR = tPixels[idx], tG = tPixels[idx+1], tB = tPixels[idx+2];
-
-          const bLum = 0.299 * bR + 0.587 * bG + 0.114 * bB;
-          const tLum = 0.299 * tR + 0.587 * tG + 0.114 * tB;
-
-          // 1. 遮瑕校正判定：原本較暗沉的區域亮度被底妝均勻提亮 (綠圈標記)
-          if ((tLum - bLum) > 28 && bLum < 125) {
-            tCtx.strokeStyle = '#10b981';
-            tCtx.lineWidth = 2;
-            tCtx.beginPath();
-            tCtx.arc(x, y, 6, 0, Math.PI * 2);
-            tCtx.stroke();
-            correctedDarkSpots++;
-          }
-          // 2. 腮紅與彩妝顯色判定：紅色素飽和度顯著增強 (粉圈標記)
-          else if ((tR - bR) > 30 && (tR - tG) > 20) {
-            tCtx.strokeStyle = '#ec4899';
-            tCtx.lineWidth = 1.5;
-            tCtx.beginPath();
-            tCtx.arc(x, y, 5, 0, Math.PI * 2);
-            tCtx.stroke();
-            colorEnhancedPixels++;
-          }
-        }
-      }
-
-      coverageScore.innerText = `${Math.min(98, 70 + correctedDarkSpots * 4)}%`;
-      pigmentScore.innerText = `+${Math.min(85, 25 + colorEnhancedPixels * 3)}%`;
-
-      updateSplitView(50);
+      c.filter = 'blur(8px)';
+      c.fillStyle = grad;
+      c.beginPath();
+      c.arc(cx, cy, radius, 0, Math.PI * 2);
+      c.fill();
+      c.restore();
     }
 
-    function updateSplitView(val) {
-      splitWrapper.style.width = `${val}%`;
-      roiTargetCanvas.style.width = `${roiBaseCanvas.clientWidth}px`;
-      roiTargetCanvas.style.height = `${roiBaseCanvas.clientHeight}px`;
+    function drawLip(c, lm, upper, lower, w, h, baseRgba) {
+      c.save();
+      c.filter = 'blur(1.5px)';
+      c.globalCompositeOperation = 'multiply';
+
+      const finalAlpha = Math.min(1.0, baseRgba[3] * makeupIntensity).toFixed(2);
+      c.fillStyle = `rgba(${baseRgba[0]}, ${baseRgba[1]}, ${baseRgba[2]}, ${finalAlpha})`;
+
+      const path = new Path2D();
+      upper.forEach((idx, i) => {
+        const pt = lm[idx];
+        if (i === 0) path.moveTo(pt.x * w, pt.y * h);
+        else path.lineTo(pt.x * w, pt.y * h);
+      });
+      path.closePath();
+
+      lower.forEach((idx, i) => {
+        const pt = lm[idx];
+        if (i === 0) path.moveTo(pt.x * w, pt.y * h);
+        else path.lineTo(pt.x * w, pt.y * h);
+      });
+      path.closePath();
+
+      c.fill(path, 'evenodd');
+
+      // 水光感高光
+      c.globalCompositeOperation = 'screen';
+      c.fillStyle = `rgba(255, 255, 255, ${0.16 * makeupIntensity})`;
+      const hl = new Path2D();
+      hl.arc(lm[17].x * w, lm[17].y * h - 3, 10, 0, Math.PI * 2);
+      c.filter = 'blur(3px)';
+      c.fill(hl);
+
+      c.restore();
     }
 
-    splitSlider.oninput = (e) => {
-      sliderValTxt.innerText = `${e.target.value}%`;
-      updateSplitView(e.target.value);
+    // 風格切換事件
+    document.querySelectorAll('.style-pill').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.style-pill').forEach(b => {
+          b.classList.remove('active');
+          b.classList.add('text-slate-300');
+        });
+        btn.classList.add('active');
+        btn.classList.remove('text-slate-300');
+
+        currentStyle = btn.dataset.style;
+        const s = STYLES[currentStyle];
+        currentStyleName.innerText = s.name;
+        styleDesc.innerText = s.desc;
+      };
+    });
+
+    // 濃淡滑桿
+    intensitySlider.oninput = (e) => {
+      makeupIntensity = parseFloat(e.target.value);
     };
 
-    toggleBlinkBtn.onclick = () => {
-      if (blinkInterval) {
-        clearInterval(blinkInterval);
-        blinkInterval = null;
-        toggleBlinkBtn.classList.remove('bg-pink-600', 'text-white');
-        updateSplitView(splitSlider.value);
-      } else {
-        toggleBlinkBtn.classList.add('bg-pink-600', 'text-white');
-        let show = true;
-        blinkInterval = setInterval(() => {
-          updateSplitView(show ? 100 : 0);
-          show = !show;
-        }, 320);
-      }
-    };
+    // 按住看素顏機制
+    const showOriginal = () => { hideMakeup = true; };
+    const showMakeup = () => { hideMakeup = false; };
 
-    resetSystemBtn.onclick = () => {
-      currentPhase = 'BASELINE';
-      baselinePose = null;
-      baselineImage = null;
-      baselineLandmarks = null;
-      if (blinkInterval) clearInterval(blinkInterval);
-      cameraSection.classList.remove('hidden');
-      analysisSection.classList.add('hidden');
-      captureBaseBtn.classList.remove('hidden');
-      captureAlignBtn.classList.add('hidden');
-      stepBadge.innerText = "步驟 1：記錄素顏基準";
-      requestAnimationFrame(processVideoFrame);
-    };
+    compareBtn.addEventListener('mousedown', showOriginal);
+    compareBtn.addEventListener('mouseup', showMakeup);
+    compareBtn.addEventListener('touchstart', showOriginal);
+    compareBtn.addEventListener('touchend', showMakeup);
 
+    // 授權 Modal 事件
     openLicenseBtn.onclick = () => licenseModal.classList.remove('hidden');
     closeLicenseBtn.onclick = () => licenseModal.classList.add('hidden');
 
