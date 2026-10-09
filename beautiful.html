@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>AuraStyle - 全方位美學造型與彩妝模擬鏡</title>
+  <title>AuraStyle - 全面造型鏡</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+  <!-- 使用最新更穩定的 MediaPipe Tasks Vision -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.js" crossorigin="anonymous"></script>
 
   <style>
     .mirror-view {
@@ -40,8 +41,8 @@
     </div>
     <div class="flex items-center space-x-1.5">
       <button id="open-license-btn" class="text-[10px] text-slate-400 hover:text-slate-200 underline">授權</button>
-      <span id="fps-badge" class="px-2 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-[10px] text-emerald-400 font-mono">
-        相機準備中
+      <span id="status-badge" class="px-2 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-[10px] text-yellow-400 font-mono">
+        點擊啟動
       </span>
     </div>
   </header>
@@ -53,19 +54,24 @@
       <video id="webcam" class="absolute inset-0 w-full h-full object-cover mirror-view" playsinline autoplay muted></video>
       <canvas id="ar-canvas" class="absolute inset-0 w-full h-full object-cover mirror-view z-10 pointer-events-none"></canvas>
 
-      <!-- 長按看素顏/原狀 -->
+      <!-- 長按看素顏 -->
       <button id="compare-btn" class="absolute top-3 right-3 bg-slate-900/80 hover:bg-slate-800 active:bg-pink-600 backdrop-blur-md border border-slate-700/80 text-slate-200 active:text-white text-[11px] px-3.5 py-1 rounded-full z-20 transition-all select-none shadow-md">
         按住看原始素顏
       </button>
 
-      <!-- 喚醒遮罩 -->
-      <div id="start-mask" class="hidden absolute inset-0 bg-slate-950/95 flex flex-col items-center justify-center p-6 text-center space-y-3 z-30">
-        <i data-lucide="camera" class="w-12 h-12 text-pink-500 animate-bounce"></i>
-        <h3 class="text-sm font-bold text-white">點擊啟動前鏡頭</h3>
-        <p class="text-xs text-slate-400">純本機運算，不留存亦不上傳任何影像。</p>
-        <button id="start-cam-btn" class="px-6 py-2.5 bg-gradient-to-r from-pink-500 to-rose-600 rounded-xl text-xs font-bold text-white shadow-lg">
-          開啟相機
+      <!-- 核心啟動按鈕 (解決手機 Autoplay 阻擋與黑色死屏問題) -->
+      <div id="start-overlay" class="absolute inset-0 bg-slate-950/90 flex flex-col items-center justify-center p-6 text-center space-y-4 z-30">
+        <div class="w-16 h-16 rounded-full bg-pink-500/20 flex items-center justify-center text-pink-400 border border-pink-500/40">
+          <i data-lucide="sparkles" class="w-8 h-8"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-white">啟動 AI 美妝鏡</h3>
+          <p class="text-xs text-slate-400 mt-1">點擊下方按鈕以允許相機即時上妝</p>
+        </div>
+        <button id="start-cam-btn" class="w-full py-3 bg-gradient-to-r from-pink-500 to-rose-600 rounded-xl text-xs font-bold text-white shadow-lg shadow-pink-500/30 active:scale-95 transition-all">
+          開啟相機並開始體驗
         </button>
+        <span id="load-msg" class="text-[10px] text-slate-500">模型與攝影機完全於裝置端本地執行</span>
       </div>
     </div>
 
@@ -118,7 +124,7 @@
 
         <!-- 髮色面板 -->
         <div id="pane-haircolor" class="pane-item hidden grid grid-cols-4 gap-1.5 text-[11px]">
-          <button class="opt-chip active p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="haircolor" data-val="none">原生黑/深髮</button>
+          <button class="opt-chip active p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="haircolor" data-val="none">原生黑髮</button>
           <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="haircolor" data-val="ash-grey">黑茶灰霧感</button>
           <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="haircolor" data-val="honey-brown">蜜糖焦糖橘</button>
           <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="haircolor" data-val="berry-pink">莓果微醺粉</button>
@@ -128,7 +134,7 @@
 
       <!-- 妝效顯色度滑桿 -->
       <div class="pt-1 flex items-center space-x-3 text-[11px] text-slate-400">
-        <span>彩妝顯色度</span>
+        <span>妝容濃淡</span>
         <input id="intensity-slider" type="range" min="0.4" max="1.5" step="0.05" value="1.0" class="w-full accent-pink-500 bg-slate-800 rounded-lg h-1.5 cursor-pointer">
       </div>
     </div>
@@ -136,10 +142,10 @@
   </main>
 
   <footer class="w-full max-w-md mt-2 text-center text-[9px] text-slate-500">
-    純瀏覽器本地記憶體運算・絕不上傳或儲存任何臉部特徵個資
+    純裝置端記憶體運算・無伺服器上傳・保障個人隱私
   </footer>
 
-  <!-- 開源授權告示彈窗 -->
+  <!-- 授權聲明 Modal -->
   <div id="license-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 max-w-sm w-full rounded-2xl p-4 shadow-2xl space-y-3">
       <div class="flex items-center justify-between border-b border-slate-800 pb-2">
@@ -150,7 +156,7 @@
       </div>
       <div class="text-[11px] text-slate-400 space-y-2 max-h-60 overflow-y-auto">
         <div>
-          <p class="font-bold text-slate-200">Google MediaPipe FaceMesh</p>
+          <p class="font-bold text-slate-200">Google MediaPipe Vision Tasks</p>
           <p class="text-[10px]">Licensed under the Apache License, Version 2.0.</p>
           <p class="text-[9px] text-slate-500">Copyright Google LLC.</p>
         </div>
@@ -158,11 +164,6 @@
           <p class="font-bold text-slate-200">Lucide Icons</p>
           <p class="text-[10px]">Licensed under the ISC License.</p>
           <p class="text-[9px] text-slate-500">Copyright Lucide Contributors.</p>
-        </div>
-        <div class="border-t border-slate-800 pt-1.5">
-          <p class="font-bold text-slate-200">Tailwind CSS</p>
-          <p class="text-[10px]">Licensed under the MIT License.</p>
-          <p class="text-[9px] text-slate-500">Copyright Tailwind Labs, Inc.</p>
         </div>
       </div>
     </div>
@@ -175,17 +176,22 @@
     const canvas = document.getElementById('ar-canvas');
     const ctx = canvas.getContext('2d');
 
+    const startOverlay = document.getElementById('start-overlay');
+    const startCamBtn = document.getElementById('start-cam-btn');
+    const loadMsg = document.getElementById('load-msg');
+    const statusBadge = document.getElementById('status-badge');
     const intensitySlider = document.getElementById('intensity-slider');
     const compareBtn = document.getElementById('compare-btn');
-    const startMask = document.getElementById('start-mask');
-    const startCamBtn = document.getElementById('start-cam-btn');
-    const fpsBadge = document.getElementById('fps-badge');
 
     const licenseModal = document.getElementById('license-modal');
     const openLicenseBtn = document.getElementById('open-license-btn');
     const closeLicenseBtn = document.getElementById('close-license-btn');
 
-    // 當前造型配置狀態
+    let faceLandmarker = null;
+    let lastVideoTime = -1;
+    let hideAll = false;
+    let makeupIntensity = 1.0;
+
     let activeConfig = {
       makeup: 'clean',
       lashes: 'natural',
@@ -194,35 +200,13 @@
       haircolor: 'none'
     };
 
-    let makeupIntensity = 1.0;
-    let hideAll = false;
-    let isProcessing = false;
-
-    // 彩妝顏色設定
     const STYLES = {
-      clean: {
-        lip: [255, 105, 140, 0.65],
-        blush: [255, 140, 160, 0.35],
-        shadow: [255, 180, 190, 0.3]
-      },
-      french: {
-        lip: [215, 20, 45, 0.82],
-        blush: [220, 40, 60, 0.28],
-        shadow: [160, 90, 40, 0.4]
-      },
-      peach: {
-        lip: [240, 100, 50, 0.72],
-        blush: [250, 140, 60, 0.38],
-        shadow: [240, 150, 70, 0.35]
-      },
-      smoky: {
-        lip: [175, 50, 75, 0.75],
-        blush: [180, 70, 100, 0.3],
-        shadow: [70, 60, 55, 0.55]
-      }
+      clean: { lip: [255, 105, 140, 0.65], blush: [255, 140, 160, 0.35], shadow: [255, 180, 190, 0.3] },
+      french: { lip: [215, 20, 45, 0.82], blush: [220, 40, 60, 0.28], shadow: [160, 90, 40, 0.4] },
+      peach: { lip: [240, 100, 50, 0.72], blush: [250, 140, 60, 0.38], shadow: [240, 150, 70, 0.35] },
+      smoky: { lip: [175, 50, 75, 0.75], blush: [180, 70, 100, 0.3], shadow: [70, 60, 55, 0.55] }
     };
 
-    // 關鍵特徵點索引
     const UPPER_LIP = [61, 185, 40, 39, 37, 0, 267, 269, 270, 409, 291, 308, 415, 310, 311, 312, 13, 82, 81, 80, 191, 78];
     const LOWER_LIP = [291, 375, 321, 405, 314, 17, 84, 181, 91, 146, 61, 78, 95, 88, 178, 87, 14, 317, 402, 318, 324, 308];
     const LEFT_EYE = [226, 247, 30, 29, 27, 28, 56, 190, 243, 112, 26, 22, 23, 24, 110, 25];
@@ -230,39 +214,365 @@
     const LEFT_LASH_PTS = [33, 246, 161, 160, 159, 158, 157, 173, 133];
     const RIGHT_LASH_PTS = [362, 398, 384, 385, 386, 387, 388, 466, 263];
 
-    // 初始化 FaceMesh
-    const faceMesh = new FaceMesh({
-      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
-    });
-    faceMesh.setOptions({
-      maxNumFaces: 1,
-      refineLandmarks: true,
-      minDetectionConfidence: 0.5,
-      minTrackingConfidence: 0.5
-    });
-    faceMesh.onResults(onResults);
-
-    // 原生相機喚起
-    async function startCamera() {
+    // 初始化最新版 MediaPipe Tasks
+    async function initModel() {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
-          audio: false
+        loadMsg.innerText = "載入 AI 模型中...";
+        const fileset = await vision.FilesetResolver.forVisionTasks(
+          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
+        );
+        faceLandmarker = await vision.FaceLandmarker.createFromOptions(fileset, {
+          baseOptions: {
+            modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
+            delegate: "GPU"
+          },
+          outputFaceBlendshapes: false,
+          runningMode: "VIDEO",
+          numFaces: 1
         });
-        video.srcObject = stream;
-        video.onloadedmetadata = () => {
-          video.play();
-          startMask.classList.add('hidden');
-          fpsBadge.innerText = "追蹤中";
-          fpsBadge.className = "px-2 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-[10px] text-pink-400 font-mono";
-          renderLoop();
-        };
+        loadMsg.innerText = "模型載入完成，點擊上方按鈕啟動相機";
       } catch (err) {
-        console.error("相機啟動失敗:", err);
-        startMask.classList.remove('hidden');
+        console.error("模型載入失敗:", err);
+        loadMsg.innerText = "模型快取載入失敗，請重新整理網頁";
       }
     }
 
-    startCamBtn.onclick = startCamera;
+    // 由使用者點擊啟動相機（解鎖瀏覽器限制）
+    startCamBtn.onclick = async () => {
+      startCamBtn.disabled = true;
+      startCamBtn.innerText = "正在開啟相機...";
 
-    async function render
+      if (!faceLandmarker) {
+        await initModel();
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: 'user',
+            width: { ideal: 640 },
+            height: { ideal: 480 }
+          },
+          audio: false
+        });
+
+        video.srcObject = stream;
+        await video.play();
+
+        startOverlay.classList.add('hidden');
+        statusBadge.innerText = "即時試妝中";
+        statusBadge.className = "px-2 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-[10px] text-emerald-400 font-mono";
+
+        requestAnimationFrame(predictLoop);
+      } catch (err) {
+        console.error("相機存取失敗:", err);
+        alert("無法取得相機權限，請確認瀏覽器已允許攝影機權限！");
+        startCamBtn.disabled = false;
+        startCamBtn.innerText = "開啟相機並開始體驗";
+      }
+    };
+
+    // 訊框迴圈
+    function predictLoop() {
+      if (video.currentTime !== lastVideoTime && faceLandmarker) {
+        lastVideoTime = video.currentTime;
+        
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        const results = faceLandmarker.detectForVideo(video, performance.now());
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (results.faceLandmarks && results.faceLandmarks.length > 0 && !hideAll) {
+          renderAll(results.faceLandmarks[0]);
+        }
+      }
+      requestAnimationFrame(predictLoop);
+    }
+
+    function renderAll(lm) {
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // 1. 髮色
+      if (activeConfig.haircolor !== 'none') {
+        drawHairColor(ctx, lm, w, h, activeConfig.haircolor);
+      }
+
+      // 2. 彩妝
+      const s = STYLES[activeConfig.makeup];
+      drawEyeShadow(ctx, lm, LEFT_EYE, w, h, s.shadow);
+      drawEyeShadow(ctx, lm, RIGHT_EYE, w, h, s.shadow);
+      drawBlush(ctx, lm[116], w, h, s.blush);
+      drawBlush(ctx, lm[345], w, h, s.blush);
+      drawLip(ctx, lm, UPPER_LIP, LOWER_LIP, w, h, s.lip);
+
+      // 3. 睫毛
+      if (activeConfig.lashes !== 'none') {
+        drawEyelashes(ctx, lm, LEFT_LASH_PTS, w, h, activeConfig.lashes, false);
+        drawEyelashes(ctx, lm, RIGHT_LASH_PTS, w, h, activeConfig.lashes, true);
+      }
+
+      // 4. 耳環
+      if (activeConfig.earrings !== 'none') {
+        drawEarring(ctx, lm[177], w, h, activeConfig.earrings, false);
+        drawEarring(ctx, lm[401], w, h, activeConfig.earrings, true);
+      }
+
+      // 5. 髮夾
+      if (activeConfig.hairclip !== 'none') {
+        drawHairClip(ctx, lm, w, h, activeConfig.hairclip);
+      }
+    }
+
+    function drawHairColor(c, lm, w, h, type) {
+      c.save();
+      c.globalCompositeOperation = 'soft-light';
+      let gradColor = 'rgba(0,0,0,0)';
+      if (type === 'ash-grey') gradColor = 'rgba(120, 140, 160, 0.55)';
+      if (type === 'honey-brown') gradColor = 'rgba(217, 119, 6, 0.55)';
+      if (type === 'berry-pink') gradColor = 'rgba(225, 29, 72, 0.45)';
+
+      const crown = lm[10];
+      const cx = crown.x * w;
+      const cy = (crown.y * h) - 30;
+      const radius = Math.hypot((lm[234].x - lm[454].x) * w, 0) * 0.85;
+
+      const grad = c.createRadialGradient(cx, cy, radius * 0.2, cx, cy, radius);
+      grad.addColorStop(0, gradColor);
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+      c.filter = 'blur(12px)';
+      c.fillStyle = grad;
+      c.beginPath();
+      c.arc(cx, cy, radius, 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+    }
+
+    function drawEyeShadow(c, lm, indices, w, h, colorArr) {
+      c.save();
+      const alpha = Math.min(1.0, colorArr[3] * makeupIntensity).toFixed(2);
+      c.filter = 'blur(6px)';
+      c.globalCompositeOperation = 'soft-light';
+      c.fillStyle = `rgba(${colorArr[0]}, ${colorArr[1]}, ${colorArr[2]}, ${alpha})`;
+      c.beginPath();
+      indices.forEach((idx, i) => {
+        const pt = lm[idx];
+        if (i === 0) c.moveTo(pt.x * w, pt.y * h - 4);
+        else c.lineTo(pt.x * w, pt.y * h - 4);
+      });
+      c.closePath();
+      c.fill();
+      c.restore();
+    }
+
+    function drawBlush(c, pt, w, h, colorArr) {
+      c.save();
+      const cx = pt.x * w;
+      const cy = pt.y * h;
+      const radius = 36;
+      const alpha = Math.min(0.8, colorArr[3] * makeupIntensity);
+      c.globalCompositeOperation = 'soft-light';
+      const grad = c.createRadialGradient(cx, cy, 3, cx, cy, radius);
+      grad.addColorStop(0, `rgba(${colorArr[0]}, ${colorArr[1]}, ${colorArr[2]}, ${alpha})`);
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      c.filter = 'blur(10px)';
+      c.fillStyle = grad;
+      c.beginPath();
+      c.arc(cx, cy, radius, 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+    }
+
+    function drawLip(c, lm, upper, lower, w, h, colorArr) {
+      c.save();
+      c.filter = 'blur(1.5px)';
+      c.globalCompositeOperation = 'multiply';
+      const alpha = Math.min(1.0, colorArr[3] * makeupIntensity).toFixed(2);
+      c.fillStyle = `rgba(${colorArr[0]}, ${colorArr[1]}, ${colorArr[2]}, ${alpha})`;
+
+      const path = new Path2D();
+      upper.forEach((idx, i) => {
+        const pt = lm[idx];
+        if (i === 0) path.moveTo(pt.x * w, pt.y * h);
+        else path.lineTo(pt.x * w, pt.y * h);
+      });
+      path.closePath();
+      lower.forEach((idx, i) => {
+        const pt = lm[idx];
+        if (i === 0) path.moveTo(pt.x * w, pt.y * h);
+        else path.lineTo(pt.x * w, pt.y * h);
+      });
+      path.closePath();
+      c.fill(path, 'evenodd');
+
+      c.globalCompositeOperation = 'screen';
+      c.fillStyle = `rgba(255, 255, 255, ${0.2 * makeupIntensity})`;
+      const hl = new Path2D();
+      hl.arc(lm[17].x * w, lm[17].y * h - 3, 10, 0, Math.PI * 2);
+      c.filter = 'blur(3px)';
+      c.fill(hl);
+      c.restore();
+    }
+
+    function drawEyelashes(c, lm, eyePts, w, h, type, isRight) {
+      c.save();
+      c.strokeStyle = '#1e1b18';
+      c.lineCap = 'round';
+      let lashLen = 6, lashWidth = 1.2, countStep = 2;
+      if (type === 'sunflower') { lashLen = 10; lashWidth = 1.6; countStep = 1; }
+      if (type === 'doll') { lashLen = 12; lashWidth = 2.0; countStep = 1; }
+      c.lineWidth = lashWidth;
+
+      for (let i = 1; i < eyePts.length - 1; i += countStep) {
+        const p = lm[eyePts[i]];
+        const prev = lm[eyePts[i - 1]];
+        const next = lm[eyePts[i + 1]];
+        const px = p.x * w;
+        const py = p.y * h;
+        const dx = (next.x - prev.x) * w;
+        const dy = (next.y - prev.y) * h;
+        const angle = Math.atan2(dy, dx);
+        const normAngle = angle - Math.PI / 2;
+        const tipX = px + Math.cos(normAngle) * lashLen + (isRight ? 2 : -2);
+        const tipY = py + Math.sin(normAngle) * lashLen - 2;
+
+        c.beginPath();
+        c.moveTo(px, py);
+        c.quadraticCurveTo(px, py - 3, tipX, tipY);
+        c.stroke();
+      }
+      c.restore();
+    }
+
+    function drawEarring(c, lobe, w, h, style, isRight) {
+      c.save();
+      const lx = lobe.x * w;
+      const ly = lobe.y * h;
+
+      if (style === 'pearl') {
+        c.fillStyle = '#f8fafc';
+        c.shadowColor = 'rgba(0,0,0,0.3)';
+        c.shadowBlur = 4;
+        c.beginPath();
+        c.arc(lx, ly + 2, 4.5, 0, Math.PI * 2);
+        c.fill();
+        c.fillStyle = '#ffffff';
+        c.beginPath();
+        c.arc(lx - 1.2, ly + 0.8, 1.5, 0, Math.PI * 2);
+        c.fill();
+      } else if (style === 'hoop') {
+        c.strokeStyle = '#facc15';
+        c.lineWidth = 2.5;
+        c.shadowColor = 'rgba(0,0,0,0.35)';
+        c.shadowBlur = 4;
+        c.beginPath();
+        c.arc(lx, ly + 14, 12, 0, Math.PI * 2);
+        c.stroke();
+      } else if (style === 'tassel') {
+        c.strokeStyle = '#e2e8f0';
+        c.lineWidth = 1.5;
+        c.beginPath();
+        c.moveTo(lx, ly);
+        c.lineTo(lx, ly + 24);
+        c.stroke();
+        c.fillStyle = '#38bdf8';
+        c.shadowColor = '#0284c7';
+        c.shadowBlur = 5;
+        c.beginPath();
+        c.arc(lx, ly + 26, 3.5, 0, Math.PI * 2);
+        c.fill();
+      }
+      c.restore();
+    }
+
+    function drawHairClip(c, lm, w, h, style) {
+      c.save();
+      const p1 = lm[103];
+      const p2 = lm[67];
+      const hx = ((p1.x + p2.x) / 2) * w - 10;
+      const hy = ((p1.y + p2.y) / 2) * h - 18;
+
+      if (style === 'pearl-bar') {
+        for (let i = 0; i < 4; i++) {
+          const px = hx + i * 8;
+          const py = hy + i * 2.5;
+          c.fillStyle = '#ffffff';
+          c.shadowColor = 'rgba(0,0,0,0.3)';
+          c.shadowBlur = 3;
+          c.beginPath();
+          c.arc(px, py, 3.8, 0, Math.PI * 2);
+          c.fill();
+        }
+      } else if (style === 'metal-gold') {
+        c.strokeStyle = '#fbbf24';
+        c.lineWidth = 4;
+        c.lineCap = 'round';
+        c.shadowColor = 'rgba(0,0,0,0.4)';
+        c.shadowBlur = 4;
+        c.beginPath();
+        c.moveTo(hx - 5, hy);
+        c.lineTo(hx + 26, hy + 8);
+        c.stroke();
+      } else if (style === 'cross-pin') {
+        c.strokeStyle = '#ec4899';
+        c.lineWidth = 2.5;
+        c.lineCap = 'round';
+        c.beginPath();
+        c.moveTo(hx, hy - 8);
+        c.lineTo(hx + 18, hy + 10);
+        c.moveTo(hx + 18, hy - 8);
+        c.lineTo(hx, hy + 10);
+        c.stroke();
+      }
+      c.restore();
+    }
+
+    // 分頁切換
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.tab-btn').forEach(b => {
+          b.classList.remove('active');
+          b.classList.add('text-slate-400');
+        });
+        btn.classList.add('active');
+        btn.classList.remove('text-slate-400');
+
+        const tab = btn.dataset.tab;
+        document.querySelectorAll('.pane-item').forEach(p => p.classList.add('hidden'));
+        document.getElementById(`pane-${tab}`).classList.remove('hidden');
+      };
+    });
+
+    // 項目切換
+    document.querySelectorAll('.opt-chip').forEach(chip => {
+      chip.onclick = () => {
+        const type = chip.dataset.type;
+        const val = chip.dataset.val;
+
+        document.querySelectorAll(`.opt-chip[data-type="${type}"]`).forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        activeConfig[type] = val;
+      };
+    });
+
+    intensitySlider.oninput = (e) => {
+      makeupIntensity = parseFloat(e.target.value);
+    };
+
+    const hideMakeup = () => { hideAll = true; };
+    const showMakeup = () => { hideAll = false; };
+    compareBtn.addEventListener('mousedown', hideMakeup);
+    compareBtn.addEventListener('mouseup', showMakeup);
+    compareBtn.addEventListener('touchstart', hideMakeup, { passive: true });
+    compareBtn.addEventListener('touchend', showMakeup, { passive: true });
+
+    openLicenseBtn.onclick = () => licenseModal.classList.remove('hidden');
+    closeLicenseBtn.onclick = () => licenseModal.classList.add('hidden');
+
+    // 頁面載入時預載模型
+    initModel();
+  </script>
+</body>
+</html>
