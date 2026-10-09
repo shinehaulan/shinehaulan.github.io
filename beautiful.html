@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>AuraStyle - 全面造型鏡</title>
+  <title>AuraStyle - 全方位造型與試鏡模擬鏡</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- 使用最新更穩定的 MediaPipe Tasks Vision -->
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
 
   <style>
     .mirror-view {
@@ -36,13 +35,12 @@
       </div>
       <div>
         <h1 class="text-sm font-bold text-white tracking-wide">AuraStyle 全面造型鏡</h1>
-        <p class="text-[9px] text-slate-400">妝容・耳飾・髮飾・髮色・睫毛</p>
+        <p class="text-[9px] text-slate-400">妝容・睫毛・耳環・髮夾・髮色・眼鏡</p>
       </div>
     </div>
     <div class="flex items-center space-x-1.5">
-      <button id="open-license-btn" class="text-[10px] text-slate-400 hover:text-slate-200 underline">授權</button>
       <span id="status-badge" class="px-2 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-[10px] text-yellow-400 font-mono">
-        點擊啟動
+        待啟動
       </span>
     </div>
   </header>
@@ -54,33 +52,38 @@
       <video id="webcam" class="absolute inset-0 w-full h-full object-cover mirror-view" playsinline autoplay muted></video>
       <canvas id="ar-canvas" class="absolute inset-0 w-full h-full object-cover mirror-view z-10 pointer-events-none"></canvas>
 
-      <!-- 長按看素顏 -->
+      <!-- 即時除錯/狀態條 -->
+      <div id="debug-log" class="absolute bottom-2 inset-x-2 bg-black/80 backdrop-blur-md text-emerald-400 font-mono text-[10px] px-2 py-1 rounded border border-emerald-500/30 z-20 truncate">
+        系統就緒，請點擊中央按鈕啟動相機
+      </div>
+
+      <!-- 長按看原始素顏 -->
       <button id="compare-btn" class="absolute top-3 right-3 bg-slate-900/80 hover:bg-slate-800 active:bg-pink-600 backdrop-blur-md border border-slate-700/80 text-slate-200 active:text-white text-[11px] px-3.5 py-1 rounded-full z-20 transition-all select-none shadow-md">
         按住看原始素顏
       </button>
 
-      <!-- 核心啟動按鈕 (解決手機 Autoplay 阻擋與黑色死屏問題) -->
+      <!-- 核心啟動按鈕 -->
       <div id="start-overlay" class="absolute inset-0 bg-slate-950/90 flex flex-col items-center justify-center p-6 text-center space-y-4 z-30">
         <div class="w-16 h-16 rounded-full bg-pink-500/20 flex items-center justify-center text-pink-400 border border-pink-500/40">
           <i data-lucide="sparkles" class="w-8 h-8"></i>
         </div>
         <div>
-          <h3 class="text-base font-bold text-white">啟動 AI 美妝鏡</h3>
-          <p class="text-xs text-slate-400 mt-1">點擊下方按鈕以允許相機即時上妝</p>
+          <h3 class="text-base font-bold text-white">啟動 AI 全面造型鏡</h3>
+          <p class="text-xs text-slate-400 mt-1">請點擊下方按鈕以取得手機鏡頭即時體驗</p>
         </div>
         <button id="start-cam-btn" class="w-full py-3 bg-gradient-to-r from-pink-500 to-rose-600 rounded-xl text-xs font-bold text-white shadow-lg shadow-pink-500/30 active:scale-95 transition-all">
-          開啟相機並開始體驗
+          開啟相機
         </button>
-        <span id="load-msg" class="text-[10px] text-slate-500">模型與攝影機完全於裝置端本地執行</span>
       </div>
     </div>
 
-    <!-- 造型配置導覽 Tab -->
+    <!-- 造型配置導覽 Tab (增加第 6 類：眼鏡) -->
     <div class="w-full bg-slate-900 border border-slate-800 rounded-2xl p-3 shadow-xl space-y-3">
       
       <!-- 類別分頁 -->
-      <div class="grid grid-cols-5 gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800/80 text-[11px] text-center font-medium">
+      <div class="grid grid-cols-6 gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800/80 text-[10px] text-center font-medium">
         <button class="tab-btn active py-1.5 rounded-lg transition-all" data-tab="makeup">彩妝</button>
+        <button class="tab-btn py-1.5 rounded-lg text-slate-400 transition-all" data-tab="glasses">眼鏡</button>
         <button class="tab-btn py-1.5 rounded-lg text-slate-400 transition-all" data-tab="lashes">睫毛</button>
         <button class="tab-btn py-1.5 rounded-lg text-slate-400 transition-all" data-tab="earrings">耳環</button>
         <button class="tab-btn py-1.5 rounded-lg text-slate-400 transition-all" data-tab="hairclip">髮夾</button>
@@ -98,6 +101,15 @@
           <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="makeup" data-val="smoky">千金煙燻</button>
         </div>
 
+        <!-- 眼鏡/墨鏡面板 (新增) -->
+        <div id="pane-glasses" class="pane-item hidden grid grid-cols-5 gap-1.5 text-[10px]">
+          <button class="opt-chip active p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="glasses" data-val="none">不戴眼鏡</button>
+          <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="glasses" data-val="gold-round">金絲細框</button>
+          <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="glasses" data-val="black-square">黑潮粗框</button>
+          <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="glasses" data-val="aviator">飛行墨鏡</button>
+          <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="glasses" data-val="cat-tea">復古茶晶</button>
+        </div>
+
         <!-- 睫毛面板 -->
         <div id="pane-lashes" class="pane-item hidden grid grid-cols-4 gap-1.5 text-[11px]">
           <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="lashes" data-val="none">無睫毛</button>
@@ -110,64 +122,36 @@
         <div id="pane-earrings" class="pane-item hidden grid grid-cols-4 gap-1.5 text-[11px]">
           <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="earrings" data-val="none">不戴耳飾</button>
           <button class="opt-chip active p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="earrings" data-val="pearl">珍珠耳釘</button>
-          <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="earrings" data-val="hoop">金屬大圓圈</button>
-          <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="earrings" data-val="tassel">水滴長流蘇</button>
+          <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="earrings" data-val="hoop">金屬圓圈</button>
+          <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="earrings" data-val="tassel">長流蘇</button>
         </div>
 
         <!-- 髮夾面板 -->
         <div id="pane-hairclip" class="pane-item hidden grid grid-cols-4 gap-1.5 text-[11px]">
           <button class="opt-chip active p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="hairclip" data-val="none">不戴髮夾</button>
           <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="hairclip" data-val="pearl-bar">珍珠排夾</button>
-          <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="hairclip" data-val="metal-gold">法式金邊夾</button>
+          <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="hairclip" data-val="metal-gold">金屬邊夾</button>
           <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="hairclip" data-val="cross-pin">少女十字夾</button>
         </div>
 
         <!-- 髮色面板 -->
         <div id="pane-haircolor" class="pane-item hidden grid grid-cols-4 gap-1.5 text-[11px]">
-          <button class="opt-chip active p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="haircolor" data-val="none">原生黑髮</button>
-          <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="haircolor" data-val="ash-grey">黑茶灰霧感</button>
-          <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="haircolor" data-val="honey-brown">蜜糖焦糖橘</button>
-          <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="haircolor" data-val="berry-pink">莓果微醺粉</button>
+          <button class="opt-chip active p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="haircolor" data-val="none">原生髮</button>
+          <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="haircolor" data-val="ash-grey">黑茶灰</button>
+          <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="haircolor" data-val="honey-brown">焦糖橘</button>
+          <button class="opt-chip p-2 rounded-xl border border-slate-800 bg-slate-950/60 text-center" data-type="haircolor" data-val="berry-pink">微醺莓粉</button>
         </div>
 
       </div>
 
       <!-- 妝效顯色度滑桿 -->
       <div class="pt-1 flex items-center space-x-3 text-[11px] text-slate-400">
-        <span>妝容濃淡</span>
+        <span>彩妝濃淡</span>
         <input id="intensity-slider" type="range" min="0.4" max="1.5" step="0.05" value="1.0" class="w-full accent-pink-500 bg-slate-800 rounded-lg h-1.5 cursor-pointer">
       </div>
     </div>
 
   </main>
-
-  <footer class="w-full max-w-md mt-2 text-center text-[9px] text-slate-500">
-    純裝置端記憶體運算・無伺服器上傳・保障個人隱私
-  </footer>
-
-  <!-- 授權聲明 Modal -->
-  <div id="license-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 max-w-sm w-full rounded-2xl p-4 shadow-2xl space-y-3">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-        <h3 class="text-xs font-bold text-white">開源授權聲明 (Open Source Notices)</h3>
-        <button id="close-license-btn" class="text-slate-400 hover:text-white">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-      <div class="text-[11px] text-slate-400 space-y-2 max-h-60 overflow-y-auto">
-        <div>
-          <p class="font-bold text-slate-200">Google MediaPipe Vision Tasks</p>
-          <p class="text-[10px]">Licensed under the Apache License, Version 2.0.</p>
-          <p class="text-[9px] text-slate-500">Copyright Google LLC.</p>
-        </div>
-        <div class="border-t border-slate-800 pt-1.5">
-          <p class="font-bold text-slate-200">Lucide Icons</p>
-          <p class="text-[10px]">Licensed under the ISC License.</p>
-          <p class="text-[9px] text-slate-500">Copyright Lucide Contributors.</p>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <script>
     lucide.createIcons();
@@ -176,24 +160,26 @@
     const canvas = document.getElementById('ar-canvas');
     const ctx = canvas.getContext('2d');
 
+    const debugLog = document.getElementById('debug-log');
     const startOverlay = document.getElementById('start-overlay');
     const startCamBtn = document.getElementById('start-cam-btn');
-    const loadMsg = document.getElementById('load-msg');
     const statusBadge = document.getElementById('status-badge');
     const intensitySlider = document.getElementById('intensity-slider');
     const compareBtn = document.getElementById('compare-btn');
 
-    const licenseModal = document.getElementById('license-modal');
-    const openLicenseBtn = document.getElementById('open-license-btn');
-    const closeLicenseBtn = document.getElementById('close-license-btn');
+    function log(msg) {
+      console.log(msg);
+      debugLog.innerText = `[${new Date().toLocaleTimeString().split(' ')[0]}] ${msg}`;
+    }
 
-    let faceLandmarker = null;
-    let lastVideoTime = -1;
+    let faceMesh = null;
+    let isProcessing = false;
     let hideAll = false;
     let makeupIntensity = 1.0;
 
     let activeConfig = {
       makeup: 'clean',
+      glasses: 'none',
       lashes: 'natural',
       earrings: 'pearl',
       hairclip: 'none',
@@ -214,37 +200,32 @@
     const LEFT_LASH_PTS = [33, 246, 161, 160, 159, 158, 157, 173, 133];
     const RIGHT_LASH_PTS = [362, 398, 384, 385, 386, 387, 388, 466, 263];
 
-    // 初始化最新版 MediaPipe Tasks
-    async function initModel() {
+    function initFaceMesh() {
       try {
-        loadMsg.innerText = "載入 AI 模型中...";
-        const fileset = await vision.FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
-        );
-        faceLandmarker = await vision.FaceLandmarker.createFromOptions(fileset, {
-          baseOptions: {
-            modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
-            delegate: "GPU"
-          },
-          outputFaceBlendshapes: false,
-          runningMode: "VIDEO",
-          numFaces: 1
+        if (typeof FaceMesh === 'undefined') {
+          log("錯誤：MediaPipe 腳本下載失敗，請檢查網路");
+          return;
+        }
+        log("配置 FaceMesh 引擎中...");
+        faceMesh = new FaceMesh({
+          locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
         });
-        loadMsg.innerText = "模型載入完成，點擊上方按鈕啟動相機";
-      } catch (err) {
-        console.error("模型載入失敗:", err);
-        loadMsg.innerText = "模型快取載入失敗，請重新整理網頁";
+        faceMesh.setOptions({
+          maxNumFaces: 1,
+          refineLandmarks: true,
+          minDetectionConfidence: 0.5,
+          minTrackingConfidence: 0.5
+        });
+        faceMesh.onResults(onResults);
+        log("FaceMesh 就緒");
+      } catch (e) {
+        log(`模型初始化異常: ${e.message}`);
       }
     }
 
-    // 由使用者點擊啟動相機（解鎖瀏覽器限制）
     startCamBtn.onclick = async () => {
       startCamBtn.disabled = true;
-      startCamBtn.innerText = "正在開啟相機...";
-
-      if (!faceLandmarker) {
-        await initModel();
-      }
+      log("請求相機權限...");
 
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -257,40 +238,46 @@
         });
 
         video.srcObject = stream;
-        await video.play();
+        video.onloadedmetadata = () => {
+          video.play();
+          startOverlay.classList.add('hidden');
+          statusBadge.innerText = "相機正常";
+          statusBadge.className = "px-2 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-[10px] text-emerald-400 font-mono";
+          log("相機啟動成功，即時追蹤中");
 
-        startOverlay.classList.add('hidden');
-        statusBadge.innerText = "即時試妝中";
-        statusBadge.className = "px-2 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-[10px] text-emerald-400 font-mono";
-
-        requestAnimationFrame(predictLoop);
+          if (!faceMesh) initFaceMesh();
+          requestAnimationFrame(renderLoop);
+        };
       } catch (err) {
-        console.error("相機存取失敗:", err);
-        alert("無法取得相機權限，請確認瀏覽器已允許攝影機權限！");
+        log(`相機開啟失敗: ${err.name} - ${err.message}`);
         startCamBtn.disabled = false;
-        startCamBtn.innerText = "開啟相機並開始體驗";
       }
     };
 
-    // 訊框迴圈
-    function predictLoop() {
-      if (video.currentTime !== lastVideoTime && faceLandmarker) {
-        lastVideoTime = video.currentTime;
-        
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-
-        const results = faceLandmarker.detectForVideo(video, performance.now());
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        if (results.faceLandmarks && results.faceLandmarks.length > 0 && !hideAll) {
-          renderAll(results.faceLandmarks[0]);
-        }
+    async function renderLoop() {
+      if (video.readyState >= 2 && faceMesh && !isProcessing) {
+        isProcessing = true;
+        try {
+          await faceMesh.send({ image: video });
+        } catch (e) {}
+        isProcessing = false;
       }
-      requestAnimationFrame(predictLoop);
+      requestAnimationFrame(renderLoop);
     }
 
-    function renderAll(lm) {
+    function onResults(results) {
+      if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+        canvas.width = video.videoWidth || 640;
+        canvas.height = video.videoHeight || 480;
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0 || hideAll) {
+        return;
+      }
+
+      const lm = results.multiFaceLandmarks[0];
       const w = canvas.width;
       const h = canvas.height;
 
@@ -313,18 +300,169 @@
         drawEyelashes(ctx, lm, RIGHT_LASH_PTS, w, h, activeConfig.lashes, true);
       }
 
-      // 4. 耳環
+      // 4. 眼鏡 / 墨鏡 (位於睫毛之上、髮夾之下)
+      if (activeConfig.glasses !== 'none') {
+        drawGlasses(ctx, lm, w, h, activeConfig.glasses);
+      }
+
+      // 5. 耳環
       if (activeConfig.earrings !== 'none') {
         drawEarring(ctx, lm[177], w, h, activeConfig.earrings, false);
         drawEarring(ctx, lm[401], w, h, activeConfig.earrings, true);
       }
 
-      // 5. 髮夾
+      // 6. 髮夾
       if (activeConfig.hairclip !== 'none') {
         drawHairClip(ctx, lm, w, h, activeConfig.hairclip);
       }
     }
 
+    // ─── 眼鏡與墨鏡渲染引擎 ───
+    function drawGlasses(c, lm, w, h, style) {
+      c.save();
+      // 雙眼瞳孔中心與鼻樑交界錨點
+      const leftEye = lm[468] || lm[159];
+      const rightEye = lm[473] || lm[386];
+      const noseBridge = lm[6] || lm[168];
+
+      const lx = leftEye.x * w;
+      const ly = leftEye.y * h;
+      const rx = rightEye.x * w;
+      const ry = rightEye.y * h;
+      const nx = noseBridge.x * w;
+      const ny = noseBridge.y * h;
+
+      const eyeDist = Math.hypot(rx - lx, ry - ly);
+      const angle = Math.atan2(ry - ly, rx - lx);
+      const lensR = eyeDist * 0.36; // 鏡片半徑
+
+      c.translate(nx, ny);
+      c.rotate(angle);
+
+      const offsetL = -eyeDist * 0.52;
+      const offsetR = eyeDist * 0.52;
+
+      // 1. 金絲細圓框
+      if (style === 'gold-round') {
+        c.strokeStyle = '#eab308';
+        c.lineWidth = 2.2;
+        c.fillStyle = 'rgba(255, 255, 255, 0.08)';
+
+        // 左鏡框與微光
+        c.beginPath();
+        c.arc(offsetL, 2, lensR, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+
+        // 右鏡框與微光
+        c.beginPath();
+        c.arc(offsetR, 2, lensR, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+
+        // 中間鼻梁橫樑
+        c.beginPath();
+        c.arc(0, -lensR * 0.3, lensR * 0.45, 0.2, Math.PI - 0.2);
+        c.stroke();
+      }
+
+      // 2. 黑潮粗方框
+      else if (style === 'black-square') {
+        c.strokeStyle = '#09090b';
+        c.lineWidth = 4.5;
+        c.lineJoin = 'round';
+        c.fillStyle = 'rgba(255, 255, 255, 0.05)';
+
+        const rw = lensR * 2.1;
+        const rh = lensR * 1.8;
+
+        // 左鏡框
+        c.strokeRect(offsetL - rw / 2, -rh / 2 + 3, rw, rh);
+        c.fillRect(offsetL - rw / 2, -rh / 2 + 3, rw, rh);
+
+        // 右鏡框
+        c.strokeRect(offsetR - rw / 2, -rh / 2 + 3, rw, rh);
+        c.fillRect(offsetR - rw / 2, -rh / 2 + 3, rw, rh);
+
+        // 鼻梁橋
+        c.beginPath();
+        c.moveTo(offsetL + rw / 2, 0);
+        c.lineTo(offsetR - rw / 2, 0);
+        c.stroke();
+      }
+
+      // 3. 飛行員墨鏡 (經典漸層黑)
+      else if (style === 'aviator') {
+        c.strokeStyle = '#ca8a04';
+        c.lineWidth = 2.4;
+
+        // 左鏡片漸層
+        const gradL = c.createLinearGradient(0, -lensR, 0, lensR * 1.3);
+        gradL.addColorStop(0, 'rgba(15, 23, 42, 0.88)');
+        gradL.addColorStop(1, 'rgba(30, 41, 59, 0.45)');
+
+        c.fillStyle = gradL;
+        drawAviatorLens(c, offsetL, 2, lensR);
+        drawAviatorLens(c, offsetR, 2, lensR);
+
+        // 飛行員經典雙橫樑
+        c.beginPath();
+        c.moveTo(offsetL + lensR * 0.6, -lensR * 0.8);
+        c.lineTo(offsetR - lensR * 0.6, -lensR * 0.8);
+        c.moveTo(offsetL + lensR * 0.75, 0);
+        c.lineTo(offsetR - lensR * 0.75, 0);
+        c.stroke();
+      }
+
+      // 4. 復古茶晶貓眼墨鏡
+      else if (style === 'cat-tea') {
+        c.strokeStyle = '#78350f';
+        c.lineWidth = 3.8;
+
+        const gradTea = c.createLinearGradient(0, -lensR, 0, lensR);
+        gradTea.addColorStop(0, 'rgba(120, 53, 15, 0.82)');
+        gradTea.addColorStop(1, 'rgba(217, 119, 6, 0.5)');
+
+        c.fillStyle = gradTea;
+
+        // 左貓眼鏡框
+        drawCatEyeLens(c, offsetL, 0, lensR, -1);
+        // 右貓眼鏡框
+        drawCatEyeLens(c, offsetR, 0, lensR, 1);
+
+        // 鼻樑連接
+        c.beginPath();
+        c.moveTo(offsetL + lensR * 0.7, 2);
+        c.lineTo(offsetR - lensR * 0.7, 2);
+        c.stroke();
+      }
+
+      c.restore();
+    }
+
+    function drawAviatorLens(c, cx, cy, r) {
+      c.beginPath();
+      c.moveTo(cx - r * 0.9, cy - r * 0.7);
+      c.lineTo(cx + r * 0.9, cy - r * 0.7);
+      c.quadraticCurveTo(cx + r * 1.1, cy + r * 0.9, cx, cy + r * 1.25);
+      c.quadraticCurveTo(cx - r * 1.1, cy + r * 0.9, cx - r * 0.9, cy - r * 0.7);
+      c.closePath();
+      c.fill();
+      c.stroke();
+    }
+
+    function drawCatEyeLens(c, cx, cy, r, dir) {
+      c.beginPath();
+      c.moveTo(cx - r * 0.85, cy);
+      c.quadraticCurveTo(cx, cy - r * 0.9, cx + r * 0.9 * dir, cy - r * 1.1);
+      c.quadraticCurveTo(cx + r * 0.9, cy + r * 0.8, cx, cy + r * 0.9);
+      c.quadraticCurveTo(cx - r * 0.9, cy + r * 0.7, cx - r * 0.85, cy);
+      c.closePath();
+      c.fill();
+      c.stroke();
+    }
+
+    // ─── 髮色渲染 ───
     function drawHairColor(c, lm, w, h, type) {
       c.save();
       c.globalCompositeOperation = 'soft-light';
@@ -350,6 +488,7 @@
       c.restore();
     }
 
+    // ─── 彩妝與睫毛 ───
     function drawEyeShadow(c, lm, indices, w, h, colorArr) {
       c.save();
       const alpha = Math.min(1.0, colorArr[3] * makeupIntensity).toFixed(2);
@@ -446,6 +585,7 @@
       c.restore();
     }
 
+    // ─── 耳環與髮夾 ───
     function drawEarring(c, lobe, w, h, style, isRight) {
       c.save();
       const lx = lobe.x * w;
@@ -520,10 +660,10 @@
         c.lineWidth = 2.5;
         c.lineCap = 'round';
         c.beginPath();
-        c.moveTo(hx, hy - 8);
+        c.moveTo(hx - 8, hy - 8);
         c.lineTo(hx + 18, hy + 10);
         c.moveTo(hx + 18, hy - 8);
-        c.lineTo(hx, hy + 10);
+        c.lineTo(hx - 8, hy + 10);
         c.stroke();
       }
       c.restore();
@@ -568,11 +708,7 @@
     compareBtn.addEventListener('touchstart', hideMakeup, { passive: true });
     compareBtn.addEventListener('touchend', showMakeup, { passive: true });
 
-    openLicenseBtn.onclick = () => licenseModal.classList.remove('hidden');
-    closeLicenseBtn.onclick = () => licenseModal.classList.add('hidden');
-
-    // 頁面載入時預載模型
-    initModel();
+    initFaceMesh();
   </script>
 </body>
 </html>
