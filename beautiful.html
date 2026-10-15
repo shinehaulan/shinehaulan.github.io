@@ -49,13 +49,13 @@
       </button>
     </div>
 
-    <!-- 拍照與畫布視窗 -->
+    <!-- 畫布與拍照視窗 -->
     <div class="relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl flex items-center justify-center">
-      <!-- 修正：加上 playsinline, autoplay, muted, webkit-playsinline 防止 Android 黑屏拒播 -->
+      <!-- 原生 Video (強制靜音與內嵌播放) -->
       <video id="webcam" playsinline autoplay muted webkit-playsinline class="absolute inset-0 w-full h-full object-cover"></video>
       <canvas id="measure-canvas" class="absolute inset-0 w-full h-full object-cover z-10 touch-none"></canvas>
 
-      <!-- 2x 浮動準心放大鏡 -->
+      <!-- 2x 浮動準星放大鏡 -->
       <canvas id="loupe-canvas" width="140" height="140" class="hidden absolute top-4 left-4 z-40 rounded-full border-2 border-white shadow-2xl bg-black pointer-events-none"></canvas>
 
       <!-- 雙軸水平儀 -->
@@ -79,7 +79,7 @@
         </div>
       </div>
 
-      <!-- 拍照前控制鈕 -->
+      <!-- 拍照前控制按鈕 -->
       <div id="cam-controls" class="absolute bottom-4 inset-x-0 flex justify-center items-center space-x-3 px-4 z-20">
         <button id="snap-btn" class="px-6 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 flex items-center space-x-1.5 active:scale-95 transition-all">
           <i data-lucide="camera" class="w-4 h-4"></i>
@@ -101,20 +101,6 @@
         <button id="export-btn" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-600/30 flex items-center space-x-1.5 active:scale-95 transition-all">
           <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
           <span>生成確認圖 (傳賣家)</span>
-        </button>
-      </div>
-
-      <!-- 啟動遮罩 (相機權限與啟動) -->
-      <div id="start-overlay" class="absolute inset-0 bg-slate-950/95 flex flex-col items-center justify-center p-6 text-center space-y-4 z-30">
-        <div class="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 border border-blue-500/40">
-          <i data-lucide="shield-check" class="w-8 h-8"></i>
-        </div>
-        <div>
-          <h3 class="text-base font-bold text-white">啟動精準量測系統</h3>
-          <p class="text-xs text-slate-400 mt-1">請將健保卡與腳掌平放地面・點選下方開啟</p>
-        </div>
-        <button id="start-cam-btn" class="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-xl text-xs font-bold text-white shadow-lg active:scale-95 transition-all">
-          開啟相機
         </button>
       </div>
     </div>
@@ -165,4 +151,491 @@
       </div>
 
       <!-- 防退貨建議尺碼盒 -->
-      <div class="bg-gradient-to-r from-blue-950/
+      <div class="bg-gradient-to-r from-blue-950/60 to-indigo-950/60 border border-blue-500/30 p-3.5 rounded-xl space-y-2">
+        <div class="flex items-center justify-between border-b border-blue-500/20 pb-1.5">
+          <span class="text-xs font-bold text-blue-300 flex items-center space-x-1">
+            <i data-lucide="check-circle" class="w-3.5 h-3.5 text-blue-400"></i>
+            <span>建議下單尺碼（防退貨）</span>
+          </span>
+          <span id="allowance-badge" class="text-[9px] px-1.5 py-0.5 bg-blue-500/20 text-blue-300 rounded font-mono">
+            已加 +0.8cm 穿襪放量
+          </span>
+        </div>
+
+        <div id="size-result-box" class="text-xs space-y-1 text-slate-200">
+          請放平手機拍照，定格後對齊卡片兩端即可獲得精確尺碼。
+        </div>
+
+        <div id="fit-alert" class="hidden p-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-[11px] text-amber-300">
+          ⚠️ <strong>楦頭偏寬警示</strong>：您的足型屬於寬楦，若購買窄版或鋼頭鞋，<strong>強烈建議選大半號或挑選 2E/4E 寬楦版</strong>，避免兩側擠腳退貨！
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="w-full max-w-md mt-2 text-center text-[9px] text-slate-500 pb-4">
+    純本機安全運算・無伺服器紀錄・買賣雙方尺寸確認工具
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    const video = document.getElementById('webcam');
+    const canvas = document.getElementById('measure-canvas');
+    const ctx = canvas.getContext('2d');
+    const loupeCanvas = document.getElementById('loupe-canvas');
+    const lctx = loupeCanvas.getContext('2d');
+
+    const tabFoot = document.getElementById('tab-foot');
+    const tabHand = document.getElementById('tab-hand');
+    const snapBtn = document.getElementById('snap-btn');
+    const retakeBtn = document.getElementById('retake-btn');
+    const exportBtn = document.getElementById('export-btn');
+    const fileInput = document.getElementById('file-input');
+    const camControls = document.getElementById('cam-controls');
+    const frozenControls = document.getElementById('frozen-controls');
+    const adjustPanel = document.getElementById('adjust-panel');
+    const viewFinder = document.getElementById('viewfinder-box');
+    const guideTargetText = document.getElementById('guide-target-text');
+
+    const bubbleLevel = document.getElementById('bubble-level');
+    const bubbleDot = document.getElementById('bubble-dot');
+    const bubbleHint = document.getElementById('bubble-hint');
+    const levelDot = document.getElementById('level-dot');
+    const levelText = document.getElementById('level-text');
+
+    const lbl1 = document.getElementById('lbl-1');
+    const lbl2 = document.getElementById('lbl-2');
+    const val1 = document.getElementById('val-1');
+    const val2 = document.getElementById('val-2');
+    const sizeResultBox = document.getElementById('size-result-box');
+    const fitAlert = document.getElementById('fit-alert');
+    const allowanceBadge = document.getElementById('allowance-badge');
+
+    let currentMode = 'foot';
+    let isFrozen = false;
+    let frozenImage = null;
+    let activeTarget = 'card';
+    let draggedPoint = null;
+    let lastSelectedPoint = null;
+
+    const CARD_REAL_CM = 8.56;
+
+    let markers = {
+      card:  { p1: { x: 0.12, y: 0.15 }, p2: { x: 0.38, y: 0.15 }, color: '#38bdf8', label: '💳 卡片 (8.56cm)' },
+      len:   { p1: { x: 0.70, y: 0.22 }, p2: { x: 0.70, y: 0.82 }, color: '#60a5fa', label: '長度' },
+      width: { p1: { x: 0.55, y: 0.48 }, p2: { x: 0.85, y: 0.48 }, color: '#34d399', label: '寬度' }
+    };
+
+    lastSelectedPoint = markers.card.p2;
+
+    // 直接在頁面加載時無阻礙調用相機
+    async function startCameraDirectly() {
+      // 陀螺儀監聽
+      try {
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+          DeviceOrientationEvent.requestPermission().then(perm => {
+            if (perm === 'granted') window.addEventListener('deviceorientation', handleOrientation);
+          }).catch(console.warn);
+        } else {
+          window.addEventListener('deviceorientation', handleOrientation);
+        }
+      } catch (e) {
+        console.warn("陀螺儀略過", e);
+      }
+
+      // 相機啟動（採用最高相容規格）
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: { facingMode: { ideal: "environment" } }
+        });
+        video.srcObject = stream;
+        video.onloadeddata = async () => {
+          try {
+            await video.play();
+            resizeCanvas();
+            renderLoop();
+          } catch (playErr) {
+            console.error("video.play 錯誤:", playErr);
+          }
+        };
+      } catch (err) {
+        console.error("相機權限或啟動失敗:", err);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', startCameraDirectly);
+
+    function handleOrientation(e) {
+      if (isFrozen) return;
+      const beta = e.beta || 0;
+      const gamma = e.gamma || 0;
+      const tiltX = Math.max(-20, Math.min(20, gamma));
+      const tiltY = Math.max(-20, Math.min(20, beta));
+      bubbleDot.style.transform = `translate(${tiltX * 1.4}px, ${tiltY * 1.4}px)`;
+
+      const angleOffset = Math.hypot(gamma, beta);
+      if (angleOffset < 8.5) {
+        bubbleDot.className = 'w-3.5 h-3.5 rounded-full bg-emerald-400 absolute transition-transform duration-75 shadow-md';
+        bubbleHint.innerText = "✓ 已水平！可拍照";
+        bubbleHint.className = 'text-[10px] text-emerald-300 font-bold bg-slate-950/80 px-2 py-0.5 rounded-md mt-1 shadow';
+        levelDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400';
+        levelText.innerText = "水平鎖定";
+      } else {
+        bubbleDot.className = 'w-3.5 h-3.5 rounded-full bg-rose-500 absolute transition-transform duration-75 shadow-md';
+        bubbleHint.innerText = "請放平手機 (垂直朝下)";
+        bubbleHint.className = 'text-[10px] text-rose-300 font-bold bg-slate-950/80 px-2 py-0.5 rounded-md mt-1 shadow';
+        levelDot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400';
+        levelText.innerText = "水平校準中";
+      }
+    }
+
+    function resizeCanvas() {
+      canvas.width = canvas.clientWidth || 360;
+      canvas.height = canvas.clientHeight || 480;
+    }
+    window.onresize = resizeCanvas;
+
+    function renderLoop() {
+      if (!isFrozen && video.readyState >= 2) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      }
+      requestAnimationFrame(renderLoop);
+    }
+
+    snapBtn.onclick = () => {
+      isFrozen = true;
+      const off = document.createElement('canvas');
+      off.width = canvas.width;
+      off.height = canvas.height;
+      off.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+      frozenImage = off;
+      enterFrozenMode();
+    };
+
+    fileInput.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const img = new Image();
+        img.onload = () => {
+          isFrozen = true;
+          resizeCanvas();
+          const off = document.createElement('canvas');
+          off.width = canvas.width;
+          off.height = canvas.height;
+          off.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          frozenImage = off;
+          enterFrozenMode();
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    };
+
+    function enterFrozenMode() {
+      viewFinder.classList.add('hidden');
+      bubbleLevel.classList.add('hidden');
+      camControls.classList.add('hidden');
+      frozenControls.classList.remove('hidden');
+      adjustPanel.classList.remove('hidden');
+      redrawFrozen();
+      calculateMeasurements();
+    }
+
+    retakeBtn.onclick = () => {
+      isFrozen = false;
+      frozenImage = null;
+      viewFinder.classList.remove('hidden');
+      bubbleLevel.classList.remove('hidden');
+      camControls.classList.remove('hidden');
+      frozenControls.classList.add('hidden');
+      adjustPanel.classList.add('hidden');
+      fitAlert.classList.add('hidden');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    };
+
+    function drawMarkers() {
+      const w = canvas.width;
+      const h = canvas.height;
+
+      Object.keys(markers).forEach(key => {
+        const m = markers[key];
+        const x1 = m.p1.x * w;
+        const y1 = m.p1.y * h;
+        const x2 = m.p2.x * w;
+        const y2 = m.p2.y * h;
+
+        ctx.save();
+        const isActive = (activeTarget === key);
+        ctx.strokeStyle = m.color;
+        ctx.lineWidth = isActive ? 3.5 : 2;
+
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+
+        drawPoint(x1, y1, m.color, (lastSelectedPoint === m.p1));
+        drawPoint(x2, y2, m.color, (lastSelectedPoint === m.p2));
+
+        ctx.fillStyle = m.color;
+        ctx.font = 'bold 12px sans-serif';
+        ctx.fillText(m.label, (x1 + x2) / 2 - 25, (y1 + y2) / 2 - 8);
+        ctx.restore();
+      });
+    }
+
+    function drawPoint(x, y, color, isSelected) {
+      ctx.beginPath();
+      ctx.arc(x, y, isSelected ? 11 : 7.5, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.strokeStyle = isSelected ? '#38bdf8' : '#ffffff';
+      ctx.lineWidth = isSelected ? 3 : 2;
+      ctx.stroke();
+    }
+
+    function redrawFrozen() {
+      if (!frozenImage) return;
+      ctx.drawImage(frozenImage, 0, 0, canvas.width, canvas.height);
+      drawMarkers();
+    }
+
+    function getPointerPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      return { 
+        x: (cx - rect.left) / canvas.width, 
+        y: (cy - rect.top) / canvas.height,
+        pixelX: cx - rect.left,
+        pixelY: cy - rect.top
+      };
+    }
+
+    canvas.addEventListener('pointerdown', (e) => {
+      const pos = getPointerPos(e);
+      const m = markers[activeTarget];
+      const d1 = Math.hypot(pos.x - m.p1.x, pos.y - m.p1.y);
+      const d2 = Math.hypot(pos.x - m.p2.x, pos.y - m.p2.y);
+
+      if (d1 < 0.12 && d1 <= d2) {
+        draggedPoint = m.p1;
+        lastSelectedPoint = m.p1;
+      } else if (d2 < 0.12) {
+        draggedPoint = m.p2;
+        lastSelectedPoint = m.p2;
+      }
+
+      if (draggedPoint && isFrozen) {
+        loupeCanvas.classList.remove('hidden');
+        updateLoupe(pos.pixelX, pos.pixelY);
+        redrawFrozen();
+      }
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (!draggedPoint) return;
+      const pos = getPointerPos(e);
+      draggedPoint.x = Math.max(0.01, Math.min(0.99, pos.x));
+      draggedPoint.y = Math.max(0.01, Math.min(0.99, pos.y));
+      if (isFrozen) {
+        redrawFrozen();
+        calculateMeasurements();
+        updateLoupe(pos.pixelX, pos.pixelY);
+      }
+    });
+
+    window.addEventListener('pointerup', () => {
+      draggedPoint = null;
+      loupeCanvas.classList.add('hidden');
+    });
+
+    function updateLoupe(px, py) {
+      if (!frozenImage) return;
+      const lw = loupeCanvas.width;
+      const lh = loupeCanvas.height;
+      lctx.clearRect(0, 0, lw, lh);
+      const zoomSize = 65;
+      lctx.drawImage(canvas, px - zoomSize / 2, py - zoomSize / 2, zoomSize, zoomSize, 0, 0, lw, lh);
+
+      lctx.strokeStyle = '#38bdf8';
+      lctx.lineWidth = 1.5;
+      lctx.beginPath();
+      lctx.moveTo(lw / 2, 0); lctx.lineTo(lw / 2, lh);
+      lctx.moveTo(0, lh / 2); lctx.lineTo(lw, lh / 2);
+      lctx.stroke();
+
+      lctx.strokeStyle = '#ffffff';
+      lctx.beginPath();
+      lctx.arc(lw / 2, lh / 2, 10, 0, Math.PI * 2);
+      lctx.stroke();
+    }
+
+    function nudgePoint(dx, dy) {
+      if (!lastSelectedPoint) return;
+      const stepX = 1 / canvas.width;
+      const stepY = 1 / canvas.height;
+      lastSelectedPoint.x = Math.max(0.01, Math.min(0.99, lastSelectedPoint.x + dx * stepX));
+      lastSelectedPoint.y = Math.max(0.01, Math.min(0.99, lastSelectedPoint.y + dy * stepY));
+      redrawFrozen();
+      calculateMeasurements();
+    }
+
+    document.getElementById('dpad-up').onclick = () => nudgePoint(0, -1);
+    document.getElementById('dpad-down').onclick = () => nudgePoint(0, 1);
+    document.getElementById('dpad-left').onclick = () => nudgePoint(-1, 0);
+    document.getElementById('dpad-right').onclick = () => nudgePoint(1, 0);
+
+    function calculateMeasurements() {
+      const w = canvas.width;
+      const h = canvas.height;
+
+      const cardDx = (markers.card.p2.x - markers.card.p1.x) * w;
+      const cardDy = (markers.card.p2.y - markers.card.p1.y) * h;
+      const cardPx = Math.hypot(cardDx, cardDy);
+
+      if (cardPx < 10) return;
+
+      const cmPerPx = CARD_REAL_CM / cardPx;
+      const getLen = (m) => (Math.hypot((m.p2.x - m.p1.x) * w, (m.p2.y - m.p1.y) * h) * cmPerPx).toFixed(1);
+
+      const l1 = parseFloat(getLen(markers.len));
+      const l2 = parseFloat(getLen(markers.width));
+
+      val1.innerText = `${l1} cm`;
+      val2.innerText = `${l2} cm`;
+
+      if (currentMode === 'foot') {
+        const shoeInnerLen = (l1 + 0.8).toFixed(1);
+        const jpn = (Math.round((l1 + 0.8) * 2) / 2).toFixed(1);
+        const eu = Math.round((parseFloat(jpn) + 1.2) * 1.5);
+        const us = ((parseFloat(jpn) - 18) * 0.95).toFixed(1);
+
+        const widthRatio = l2 / l1;
+        let isWide = (widthRatio > 0.40);
+        let widthTag = isWide ? (widthRatio > 0.43 ? "特寬楦 (4E)" : "寬楦 (2E/3E)") : "標準楦 (D)";
+
+        sizeResultBox.innerHTML = `
+          <div class="grid grid-cols-3 gap-1 text-center font-mono my-1 bg-slate-900 p-2 rounded-lg border border-slate-800">
+            <div><span class="text-[9px] text-slate-400 block">日碼 (CM)</span><strong class="text-white text-sm">${jpn}</strong></div>
+            <div><span class="text-[9px] text-slate-400 block">歐碼 (EU)</span><strong class="text-white text-sm">${eu}</strong></div>
+            <div><span class="text-[9px] text-slate-400 block">美碼 (US)</span><strong class="text-white text-sm">${us}</strong></div>
+          </div>
+          <div class="text-[11px] text-slate-300">
+            • 建議鞋內長：<strong>${shoeInnerLen} cm</strong> (裸足 ${l1}cm + 預留空間)<br>
+            • 楦頭型態：<strong class="${isWide ? 'text-amber-400' : 'text-emerald-400'}">${widthTag}</strong>
+          </div>
+        `;
+
+        if (isWide) fitAlert.classList.remove('hidden');
+        else fitAlert.classList.add('hidden');
+      } else {
+        fitAlert.classList.add('hidden');
+        let gloveSize = "M 號";
+        if (l2 < 7.8) gloveSize = "S 號";
+        else if (l2 >= 8.8 && l2 < 9.8) gloveSize = "L 號";
+        else if (l2 >= 9.8) gloveSize = "XL 號";
+
+        sizeResultBox.innerHTML = `
+          <div class="text-center bg-slate-900 p-2 rounded-lg border border-slate-800 font-mono">
+            <span class="text-[9px] text-slate-400 block">推薦手套尺碼</span>
+            <strong class="text-emerald-400 text-base">${gloveSize}</strong>
+          </div>
+          <div class="text-[11px] text-slate-300 mt-1">
+            • 手掌寬度：<strong>${l2} cm</strong> (最核心依據)
+          </div>
+        `;
+      }
+    }
+
+    document.querySelectorAll('.target-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.target-btn').forEach(b => {
+          b.classList.remove('active', 'border-blue-500', 'bg-blue-500/20', 'text-blue-400');
+          b.classList.add('border-slate-800', 'bg-slate-950', 'text-slate-300');
+        });
+        btn.classList.add('active', 'border-blue-500', 'bg-blue-500/20', 'text-blue-400');
+        btn.classList.remove('border-slate-800', 'bg-slate-950', 'text-slate-300');
+        activeTarget = btn.dataset.target;
+        lastSelectedPoint = markers[activeTarget].p2;
+        if (isFrozen) redrawFrozen();
+      };
+    });
+
+    tabFoot.onclick = () => {
+      currentMode = 'foot';
+      tabFoot.classList.add('active');
+      tabFoot.classList.remove('text-slate-400');
+      tabHand.classList.remove('active');
+      tabHand.classList.add('text-slate-400');
+      guideTargetText.innerText = "[ 腳掌平放此區域 ]";
+      allowanceBadge.innerText = "已加 +0.8cm 穿襪放量";
+      lbl1.innerText = "實測裸足長度";
+      lbl2.innerText = "實測足掌寬度";
+      if (isFrozen) { redrawFrozen(); calculateMeasurements(); }
+    };
+
+    tabHand.onclick = () => {
+      currentMode = 'hand';
+      tabHand.classList.add('active');
+      tabHand.classList.remove('text-slate-400');
+      tabFoot.classList.remove('active');
+      tabFoot.classList.add('text-slate-400');
+      guideTargetText.innerText = "[ 手掌平放此區域 ]";
+      allowanceBadge.innerText = "依掌寬標準判定";
+      lbl1.innerText = "實測全手長度";
+      lbl2.innerText = "實測手掌寬度";
+      if (isFrozen) { redrawFrozen(); calculateMeasurements(); }
+    };
+
+    exportBtn.onclick = () => {
+      if (!frozenImage) return;
+      const exportCanvas = document.createElement('canvas');
+      exportCanvas.width = canvas.width;
+      exportCanvas.height = canvas.height + 140;
+      const expCtx = exportCanvas.getContext('2d');
+
+      expCtx.fillStyle = '#020617';
+      expCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+      expCtx.drawImage(canvas, 0, 0);
+
+      expCtx.fillStyle = '#0f172a';
+      expCtx.fillRect(10, canvas.height + 10, exportCanvas.width - 20, 120);
+      expCtx.strokeStyle = '#3b82f6';
+      expCtx.lineWidth = 1;
+      expCtx.strokeRect(10, canvas.height + 10, exportCanvas.width - 20, 120);
+
+      expCtx.fillStyle = '#38bdf8';
+      expCtx.font = 'bold 14px sans-serif';
+      expCtx.fillText(currentMode === 'foot' ? '【買鞋防退貨尺寸確認卡】' : '【手套尺寸確認卡】', 22, canvas.height + 34);
+
+      expCtx.fillStyle = '#f8fafc';
+      expCtx.font = '12px sans-serif';
+      expCtx.fillText(`實測數據：${lbl1.innerText} ${val1.innerText} ｜ ${lbl2.innerText} ${val2.innerText}`, 22, canvas.height + 58);
+
+      expCtx.fillStyle = '#34d399';
+      expCtx.font = 'bold 13px sans-serif';
+      if (currentMode === 'foot') {
+        const jpn = (Math.round((parseFloat(val1.innerText) + 0.8) * 2) / 2).toFixed(1);
+        expCtx.fillText(`推薦下單：日碼 ${jpn} cm / 歐碼 ${Math.round((parseFloat(jpn) + 1.2) * 1.5)}`, 22, canvas.height + 82);
+      } else {
+        expCtx.fillText(`推薦手套：依掌寬建議下單`, 22, canvas.height + 82);
+      }
+
+      expCtx.fillStyle = '#94a3b8';
+      expCtx.font = '10px sans-serif';
+      expCtx.fillText('買家已完成健保卡比例校準・供賣家備貨核對', 22, canvas.height + 108);
+
+      const link = document.createElement('a');
+      link.download = `AuraFit_尺寸確認圖_${Date.now()}.png`;
+      link.href = exportCanvas.toDataURL('image/png');
+      link.click();
+    };
+  </script>
+</body>
+</html>
