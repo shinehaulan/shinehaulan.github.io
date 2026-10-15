@@ -3,344 +3,241 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>AuraFit Pro - 高精度防退貨尺寸量測系統</title>
-  
+  <title>極簡尺碼測量 - 買鞋防退貨神器</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-
   <style>
-    .mode-tab.active {
-      background-color: #2563eb;
-      color: #ffffff;
-      box-shadow: 0 0 14px rgba(37, 99, 235, 0.45);
+    /* 滑桿手感優化 */
+    input[type=range] {
+      -webkit-appearance: none;
+      background: #1e293b;
+      border-radius: 9999px;
+      height: 8px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 22px;
+      width: 22px;
+      border-radius: 50%;
+      background: #38bdf8;
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+      cursor: pointer;
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center p-2 sm:p-4 font-sans selection:bg-blue-500">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center p-3 font-sans select-none">
 
   <!-- 頂部標頭 -->
   <header class="w-full max-w-md flex items-center justify-between pb-2 border-b border-slate-800">
     <div class="flex items-center space-x-2">
-      <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-white shadow-lg text-sm">
-        Pro
+      <div class="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-white shadow text-sm">
+        卡
       </div>
       <div>
-        <h1 class="text-sm font-bold text-white tracking-wide">高精度防退貨量測系統</h1>
-        <p class="text-[9px] text-slate-400">陀螺儀水平門鎖・觸控放大鏡・穿著放量</p>
+        <h1 class="text-sm font-bold text-white">游標尺式精準量測</h1>
+        <p class="text-[10px] text-slate-400">滑動推桿對齊・不擋視線・10秒完成</p>
       </div>
     </div>
-    <span id="level-badge" class="px-2 py-0.5 rounded-full bg-rose-950 border border-rose-500/40 text-[10px] text-rose-400 font-semibold flex items-center space-x-1">
-      <span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>
-      <span id="level-text">校準水平中</span>
+    <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-900 border border-slate-700 text-emerald-400 font-mono">
+      健保卡基準 (8.56cm)
     </span>
   </header>
 
   <main class="w-full max-w-md mt-2 flex flex-col items-center space-y-3">
 
-    <!-- 模式切換 -->
-    <div class="w-full grid grid-cols-2 gap-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs font-semibold">
-      <button id="tab-foot" class="mode-tab active py-2 rounded-lg transition-all flex items-center justify-center space-x-1.5">
-        <i data-lucide="footprints" class="w-4 h-4"></i>
-        <span>買鞋量足（防退貨）</span>
-      </button>
-      <button id="tab-hand" class="mode-tab py-2 rounded-lg text-slate-400 transition-all flex items-center justify-center space-x-1.5">
-        <i data-lucide="hand" class="w-4 h-4"></i>
-        <span>量手（防摔手套）</span>
-      </button>
-    </div>
-
-    <!-- 拍照與量測畫布視窗 -->
+    <!-- 主取景/測量畫布 -->
     <div class="relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl flex items-center justify-center">
       <video id="webcam" class="absolute inset-0 w-full h-full object-cover" playsinline autoplay muted></video>
-      <canvas id="measure-canvas" class="absolute inset-0 w-full h-full object-cover z-10 touch-none"></canvas>
+      <canvas id="view-canvas" class="absolute inset-0 w-full h-full object-cover z-10"></canvas>
 
-      <!-- 放大鏡視窗 (拖曳時顯示) -->
-      <canvas id="loupe-canvas" width="130" height="130" class="hidden absolute top-4 left-4 z-40 rounded-full border-2 border-white shadow-2xl bg-black pointer-events-none"></canvas>
-
-      <!-- 即時雙軸水平泡泡儀 (拍照前顯示) -->
-      <div id="bubble-level" class="absolute z-20 pointer-events-none flex flex-col items-center justify-center">
-        <div class="w-16 h-16 rounded-full border-2 border-slate-400/40 bg-black/30 backdrop-blur-sm relative flex items-center justify-center">
-          <!-- 靶心 -->
-          <div class="w-4 h-4 rounded-full border border-sky-400/60"></div>
-          <!-- 水平泡泡 -->
-          <div id="bubble-dot" class="w-3.5 h-3.5 rounded-full bg-rose-500 absolute transition-transform duration-75 shadow-md"></div>
+      <!-- 拍攝引導框 (拍照前) -->
+      <div id="guide-box" class="absolute inset-0 z-10 pointer-events-none p-4 flex flex-col justify-between">
+        <div class="w-32 h-20 border-2 border-dashed border-sky-400/80 rounded-xl p-1 bg-sky-500/10 text-[10px] text-sky-300 font-bold flex items-center justify-center text-center">
+          健保卡/悠遊卡<br>平放此處
         </div>
-        <span id="bubble-hint" class="text-[10px] text-rose-300 font-bold bg-slate-950/80 px-2 py-0.5 rounded-md mt-1 shadow">
-          請放平手機 (垂直朝下)
-        </span>
-      </div>
-
-      <!-- 取景輔助引導 -->
-      <div id="viewfinder-box" class="absolute inset-0 z-10 pointer-events-none flex flex-col justify-between p-5">
-        <div class="w-28 h-18 border-2 border-dashed border-sky-400/70 rounded-lg p-1 bg-sky-500/10 text-[9px] text-sky-300 font-mono">
-          [ 健保卡/信用卡放置處 ]
-        </div>
-        <div class="self-end w-36 h-56 border-2 border-dashed border-emerald-400/60 rounded-2xl p-2 bg-emerald-500/10 text-[9px] text-emerald-300 text-center flex items-center justify-center">
-          <span id="guide-target-text">[ 腳掌平放此區域 ]</span>
+        <div class="self-end w-44 h-64 border-2 border-dashed border-emerald-400/80 rounded-2xl p-2 bg-emerald-500/10 text-[11px] text-emerald-300 flex items-center justify-center text-center font-bold">
+          腳掌平放此處<br>(腳尖朝上)
         </div>
       </div>
 
-      <!-- 拍照按鈕區 -->
-      <div id="cam-controls" class="absolute bottom-4 inset-x-0 flex justify-center items-center space-x-3 px-4 z-20">
-        <button id="snap-btn" disabled class="px-6 py-2.5 rounded-full bg-slate-700 text-slate-400 font-bold text-xs shadow-lg flex items-center space-x-1.5 transition-all opacity-70">
+      <!-- 水平感應提示 -->
+      <div id="level-tip" class="absolute top-3 right-3 z-20 px-2 py-1 rounded-lg bg-black/70 backdrop-blur border border-slate-700 text-[10px] text-amber-300 font-medium">
+        請垂直朝下拿平
+      </div>
+
+      <!-- 拍照控制鈕 -->
+      <div id="cam-bar" class="absolute bottom-4 inset-x-0 flex justify-center items-center space-x-3 px-4 z-20">
+        <button id="snap-btn" class="px-7 py-3 rounded-full bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-bold text-xs shadow-lg shadow-blue-600/30 flex items-center space-x-2 transition-all">
           <i data-lucide="camera" class="w-4 h-4"></i>
-          <span id="snap-text">手機水平後即可拍照</span>
+          <span>定格拍照開始測量</span>
         </button>
-        <label class="px-4 py-2.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs border border-slate-700 cursor-pointer flex items-center space-x-1.5">
+        <label class="px-4 py-3 rounded-full bg-slate-800 text-slate-300 font-bold text-xs border border-slate-700 cursor-pointer flex items-center space-x-1.5 active:scale-95">
           <i data-lucide="image" class="w-4 h-4"></i>
           <span>相片</span>
           <input id="file-input" type="file" accept="image/*" class="hidden">
         </label>
       </div>
 
-      <!-- 定格後的按鈕區 -->
-      <div id="frozen-controls" class="hidden absolute bottom-3 inset-x-0 flex justify-center items-center space-x-2 px-3 z-20">
-        <button id="retake-btn" class="px-3.5 py-2 rounded-xl bg-slate-800/90 text-slate-300 border border-slate-700 text-xs font-semibold flex items-center space-x-1">
-          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-          <span>重新拍照</span>
-        </button>
-        <button id="export-btn" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-600/30 flex items-center space-x-1.5 active:scale-95 transition-all">
-          <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
-          <span>生成確認圖 (傳賣家)</span>
-        </button>
-      </div>
-
-      <!-- 相機啟動遮罩 -->
-      <div id="start-overlay" class="absolute inset-0 bg-slate-950/95 flex flex-col items-center justify-center p-6 text-center space-y-4 z-30">
-        <div class="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 border border-blue-500/40">
-          <i data-lucide="shield-check" class="w-8 h-8"></i>
-        </div>
-        <div>
-          <h3 class="text-base font-bold text-white">開啟相機與水平感測</h3>
-          <p class="text-xs text-slate-400 mt-1">內建水平儀門鎖，避免拍斜導致量測誤差</p>
-        </div>
-        <button id="start-cam-btn" class="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-xl text-xs font-bold text-white shadow-lg active:scale-95 transition-all">
-          開始精準量測
+      <!-- 定格後的動作按鈕 -->
+      <div id="frozen-bar" class="hidden absolute top-3 left-3 z-20">
+        <button id="retake-btn" class="px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-700 text-[11px] text-slate-300 font-semibold flex items-center space-x-1 shadow">
+          <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+          <span>重拍</span>
         </button>
       </div>
     </div>
 
-    <!-- 標尺微調按鈕 -->
-    <div id="adjust-panel" class="hidden w-full bg-slate-900 border border-slate-800 rounded-2xl p-3 shadow-xl space-y-2">
-      <div class="flex items-center justify-between text-xs text-slate-300">
-        <span class="font-bold text-white">點選項目拖曳錨點（會彈出 2x 放大鏡）：</span>
+    <!-- 步驟推桿微調面板 (定格後顯示) -->
+    <div id="slider-panel" class="hidden w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-3.5">
+      <div class="text-xs font-bold text-white flex items-center justify-between border-b border-slate-800 pb-2">
+        <span>滑動推桿對齊（如同游標卡尺）：</span>
+        <span class="text-[10px] text-sky-400">直覺好拉・絕不擋手</span>
       </div>
-      <div class="grid grid-cols-4 gap-1.5 text-[11px]" id="target-selector">
-        <button class="target-btn active p-1.5 rounded-lg border border-blue-500 bg-blue-500/20 text-blue-400 font-semibold text-center" data-target="card">
-          💳 卡片兩端
-        </button>
-        <button id="target-btn-1" class="target-btn p-1.5 rounded-lg border border-slate-800 bg-slate-950 text-slate-300 font-medium text-center" data-target="len">
-          最長趾尖
-        </button>
-        <button id="target-btn-2" class="target-btn p-1.5 rounded-lg border border-slate-800 bg-slate-950 text-slate-300 font-medium text-center" data-target="width">
-          最寬蹠骨
-        </button>
-        <button id="target-btn-3" class="target-btn p-1.5 rounded-lg border border-slate-800 bg-slate-950 text-slate-300 font-medium text-center" data-target="part3">
-          腳跟後緣
-        </button>
+
+      <!-- 1. 卡片寬度校準推桿 -->
+      <div class="space-y-1">
+        <div class="flex justify-between text-[11px]">
+          <span class="text-sky-300 font-bold flex items-center space-x-1">
+            <span class="w-2 h-2 rounded-full bg-sky-400 inline-block"></span>
+            <span>1. 健保卡寬度框線</span>
+          </span>
+          <span id="card-px-val" class="text-slate-400 font-mono text-[10px]">校準中</span>
+        </div>
+        <input id="slider-card" type="range" min="60" max="320" value="130" class="w-full">
+      </div>
+
+      <!-- 2. 腳尖推桿 -->
+      <div class="space-y-1">
+        <div class="flex justify-between text-[11px]">
+          <span class="text-blue-400 font-bold flex items-center space-x-1">
+            <span class="w-2 h-2 rounded-full bg-blue-500 inline-block"></span>
+            <span>2. 腳趾最前端（切齊大拇趾）</span>
+          </span>
+        </div>
+        <input id="slider-toe" type="range" min="5" max="95" value="25" class="w-full">
+      </div>
+
+      <!-- 3. 腳跟推桿 -->
+      <div class="space-y-1">
+        <div class="flex justify-between text-[11px]">
+          <span class="text-indigo-400 font-bold flex items-center space-x-1">
+            <span class="w-2 h-2 rounded-full bg-indigo-500 inline-block"></span>
+            <span>3. 腳後跟最後端（切齊腳後凸點）</span>
+          </span>
+        </div>
+        <input id="slider-heel" type="range" min="5" max="95" value="80" class="w-full">
+      </div>
+
+      <!-- 4. 腳掌寬度推桿 -->
+      <div class="space-y-1">
+        <div class="flex justify-between text-[11px]">
+          <span class="text-emerald-400 font-bold flex items-center space-x-1">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+            <span>4. 腳掌最寬處（推桿貼緊兩側）</span>
+          </span>
+        </div>
+        <input id="slider-width" type="range" min="30" max="240" value="110" class="w-full">
       </div>
     </div>
 
-    <!-- 核心數據與推薦卡片 -->
+    <!-- 尺碼計算看板 -->
     <div class="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-3">
-      
-      <!-- 裸量基礎數據 -->
-      <div class="grid grid-cols-3 gap-2 text-center">
-        <div class="bg-slate-950 p-2 rounded-xl border border-slate-800">
-          <div id="lbl-1" class="text-[10px] text-slate-400">裸足長度</div>
-          <div id="val-1" class="text-sm font-bold text-blue-400 font-mono mt-0.5">-- cm</div>
+      <div class="grid grid-cols-2 gap-2 text-center">
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+          <div class="text-[10px] text-slate-400">實測裸足長</div>
+          <div id="res-foot-len" class="text-base font-bold text-blue-400 font-mono mt-0.5">-- cm</div>
         </div>
-        <div class="bg-slate-950 p-2 rounded-xl border border-slate-800">
-          <div id="lbl-2" class="text-[10px] text-slate-400">足掌寬度</div>
-          <div id="val-2" class="text-sm font-bold text-emerald-400 font-mono mt-0.5">-- cm</div>
-        </div>
-        <div class="bg-slate-950 p-2 rounded-xl border border-slate-800">
-          <div id="lbl-3" class="text-[10px] text-slate-400">腳跟寬度</div>
-          <div id="val-3" class="text-sm font-bold text-purple-400 font-mono mt-0.5">-- cm</div>
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+          <div class="text-[10px] text-slate-400">實測足掌寬</div>
+          <div id="res-foot-width" class="text-base font-bold text-emerald-400 font-mono mt-0.5">-- cm</div>
         </div>
       </div>
 
-      <!-- 防退貨核心：推薦尺碼盒 -->
+      <!-- 推薦尺碼盒 -->
       <div class="bg-gradient-to-r from-blue-950/60 to-indigo-950/60 border border-blue-500/30 p-3.5 rounded-xl space-y-2">
         <div class="flex items-center justify-between border-b border-blue-500/20 pb-1.5">
           <span class="text-xs font-bold text-blue-300 flex items-center space-x-1">
             <i data-lucide="check-circle" class="w-3.5 h-3.5 text-blue-400"></i>
-            <span>防退貨建議下單尺碼</span>
+            <span>防退貨建議下單鞋碼</span>
           </span>
-          <span id="allowance-badge" class="text-[9px] px-1.5 py-0.5 bg-blue-500/20 text-blue-300 rounded font-mono">
-            已加 +0.8cm 穿襪活動量
+          <span class="text-[9px] px-1.5 py-0.5 bg-blue-500/20 text-blue-300 rounded font-mono">
+            已加 +0.8cm 穿襪放量
           </span>
         </div>
 
         <div id="size-result-box" class="text-xs space-y-1 text-slate-200">
-          請放平手機拍照，或直接上傳照片進行量測。
+          拍照後推動上方推桿切齊腳邊，立即精確換算。
         </div>
 
-        <!-- 寬楦/版型危險警示區（防磨腳退貨） -->
-        <div id="fit-alert" class="hidden p-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-[11px] text-amber-300">
-          ⚠️ <strong>楦頭偏寬警示</strong>：足型屬於寬楦，購買尖頭或窄版球鞋<strong>強烈建議選大半號或選 2E/4E 寬楦</strong>，避免擠腳退貨！
+        <!-- 寬楦警告 -->
+        <div id="wide-alert" class="hidden p-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-[11px] text-amber-300">
+          ⚠️ <strong>寬楦提醒</strong>：您的腳掌比例偏寬，<strong>強烈建議選擇大半號或 2E 寬楦版</strong>，避免兩側擠腳退貨！
         </div>
       </div>
-
     </div>
 
   </main>
-
-  <footer class="w-full max-w-md mt-2 text-center text-[9px] text-slate-500 pb-4">
-    純本機安全運算・無伺服器紀錄・買賣雙方尺寸確認工具
-  </footer>
 
   <script>
     lucide.createIcons();
 
     const video = document.getElementById('webcam');
-    const canvas = document.getElementById('measure-canvas');
+    const canvas = document.getElementById('view-canvas');
     const ctx = canvas.getContext('2d');
-    const loupeCanvas = document.getElementById('loupe-canvas');
-    const lctx = loupeCanvas.getContext('2d');
 
-    const tabFoot = document.getElementById('tab-foot');
-    const tabHand = document.getElementById('tab-hand');
-    const startOverlay = document.getElementById('start-overlay');
-    const startCamBtn = document.getElementById('start-cam-btn');
     const snapBtn = document.getElementById('snap-btn');
-    const snapText = document.getElementById('snap-text');
     const retakeBtn = document.getElementById('retake-btn');
-    const exportBtn = document.getElementById('export-btn');
     const fileInput = document.getElementById('file-input');
-    const camControls = document.getElementById('cam-controls');
-    const frozenControls = document.getElementById('frozen-controls');
-    const adjustPanel = document.getElementById('adjust-panel');
-    const viewFinder = document.getElementById('viewfinder-box');
-    const guideTargetText = document.getElementById('guide-target-text');
+    const guideBox = document.getElementById('guide-box');
+    const camBar = document.getElementById('cam-bar');
+    const frozenBar = document.getElementById('frozen-bar');
+    const sliderPanel = document.getElementById('slider-panel');
+    const levelTip = document.getElementById('level-tip');
 
-    const bubbleLevel = document.getElementById('bubble-level');
-    const bubbleDot = document.getElementById('bubble-dot');
-    const bubbleHint = document.getElementById('bubble-hint');
-    const levelBadge = document.getElementById('level-badge');
-    const levelText = document.getElementById('level-text');
+    const sliderCard = document.getElementById('slider-card');
+    const sliderToe = document.getElementById('slider-toe');
+    const sliderHeel = document.getElementById('slider-heel');
+    const sliderWidth = document.getElementById('slider-width');
 
-    const lbl1 = document.getElementById('lbl-1');
-    const lbl2 = document.getElementById('lbl-2');
-    const lbl3 = document.getElementById('lbl-3');
-    const val1 = document.getElementById('val-1');
-    const val2 = document.getElementById('val-2');
-    const val3 = document.getElementById('val-3');
+    const resFootLen = document.getElementById('res-foot-len');
+    const resFootWidth = document.getElementById('res-foot-width');
     const sizeResultBox = document.getElementById('size-result-box');
-    const fitAlert = document.getElementById('fit-alert');
-    const allowanceBadge = document.getElementById('allowance-badge');
+    const wideAlert = document.getElementById('wide-alert');
 
-    let currentMode = 'foot';
     let isFrozen = false;
     let frozenImage = null;
-    let activeTarget = 'card';
-    let draggedPoint = null;
-    let isLevel = false;
-
     const CARD_REAL_CM = 8.56;
 
-    let markers = {
-      card: { p1: { x: 0.18, y: 0.20 }, p2: { x: 0.42, y: 0.20 }, color: '#38bdf8', label: '💳 卡片(8.56cm)' },
-      len:  { p1: { x: 0.68, y: 0.20 }, p2: { x: 0.68, y: 0.80 }, color: '#60a5fa', label: '足長' },
-      width:{ p1: { x: 0.52, y: 0.44 }, p2: { x: 0.84, y: 0.44 }, color: '#34d399', label: '掌寬' },
-      part3:{ p1: { x: 0.58, y: 0.76 }, p2: { x: 0.78, y: 0.76 }, color: '#c084fc', label: '跟寬' }
-    };
-
-    // 啟動相機與陀螺儀
+    // 啟動鏡頭
     async function initCamera() {
-      // 請求陀螺儀權限 (iOS 13+)
-      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-        try {
-          const perm = await DeviceOrientationEvent.requestPermission();
-          if (perm === 'granted') {
-            window.addEventListener('deviceorientation', handleOrientation);
-          }
-        } catch (e) {
-          console.warn(e);
-        }
-      } else {
-        window.addEventListener('deviceorientation', handleOrientation);
-      }
-
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 960 } }
+          video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 960 } }
         });
         video.srcObject = stream;
         video.onloadedmetadata = () => {
           video.play();
-          startOverlay.classList.add('hidden');
           resizeCanvas();
           renderLoop();
         };
-      } catch (err) {
-        // 退回前置鏡頭或無鏡頭
-        startOverlay.classList.add('hidden');
-        snapBtn.disabled = false;
-        snapBtn.classList.remove('bg-slate-700', 'text-slate-400');
-        snapBtn.classList.add('bg-blue-600', 'text-white');
-        snapText.innerText = "拍照量測";
+      } catch (e) {
+        levelTip.innerText = "相機已關閉，可點「相片」上傳";
       }
+
+      window.addEventListener('deviceorientation', (e) => {
+        if (isFrozen) return;
+        const offset = Math.hypot(e.gamma || 0, e.beta || 0);
+        if (offset < 9) {
+          levelTip.innerText = "✓ 已放平，角度精準";
+          levelTip.className = "absolute top-3 right-3 z-20 px-2 py-1 rounded-lg bg-emerald-950/80 border border-emerald-500 text-[10px] text-emerald-300 font-medium";
+        } else {
+          levelTip.innerText = "請垂直朝下拿平";
+          levelTip.className = "absolute top-3 right-3 z-20 px-2 py-1 rounded-lg bg-black/70 backdrop-blur border border-slate-700 text-[10px] text-amber-300 font-medium";
+        }
+      });
     }
-
-    startCamBtn.onclick = initCamera;
-
-    // 處理手機水平傾斜 (防止拍歪)
-    function handleOrientation(e) {
-      if (isFrozen) return;
-      const beta = e.beta || 0;   // 前後傾斜 (-180 ~ 180)
-      const gamma = e.gamma || 0; // 左右傾斜 (-90 ~ 90)
-
-      // 手機垂直向下俯拍時，beta 通常接近 0，gamma 接近 0
-      const tiltX = Math.max(-20, Math.min(20, gamma));
-      const tiltY = Math.max(-20, Math.min(20, beta));
-
-      // 移動泡泡
-      bubbleDot.style.transform = `translate(${tiltX * 1.4}px, ${tiltY * 1.4}px)`;
-
-      // 傾斜角小於 4 度判定為水平
-      const angleOffset = Math.hypot(gamma, beta);
-      if (angleOffset < 4.5) {
-        setAngleStatus(true);
-      } else {
-        setAngleStatus(false);
-      }
-    }
-
-    function setAngleStatus(level) {
-      isLevel = level;
-      if (level) {
-        bubbleDot.classList.remove('bg-rose-500');
-        bubbleDot.classList.add('bg-emerald-400');
-        bubbleHint.innerText = "✓ 已水平！可拍照";
-        bubbleHint.classList.remove('text-rose-300');
-        bubbleHint.classList.add('text-emerald-300');
-
-        levelBadge.classList.remove('bg-rose-950', 'border-rose-500/40', 'text-rose-400');
-        levelBadge.classList.add('bg-emerald-950', 'border-emerald-500/40', 'text-emerald-400');
-        levelText.innerText = "水平鎖定中";
-
-        snapBtn.disabled = false;
-        snapBtn.classList.remove('bg-slate-700', 'text-slate-400', 'opacity-70');
-        snapBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-500', 'text-white', 'shadow-emerald-500/30');
-        snapText.innerText = "水平就緒・立即拍照";
-      } else {
-        bubbleDot.classList.remove('bg-emerald-400');
-        bubbleDot.classList.add('bg-rose-500');
-        bubbleHint.innerText = "請放平手機 (垂直朝下)";
-        bubbleHint.classList.remove('text-emerald-300');
-        bubbleHint.classList.add('text-rose-300');
-
-        levelBadge.classList.remove('bg-emerald-950', 'border-emerald-500/40', 'text-emerald-400');
-        levelBadge.classList.add('bg-rose-950', 'border-rose-500/40', 'text-rose-400');
-        levelText.innerText = "傾斜校正中";
-
-        snapBtn.disabled = true;
-        snapBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-500', 'text-white', 'shadow-emerald-500/30');
-        snapBtn.classList.add('bg-slate-700', 'text-slate-400', 'opacity-70');
-        snapText.innerText = "手機水平後即可拍照";
-      }
-    }
+    initCamera();
 
     function resizeCanvas() {
       canvas.width = canvas.clientWidth || 360;
@@ -351,7 +248,6 @@
     function renderLoop() {
       if (!isFrozen && video.readyState >= 2) {
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        drawMarkers();
       }
       requestAnimationFrame(renderLoop);
     }
@@ -364,7 +260,7 @@
       off.height = canvas.height;
       off.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
       frozenImage = off;
-      enterFrozenMode();
+      enterFrozen();
     };
 
     fileInput.onchange = (e) => {
@@ -381,331 +277,84 @@
           off.height = canvas.height;
           off.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
           frozenImage = off;
-          enterFrozenMode();
+          enterFrozen();
         };
         img.src = evt.target.result;
       };
       reader.readAsDataURL(file);
     };
 
-    function enterFrozenMode() {
-      viewFinder.classList.add('hidden');
-      bubbleLevel.classList.add('hidden');
-      camControls.classList.add('hidden');
-      frozenControls.classList.remove('hidden');
-      adjustPanel.classList.remove('hidden');
-      redrawFrozen();
-      calculateMeasurements();
+    function enterFrozen() {
+      guideBox.classList.add('hidden');
+      camBar.classList.add('hidden');
+      frozenBar.classList.remove('hidden');
+      sliderPanel.classList.remove('hidden');
+      levelTip.classList.add('hidden');
+      redraw();
+      updateCalc();
     }
 
     retakeBtn.onclick = () => {
       isFrozen = false;
       frozenImage = null;
-      viewFinder.classList.remove('hidden');
-      bubbleLevel.classList.remove('hidden');
-      camControls.classList.remove('hidden');
-      frozenControls.classList.add('hidden');
-      adjustPanel.classList.add('hidden');
-      fitAlert.classList.add('hidden');
-      setAngleStatus(false);
+      guideBox.classList.remove('hidden');
+      camBar.classList.remove('hidden');
+      frozenBar.classList.add('hidden');
+      sliderPanel.classList.add('hidden');
+      levelTip.classList.remove('hidden');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
     };
 
-    // 繪製錨點
-    function drawMarkers() {
+    // 重新繪製定格影像與直覺標尺線
+    function redraw() {
+      if (!frozenImage) return;
       const w = canvas.width;
       const h = canvas.height;
 
-      Object.keys(markers).forEach(key => {
-        const m = markers[key];
-        const x1 = m.p1.x * w;
-        const y1 = m.p1.y * h;
-        const x2 = m.p2.x * w;
-        const y2 = m.p2.y * h;
+      ctx.drawImage(frozenImage, 0, 0, w, h);
 
-        ctx.save();
-        ctx.strokeStyle = m.color;
-        ctx.lineWidth = (activeTarget === key) ? 3 : 2;
+      // 1. 繪製卡片基準尺規 (左上方)
+      const cardPx = parseFloat(sliderCard.value);
+      const cardH = cardPx * (5.398 / 8.56);
+      const cardX = w * 0.08;
+      const cardY = h * 0.06;
 
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-        ctx.stroke();
+      ctx.save();
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 2.5;
+      ctx.setLineDash([4, 3]);
+      ctx.strokeRect(cardX, cardY, cardPx, cardH);
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText(`💳 健保卡寬度 (${CARD_REAL_CM}cm)`, cardX, cardY - 5);
+      ctx.restore();
 
-        drawPoint(x1, y1, m.color, activeTarget === key);
-        drawPoint(x2, y2, m.color, activeTarget === key);
-
-        ctx.fillStyle = m.color;
-        ctx.font = 'bold 11px sans-serif';
-        ctx.fillText(m.label, (x1 + x2) / 2 - 20, (y1 + y2) / 2 - 8);
-        ctx.restore();
-      });
-    }
-
-    function drawPoint(x, y, color, isActive) {
+      // 2. 繪製腳尖切線 (橫向游標尺)
+      const toeY = (parseFloat(sliderToe.value) / 100) * h;
+      ctx.save();
+      ctx.strokeStyle = '#60a5fa';
+      ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.arc(x, y, isActive ? 9 : 6.5, 0, Math.PI * 2);
-      ctx.fillStyle = color;
-      ctx.fill();
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 2;
+      ctx.moveTo(w * 0.40, toeY);
+      ctx.lineTo(w * 0.98, toeY);
       ctx.stroke();
-    }
+      ctx.fillStyle = '#60a5fa';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText('▲ 腳趾最前端', w * 0.42, toeY - 6);
+      ctx.restore();
 
-    function redrawFrozen() {
-      if (!frozenImage) return;
-      ctx.drawImage(frozenImage, 0, 0, canvas.width, canvas.height);
-      drawMarkers();
-    }
+      // 3. 繪製腳跟切線 (橫向游標尺)
+      const heelY = (parseFloat(sliderHeel.value) / 100) * h;
+      ctx.save();
+      ctx.strokeStyle = '#818cf8';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(w * 0.40, heelY);
+      ctx.lineTo(w * 0.98, heelY);
+      ctx.stroke();
+      ctx.fillStyle = '#818cf8';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText('▼ 腳後跟最後端', w * 0.42, heelY + 14);
+      ctx.restore();
 
-    // 觸控拖曳與放大鏡（Loupe）
-    function getPointerPos(e) {
-      const rect = canvas.getBoundingClientRect();
-      const cx = e.touches ? e.touches[0].clientX : e.clientX;
-      const cy = e.touches ? e.touches[0].clientY : e.clientY;
-      return { 
-        x: (cx - rect.left) / canvas.width, 
-        y: (cy - rect.top) / canvas.height,
-        pixelX: cx - rect.left,
-        pixelY: cy - rect.top
-      };
-    }
-
-    canvas.addEventListener('pointerdown', (e) => {
-      const pos = getPointerPos(e);
-      const m = markers[activeTarget];
-      if (Math.hypot(pos.x - m.p1.x, pos.y - m.p1.y) < 0.08) draggedPoint = m.p1;
-      else if (Math.hypot(pos.x - m.p2.x, pos.y - m.p2.y) < 0.08) draggedPoint = m.p2;
-
-      if (draggedPoint && isFrozen) {
-        loupeCanvas.classList.remove('hidden');
-        updateLoupe(pos.pixelX, pos.pixelY);
-      }
-    });
-
-    window.addEventListener('pointermove', (e) => {
-      if (!draggedPoint) return;
-      const pos = getPointerPos(e);
-      draggedPoint.x = Math.max(0.02, Math.min(0.98, pos.x));
-      draggedPoint.y = Math.max(0.02, Math.min(0.98, pos.y));
-      if (isFrozen) {
-        redrawFrozen();
-        calculateMeasurements();
-        updateLoupe(pos.pixelX, pos.pixelY);
-      }
-    });
-
-    window.addEventListener('pointerup', () => {
-      draggedPoint = null;
-      loupeCanvas.classList.add('hidden');
-    });
-
-    // 更新 2x 局部放大鏡視窗
-    function updateLoupe(px, py) {
-      if (!frozenImage) return;
-      const lw = loupeCanvas.width;
-      const lh = loupeCanvas.height;
-      lctx.clearRect(0, 0, lw, lh);
-
-      // 抓取手指周圍 65x65 像素並放大 2 倍繪製
-      const zoomSize = 65;
-      lctx.drawImage(
-        canvas,
-        px - zoomSize / 2, py - zoomSize / 2, zoomSize, zoomSize,
-        0, 0, lw, lh
-      );
-
-      // 畫準星
-      lctx.strokeStyle = '#38bdf8';
-      lctx.lineWidth = 1.5;
-      lctx.beginPath();
-      lctx.moveTo(lw / 2, 0); lctx.lineTo(lw / 2, lh);
-      lctx.moveTo(0, lh / 2); lctx.lineTo(lw, lh / 2);
-      lctx.stroke();
-
-      lctx.strokeStyle = '#ffffff';
-      lctx.beginPath();
-      lctx.arc(lw / 2, lh / 2, 8, 0, Math.PI * 2);
-      lctx.stroke();
-    }
-
-    // 計算邏輯
-    function calculateMeasurements() {
-      const w = canvas.width;
-      const h = canvas.height;
-
-      const cardDx = (markers.card.p2.x - markers.card.p1.x) * w;
-      const cardDy = (markers.card.p2.y - markers.card.p1.y) * h;
-      const cardPx = Math.hypot(cardDx, cardDy);
-
-      if (cardPx < 10) return;
-
-      const cmPerPx = CARD_REAL_CM / cardPx;
-      const getLen = (m) => (Math.hypot((m.p2.x - m.p1.x) * w, (m.p2.y - m.p1.y) * h) * cmPerPx).toFixed(1);
-
-      const l1 = parseFloat(getLen(markers.len));
-      const l2 = parseFloat(getLen(markers.width));
-      const l3 = parseFloat(getLen(markers.part3));
-
-      val1.innerText = `${l1} cm`;
-      val2.innerText = `${l2} cm`;
-      val3.innerText = `${l3} cm`;
-
-      if (currentMode === 'foot') {
-        const shoeInnerLen = (l1 + 0.8).toFixed(1);
-        const jpn = (Math.round((l1 + 0.8) * 2) / 2).toFixed(1);
-        const eu = Math.round((parseFloat(jpn) + 1.2) * 1.5);
-        const us = ((parseFloat(jpn) - 18) * 0.95).toFixed(1);
-
-        const widthRatio = l2 / l1;
-        let isWide = false;
-        let widthTag = "標準楦 (D)";
-
-        if (widthRatio > 0.40) {
-          isWide = true;
-          widthTag = "寬楦 (2E/3E)";
-        }
-        if (widthRatio > 0.43) {
-          isWide = true;
-          widthTag = "特寬楦 (4E)";
-        }
-
-        sizeResultBox.innerHTML = `
-          <div class="grid grid-cols-3 gap-1 text-center font-mono my-1 bg-slate-900 p-2 rounded-lg border border-slate-800">
-            <div><span class="text-[9px] text-slate-400 block">日碼 (CM)</span><strong class="text-white text-sm">${jpn}</strong></div>
-            <div><span class="text-[9px] text-slate-400 block">歐碼 (EU)</span><strong class="text-white text-sm">${eu}</strong></div>
-            <div><span class="text-[9px] text-slate-400 block">美碼 (US男)</span><strong class="text-white text-sm">${us}</strong></div>
-          </div>
-          <div class="text-[11px] text-slate-300">
-            • 建議鞋內長：<strong>${shoeInnerLen} cm</strong> (裸足 ${l1}cm + 預留空間)<br>
-            • 楦頭型態：<strong class="${isWide ? 'text-amber-400' : 'text-emerald-400'}">${widthTag}</strong>
-          </div>
-        `;
-
-        if (isWide) {
-          fitAlert.classList.remove('hidden');
-        } else {
-          fitAlert.classList.add('hidden');
-        }
-      } else {
-        fitAlert.classList.add('hidden');
-        let gloveSize = "M 號";
-        if (l2 < 7.8) gloveSize = "S 號";
-        else if (l2 >= 8.8 && l2 < 9.8) gloveSize = "L 號";
-        else if (l2 >= 9.8) gloveSize = "XL 號";
-
-        sizeResultBox.innerHTML = `
-          <div class="text-center bg-slate-900 p-2 rounded-lg border border-slate-800 font-mono">
-            <span class="text-[9px] text-slate-400 block">推薦手套尺碼</span>
-            <strong class="text-emerald-400 text-base">${gloveSize}</strong>
-          </div>
-          <div class="text-[11px] text-slate-300 mt-1">
-            • 手掌寬度：<strong>${l2} cm</strong> (最核心依據)<br>
-            • 中指長度：<strong>${l3} cm</strong> (防指尖壓迫)
-          </div>
-        `;
-      }
-    }
-
-    // 模式切換
-    tabFoot.onclick = () => {
-      currentMode = 'foot';
-      tabFoot.classList.add('active');
-      tabFoot.classList.remove('text-slate-400');
-      tabHand.classList.remove('active');
-      tabHand.classList.add('text-slate-400');
-
-      guideTargetText.innerText = "[ 腳掌平放此區域 ]";
-      allowanceBadge.innerText = "已加 +0.8cm 穿襪活動量";
-      lbl1.innerText = "裸足長度";
-      lbl2.innerText = "足掌寬度";
-      lbl3.innerText = "腳跟寬度";
-
-      markers.len.label = "足長";
-      markers.width.label = "掌寬";
-      markers.part3.label = "跟寬";
-
-      if (isFrozen) { redrawFrozen(); calculateMeasurements(); }
-    };
-
-    tabHand.onclick = () => {
-      currentMode = 'hand';
-      tabHand.classList.add('active');
-      tabHand.classList.remove('text-slate-400');
-      tabFoot.classList.remove('active');
-      tabFoot.classList.add('text-slate-400');
-
-      guideTargetText.innerText = "[ 手掌平放此區域 ]";
-      allowanceBadge.innerText = "依掌寬與指長綜合判定";
-      lbl1.innerText = "全手長度";
-      lbl2.innerText = "手掌寬度";
-      lbl3.innerText = "中指長度";
-
-      markers.len.label = "全手長";
-      markers.width.label = "掌寬";
-      markers.part3.label = "中指長";
-
-      if (isFrozen) { redrawFrozen(); calculateMeasurements(); }
-    };
-
-    document.querySelectorAll('.target-btn').forEach(btn => {
-      btn.onclick = () => {
-        document.querySelectorAll('.target-btn').forEach(b => {
-          b.classList.remove('active', 'border-blue-500', 'bg-blue-500/20', 'text-blue-400');
-          b.classList.add('border-slate-800', 'bg-slate-950', 'text-slate-300');
-        });
-        btn.classList.add('active', 'border-blue-500', 'bg-blue-500/20', 'text-blue-400');
-        btn.classList.remove('border-slate-800', 'bg-slate-950', 'text-slate-300');
-        activeTarget = btn.dataset.target;
-        if (isFrozen) redrawFrozen();
-      };
-    });
-
-    // 匯出確認圖
-    exportBtn.onclick = () => {
-      if (!frozenImage) return;
-
-      const exportCanvas = document.createElement('canvas');
-      exportCanvas.width = canvas.width;
-      exportCanvas.height = canvas.height + 140;
-      const expCtx = exportCanvas.getContext('2d');
-
-      expCtx.fillStyle = '#020617';
-      expCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
-      expCtx.drawImage(canvas, 0, 0);
-
-      expCtx.fillStyle = '#0f172a';
-      expCtx.fillRect(10, canvas.height + 10, exportCanvas.width - 20, 120);
-
-      expCtx.strokeStyle = '#3b82f6';
-      expCtx.lineWidth = 1;
-      expCtx.strokeRect(10, canvas.height + 10, exportCanvas.width - 20, 120);
-
-      expCtx.fillStyle = '#38bdf8';
-      expCtx.font = 'bold 14px sans-serif';
-      expCtx.fillText(currentMode === 'foot' ? '【買鞋防退貨尺寸確認卡】' : '【手套尺寸確認卡】', 22, canvas.height + 34);
-
-      expCtx.fillStyle = '#f8fafc';
-      expCtx.font = '12px sans-serif';
-      expCtx.fillText(`實測數據：${lbl1.innerText} ${val1.innerText} ｜ ${lbl2.innerText} ${val2.innerText}`, 22, canvas.height + 58);
-
-      expCtx.fillStyle = '#34d399';
-      expCtx.font = 'bold 13px sans-serif';
-      if (currentMode === 'foot') {
-        const jpn = (Math.round((parseFloat(val1.innerText) + 0.8) * 2) / 2).toFixed(1);
-        expCtx.fillText(`推薦下單：日碼 ${jpn} cm / 歐碼 ${Math.round((parseFloat(jpn) + 1.2) * 1.5)}`, 22, canvas.height + 82);
-      } else {
-        expCtx.fillText(`推薦手套：依掌寬建議下單`, 22, canvas.height + 82);
-      }
-
-      expCtx.fillStyle = '#94a3b8';
-      expCtx.font = '10px sans-serif';
-      expCtx.fillText('買家已完成水平校準與健保卡比對・供賣家備貨核對', 22, canvas.height + 108);
-
-      const link = document.createElement('a');
-      link.download = `AuraFit_尺寸確認圖_${Date.now()}.png`;
-      link.href = exportCanvas.toDataURL('image/png');
-      link.click();
-    };
-  </script>
-</body>
-</html>
+      // 4. 繪製腳寬
