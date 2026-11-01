@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>長輩語音備忘錄 - 本地隱私安全版</title>
+  <title>長輩貼心備忘錄</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; }
     body {
@@ -14,44 +13,154 @@
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      padding: 16px 16px 90px 16px; /* 底部保留 90px 避開廣告欄位，防誤觸 */
+      padding: 16px 16px 90px 16px;
     }
-    header { text-align: center; margin: 12px 0 20px 0; }
-    h1 { font-size: 30px; color: #FFD54F; }
-    .status-text { font-size: 18px; color: #B0BEC5; margin-top: 6px; }
+    header { text-align: center; margin: 10px 0 16px 0; }
+    h1 { font-size: 32px; color: #FFD54F; letter-spacing: 1px; }
 
-    /* 錄音按鈕 */
-    .mic-button {
-      width: 170px;
-      height: 170px;
-      border-radius: 50%;
-      background: linear-gradient(145deg, #2E7D32, #1B5E20);
-      border: 4px solid #81C784;
-      color: #FFFFFF;
-      font-size: 24px;
+    /* 容器佈局 */
+    .app-card {
+      width: 100%;
+      max-width: 520px;
+      background-color: #1E1E1E;
+      border: 2px solid #37474F;
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      margin-bottom: 20px;
+    }
+
+    /* 快捷分類選取區 */
+    .section-label { font-size: 20px; color: #90A4AE; margin-bottom: 10px; font-weight: bold; }
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .cat-btn {
+      background-color: #263238;
+      border: 2px solid #455A64;
+      color: #ECEFF1;
+      font-size: 19px;
       font-weight: bold;
+      padding: 12px 6px;
+      border-radius: 12px;
+      cursor: pointer;
       display: flex;
       flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .cat-btn.active {
+      background-color: #00695C;
+      border-color: #80CBC4;
+      color: #FFFFFF;
+      box-shadow: 0 0 10px rgba(128, 203, 196, 0.4);
+    }
+    .cat-btn span.icon { font-size: 26px; }
+
+    /* 輸入區（語音 + 文字雙軌） */
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .text-input {
+      flex: 1;
+      background-color: #2A2A2A;
+      border: 2px solid #455A64;
+      border-radius: 12px;
+      color: #FFFFFF;
+      font-size: 22px;
+      padding: 12px 14px;
+      outline: none;
+    }
+    .text-input:focus { border-color: #FFD54F; }
+    
+    .mic-btn-small {
+      width: 65px;
+      background: linear-gradient(145deg, #2E7D32, #1B5E20);
+      border: 2px solid #81C784;
+      border-radius: 12px;
+      color: #FFF;
+      font-size: 28px;
+      display: flex;
       justify-content: center;
       align-items: center;
       cursor: pointer;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-      margin-bottom: 20px;
-      -webkit-tap-highlight-color: transparent;
     }
-    .mic-button.recording {
+    .mic-btn-small.recording {
       background: linear-gradient(145deg, #C62828, #8E0000);
       border-color: #FF8A80;
       animation: pulse 1.2s infinite;
     }
     @keyframes pulse {
       0% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.7); }
-      70% { box-shadow: 0 0 0 20px rgba(229, 57, 53, 0); }
+      70% { box-shadow: 0 0 0 12px rgba(229, 57, 53, 0); }
       100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0); }
     }
 
-    /* 備忘清單 */
-    .list-container { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 14px; }
+    /* 時間與新增按鈕 */
+    .time-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .time-label { font-size: 18px; color: #CFD8DC; white-space: nowrap; }
+    .time-picker {
+      background-color: #2A2A2A;
+      border: 2px solid #455A64;
+      border-radius: 10px;
+      color: #FFFFFF;
+      font-size: 20px;
+      padding: 8px 10px;
+      flex: 1;
+    }
+    .add-btn {
+      width: 100%;
+      background-color: #E65100;
+      border: 2px solid #FFB74D;
+      color: #FFFFFF;
+      font-size: 24px;
+      font-weight: bold;
+      padding: 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(230, 81, 0, 0.4);
+    }
+
+    /* 行動不便叫車專區 */
+    .taxi-box {
+      width: 100%;
+      max-width: 520px;
+      background-color: #212121;
+      border: 2px solid #FFCA28;
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .taxi-title { font-size: 20px; color: #FFD54F; font-weight: bold; }
+    .taxi-desc { font-size: 14px; color: #B0BEC5; margin-top: 2px; }
+    .call-btn {
+      background-color: #FF8F00;
+      border: none;
+      color: #000;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 10px 14px;
+      border-radius: 10px;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    /* 備忘清單卡片 */
+    .list-container { width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 14px; }
     .note-card {
       background-color: #1E1E1E;
       border: 2px solid #37474F;
@@ -60,137 +169,223 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
-    .note-content { flex: 1; cursor: pointer; }
-    .note-text { font-size: 22px; line-height: 1.4; color: #FFFFFF; }
-    .note-time { font-size: 15px; color: #90A4AE; margin-top: 4px; }
-    .delete-btn {
-      background-color: #263238;
-      border: 1px solid #B71C1C;
-      color: #FF8A80;
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 16px;
+    .cat-tag {
+      font-size: 14px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: bold;
+      display: inline-block;
+      margin-bottom: 6px;
     }
+    .tag-吃藥 { background-color: #C62828; color: #FFF; }
+    .tag-回診 { background-color: #1565C0; color: #FFF; }
+    .tag-健身 { background-color: #2E7D32; color: #FFF; }
+    .tag-心靈 { background-color: #6A1B9A; color: #FFF; }
+    .tag-日常 { background-color: #455A64; color: #FFF; }
 
-    /* 合規底部廣告版位（固定底欄，合規防誤觸） */
+    .note-text { font-size: 23px; color: #FFFFFF; font-weight: bold; line-height: 1.3; }
+    .note-alarm { font-size: 17px; color: #FFB74D; margin-top: 6px; }
+    .card-actions { display: flex; flex-direction: column; gap: 8px; }
+    .btn-speak { background: #37474F; border: 1px solid #78909C; color: #FFF; padding: 8px 12px; border-radius: 8px; font-size: 16px; cursor: pointer; }
+    .btn-del { background: #263238; border: 1px solid #B71C1C; color: #FF8A80; padding: 8px 12px; border-radius: 8px; font-size: 16px; cursor: pointer; }
+
+    /* 底部合規廣告位 */
     .ad-fixed-bottom {
       position: fixed;
       bottom: 0;
       left: 0;
       width: 100%;
       height: 60px;
-      background-color: #000000;
-      border-top: 1px solid #333333;
+      background-color: #000;
+      border-top: 1px solid #333;
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 999;
-    }
-    .privacy-link {
-      margin-top: 25px;
-      font-size: 14px;
-      color: #78909C;
-      text-decoration: underline;
-      cursor: pointer;
+      font-size: 13px;
+      color: #757575;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>老人家語音備忘錄</h1>
-    <div class="status-text" id="status-bar">按綠色鈕開始說話</div>
+    <h1>貼心長輩備忘錄</h1>
+    <div id="status-text" style="color: #90A4AE; font-size: 16px; margin-top: 4px;">字大、聲音響、隨時隨地提醒您</div>
   </header>
 
-  <button class="mic-button" id="record-btn" onclick="toggleRecord()">
-    <span style="font-size: 48px; margin-bottom: 2px;">🎙️</span>
-    <span id="btn-text">按我說話</span>
-  </button>
+  <!-- 叫車專用直撥區（行動不便長輩一鍵叫車） -->
+  <div class="taxi-box">
+    <div>
+      <div class="taxi-title">🚕 行動不便專車接送</div>
+      <div class="taxi-desc">台灣大車隊 (無障礙 / 多元計程車)</div>
+    </div>
+    <a href="tel:55688" class="call-btn">直撥 55688</a>
+  </div>
+
+  <div class="app-card">
+    <div class="section-label">1. 選擇要記的事情：</div>
+    <div class="category-grid">
+      <button class="cat-btn active" onclick="selectCat('吃藥', '💊', this)">
+        <span class="icon">💊</span>吃藥
+      </button>
+      <button class="cat-btn" onclick="selectCat('回診', '🏥', this)">
+        <span class="icon">🏥</span>回診
+      </button>
+      <button class="cat-btn" onclick="selectCat('健身', '🏃', this)">
+        <span class="icon">🏃</span>健身運動
+      </button>
+      <button class="cat-btn" onclick="selectCat('心靈', '🌸', this)">
+        <span class="icon">🌸</span>心靈放鬆
+      </button>
+      <button class="cat-btn" onclick="selectCat('日常', '📝', this)">
+        <span class="icon">📝</span>一般日常
+      </button>
+      <a href="tel:1966" class="cat-btn" style="text-decoration:none;">
+        <span class="icon">📞</span>長照專線
+      </a>
+    </div>
+
+    <div class="section-label">2. 說話或打字輸入：</div>
+    <div class="input-row">
+      <input type="text" id="note-input" class="text-input" placeholder="例如：晚上吃降血壓藥">
+      <button class="mic-btn-small" id="mic-btn" onclick="toggleRecord()" title="按一下用講的">🎙️</button>
+    </div>
+
+    <div class="time-row">
+      <span class="time-label">⏰ 提醒時間：</span>
+      <input type="time" id="alarm-time" class="time-picker">
+    </div>
+
+    <button class="add-btn" onclick="addNote()">＋ 記下來並設定提醒</button>
+  </div>
 
   <div class="list-container">
+    <div style="font-size: 22px; color: #ECEFF1; border-bottom: 2px solid #37474F; padding-bottom: 8px;">
+      📋 記下的行程清單
+    </div>
     <div id="notes-list"></div>
   </div>
 
-  <div class="privacy-link" onclick="showPrivacyModal()">隱私權保障聲明（資料不外傳）</div>
-
-  <!-- 商業化廣告專用容器（未來審核通過後，將 AdSense 程式碼貼入此處） -->
-  <div class="ad-fixed-bottom" id="ad-container">
-    <span style="font-size: 12px; color: #616161;">[ 廣告版位 / 支援 Google AdSense ]</span>
-    <!--
-      實際商用時插入 AdSense 程式碼：
-      <ins class="adsbygoogle"
-           style="display:inline-block;width:320px;height:50px"
-           data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-           data-ad-slot="XXXXXXXXXX"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-    -->
+  <!-- 底部固定合規廣告欄（支援 Google AdSense） -->
+  <div class="ad-fixed-bottom" id="ad-banner">
+    [ 贊助廣告版位 · 零個資留存安全認證 ]
   </div>
 
   <script>
-    const STORAGE_KEY = 'senior_notes_v1';
-    let recognition = null;
+    const STORAGE_KEY = 'senior_care_notes_v2';
+    let currentCategory = '吃藥';
+    let currentIcon = '💊';
     let isRecording = false;
+    let recognition = null;
+    let notifiedIds = new Set();
 
+    // 1. 初始化分類按鈕
+    function selectCat(cat, icon, btn) {
+      currentCategory = cat;
+      currentIcon = icon;
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const input = document.getElementById('note-input');
+      if (cat === '吃藥') input.placeholder = '例如：吃降血壓藥半顆';
+      else if (cat === '回診') input.placeholder = '例如：下午三點國泰醫院心臟科';
+      else if (cat === '健身') input.placeholder = '例如：公園散步30分鐘、拉筋';
+      else if (cat === '心靈') input.placeholder = '例如：聽大悲咒、打給老李聊天';
+      else input.placeholder = '請輸入或用講的...';
+    }
+
+    // 2. 語音辨識（純前端 Web Speech API）
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       recognition = new SpeechRecognition();
       recognition.continuous = false;
-      recognition.interimResults = false;
       recognition.lang = 'zh-TW';
 
       recognition.onstart = () => {
         isRecording = true;
-        document.getElementById('record-btn').classList.add('recording');
-        document.getElementById('btn-text').innerText = '正在聽...';
-        document.getElementById('status-bar').innerText = '請說話，講完請稍候';
+        const mic = document.getElementById('mic-btn');
+        mic.classList.add('recording');
+        mic.innerText = '🔴';
       };
 
-      recognition.onresult = (e) => {
-        const text = e.results[0][0].transcript.trim();
-        if (text) saveNote(text);
+      recognition.onresult = (event) => {
+        const text = event.results[0][0].transcript.trim();
+        document.getElementById('note-input').value = text;
+      };
+
+      recognition.onend = () => {
+        isRecording = false;
+        const mic = document.getElementById('mic-btn');
+        mic.classList.remove('recording');
+        mic.innerText = '🎙️';
       };
 
       recognition.onerror = () => {
-        resetUI();
-        document.getElementById('status-bar').innerText = '沒聽清楚，請再按一次';
+        isRecording = false;
+        document.getElementById('mic-btn').classList.remove('recording');
+        document.getElementById('mic-btn').innerText = '🎙️';
+        speak("沒有聽清楚，請再按一次說話。");
       };
-
-      recognition.onend = resetUI;
-    } else {
-      document.getElementById('status-bar').innerText = '您的瀏覽器不支援語音辨識';
-      document.getElementById('record-btn').style.display = 'none';
     }
 
     function toggleRecord() {
-      if (!recognition) return;
+      if (!recognition) {
+        alert("此手機瀏覽器不支援語音辨識，請直接打字。");
+        return;
+      }
       if (isRecording) {
         recognition.stop();
-        resetUI();
       } else {
-        try { recognition.start(); } catch (e) { recognition.stop(); }
+        recognition.start();
       }
     }
 
-    function resetUI() {
-      isRecording = false;
-      const btn = document.getElementById('record-btn');
-      btn.classList.remove('recording');
-      document.getElementById('btn-text').innerText = '按我說話';
-      document.getElementById('status-bar').innerText = '按綠色鈕開始說話';
+    // 3. 語音朗讀合成
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'zh-TW';
+        utter.rate = 0.85; // 長輩語速放慢
+        utter.pitch = 1.0;
+        window.speechSynthesis.speak(utter);
+      }
     }
 
-    function saveNote(text) {
+    // 4. 資料存取與新增
+    function addNote() {
+      const input = document.getElementById('note-input');
+      const timeInput = document.getElementById('alarm-time');
+      const text = input.value.trim();
+
+      if (!text) {
+        speak("請先說話或輸入內容");
+        return;
+      }
+
       const notes = getNotes();
-      notes.unshift({
+      const newNote = {
         id: Date.now(),
+        category: currentCategory,
         text: text,
-        date: new Date().toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })
-      });
+        time: timeInput.value || '', // 提醒時間 (HH:mm)
+        createdDate: new Date().toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' })
+      };
+
+      notes.unshift(newNote);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+
+      // 重置欄位並重新渲染
+      input.value = '';
+      timeInput.value = '';
       render();
-      speak(`已記錄：${text}`);
+
+      let confirmMsg = `已幫您記下${newNote.category}：${newNote.text}`;
+      if (newNote.time) confirmMsg += `，將在 ${newNote.time} 提醒您`;
+      speak(confirmMsg);
     }
 
     function getNotes() {
@@ -203,38 +398,53 @@
       render();
     }
 
-    function speak(text) {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance(text);
-        utter.lang = 'zh-TW';
-        utter.rate = 0.9;
-        window.speechSynthesis.speak(utter);
-      }
-    }
-
+    // 5. 畫面渲染
     function render() {
-      const notes = getNotes();
       const listEl = document.getElementById('notes-list');
+      const notes = getNotes();
+
       if (notes.length === 0) {
-        listEl.innerHTML = '<div style="color:#78909C; text-align:center; margin-top:20px; font-size:18px;">目前沒有備忘</div>';
+        listEl.innerHTML = '<div style="color:#78909C; text-align:center; margin-top:24px; font-size:20px;">目前沒有任何備忘事項</div>';
         return;
       }
+
       listEl.innerHTML = notes.map(n => `
         <div class="note-card">
-          <div class="note-content" onclick="speak('${n.text}')">
+          <div style="flex:1;">
+            <span class="cat-tag tag-${n.category}">${n.category}</span>
             <div class="note-text">${n.text}</div>
-            <div class="note-time">${n.date} · 🔊 點此念出</div>
+            <div class="note-alarm">${n.time ? '⏰ 提醒：' + n.time : '📅 記錄：' + n.createdDate}</div>
           </div>
-          <button class="delete-btn" onclick="deleteNote(${n.id})">刪除</button>
+          <div class="card-actions">
+            <button class="btn-speak" onclick="speak('${n.category}提醒：${n.text}')">🔊 念出來</button>
+            <button class="btn-del" onclick="deleteNote(${n.id})">刪除</button>
+          </div>
         </div>
       `).join('');
     }
 
-    function showPrivacyModal() {
-      alert("【隱私權保護承諾】\n\n1. 本工具所有錄音轉文字內容僅儲存於您個人的手機瀏覽器（LocalStorage）中。\n2. 本站無後端伺服器，絕不上傳、備份或窺探任何私人內容。\n3. 清除瀏覽器快取即可永久刪除全部記錄。");
-    }
+    // 6. 前端定時器：每 10 秒檢查一次鬧鐘提醒
+    setInterval(() => {
+      const now = new Date();
+      const currentHHMM = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+      const notes = getNotes();
 
+      notes.forEach(note => {
+        if (note.time === currentHHMM) {
+          const alarmKey = `${note.id}-${currentHHMM}`;
+          if (!notifiedIds.has(alarmKey)) {
+            notifiedIds.add(alarmKey);
+            // 語音主動大聲提醒 2 次
+            const alarmMsg = `時間到了！提醒您，${note.category}：${note.text}`;
+            speak(alarmMsg);
+            setTimeout(() => speak(alarmMsg), 4000);
+            alert(`【時間到了提醒】\n\n類別：${note.category}\n內容：${note.text}`);
+          }
+        }
+      });
+    }, 10000);
+
+    // 初始化載入
     render();
   </script>
 </body>
