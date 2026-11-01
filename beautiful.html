@@ -1,1 +1,241 @@
 
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>長輩語音備忘錄 - 本地隱私安全版</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; }
+    body {
+      background-color: #121212;
+      color: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px 16px 90px 16px; /* 底部保留 90px 避開廣告欄位，防誤觸 */
+    }
+    header { text-align: center; margin: 12px 0 20px 0; }
+    h1 { font-size: 30px; color: #FFD54F; }
+    .status-text { font-size: 18px; color: #B0BEC5; margin-top: 6px; }
+
+    /* 錄音按鈕 */
+    .mic-button {
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #2E7D32, #1B5E20);
+      border: 4px solid #81C784;
+      color: #FFFFFF;
+      font-size: 24px;
+      font-weight: bold;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      margin-bottom: 20px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .mic-button.recording {
+      background: linear-gradient(145deg, #C62828, #8E0000);
+      border-color: #FF8A80;
+      animation: pulse 1.2s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.7); }
+      70% { box-shadow: 0 0 0 20px rgba(229, 57, 53, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0); }
+    }
+
+    /* 備忘清單 */
+    .list-container { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 14px; }
+    .note-card {
+      background-color: #1E1E1E;
+      border: 2px solid #37474F;
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .note-content { flex: 1; cursor: pointer; }
+    .note-text { font-size: 22px; line-height: 1.4; color: #FFFFFF; }
+    .note-time { font-size: 15px; color: #90A4AE; margin-top: 4px; }
+    .delete-btn {
+      background-color: #263238;
+      border: 1px solid #B71C1C;
+      color: #FF8A80;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    /* 合規底部廣告版位（固定底欄，合規防誤觸） */
+    .ad-fixed-bottom {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 60px;
+      background-color: #000000;
+      border-top: 1px solid #333333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+    .privacy-link {
+      margin-top: 25px;
+      font-size: 14px;
+      color: #78909C;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>老人家語音備忘錄</h1>
+    <div class="status-text" id="status-bar">按綠色鈕開始說話</div>
+  </header>
+
+  <button class="mic-button" id="record-btn" onclick="toggleRecord()">
+    <span style="font-size: 48px; margin-bottom: 2px;">🎙️</span>
+    <span id="btn-text">按我說話</span>
+  </button>
+
+  <div class="list-container">
+    <div id="notes-list"></div>
+  </div>
+
+  <div class="privacy-link" onclick="showPrivacyModal()">隱私權保障聲明（資料不外傳）</div>
+
+  <!-- 商業化廣告專用容器（未來審核通過後，將 AdSense 程式碼貼入此處） -->
+  <div class="ad-fixed-bottom" id="ad-container">
+    <span style="font-size: 12px; color: #616161;">[ 廣告版位 / 支援 Google AdSense ]</span>
+    <!--
+      實際商用時插入 AdSense 程式碼：
+      <ins class="adsbygoogle"
+           style="display:inline-block;width:320px;height:50px"
+           data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+           data-ad-slot="XXXXXXXXXX"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    -->
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'senior_notes_v1';
+    let recognition = null;
+    let isRecording = false;
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'zh-TW';
+
+      recognition.onstart = () => {
+        isRecording = true;
+        document.getElementById('record-btn').classList.add('recording');
+        document.getElementById('btn-text').innerText = '正在聽...';
+        document.getElementById('status-bar').innerText = '請說話，講完請稍候';
+      };
+
+      recognition.onresult = (e) => {
+        const text = e.results[0][0].transcript.trim();
+        if (text) saveNote(text);
+      };
+
+      recognition.onerror = () => {
+        resetUI();
+        document.getElementById('status-bar').innerText = '沒聽清楚，請再按一次';
+      };
+
+      recognition.onend = resetUI;
+    } else {
+      document.getElementById('status-bar').innerText = '您的瀏覽器不支援語音辨識';
+      document.getElementById('record-btn').style.display = 'none';
+    }
+
+    function toggleRecord() {
+      if (!recognition) return;
+      if (isRecording) {
+        recognition.stop();
+        resetUI();
+      } else {
+        try { recognition.start(); } catch (e) { recognition.stop(); }
+      }
+    }
+
+    function resetUI() {
+      isRecording = false;
+      const btn = document.getElementById('record-btn');
+      btn.classList.remove('recording');
+      document.getElementById('btn-text').innerText = '按我說話';
+      document.getElementById('status-bar').innerText = '按綠色鈕開始說話';
+    }
+
+    function saveNote(text) {
+      const notes = getNotes();
+      notes.unshift({
+        id: Date.now(),
+        text: text,
+        date: new Date().toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+      render();
+      speak(`已記錄：${text}`);
+    }
+
+    function getNotes() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    }
+
+    function deleteNote(id) {
+      const notes = getNotes().filter(n => n.id !== id);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+      render();
+    }
+
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'zh-TW';
+        utter.rate = 0.9;
+        window.speechSynthesis.speak(utter);
+      }
+    }
+
+    function render() {
+      const notes = getNotes();
+      const listEl = document.getElementById('notes-list');
+      if (notes.length === 0) {
+        listEl.innerHTML = '<div style="color:#78909C; text-align:center; margin-top:20px; font-size:18px;">目前沒有備忘</div>';
+        return;
+      }
+      listEl.innerHTML = notes.map(n => `
+        <div class="note-card">
+          <div class="note-content" onclick="speak('${n.text}')">
+            <div class="note-text">${n.text}</div>
+            <div class="note-time">${n.date} · 🔊 點此念出</div>
+          </div>
+          <button class="delete-btn" onclick="deleteNote(${n.id})">刪除</button>
+        </div>
+      `).join('');
+    }
+
+    function showPrivacyModal() {
+      alert("【隱私權保護承諾】\n\n1. 本工具所有錄音轉文字內容僅儲存於您個人的手機瀏覽器（LocalStorage）中。\n2. 本站無後端伺服器，絕不上傳、備份或窺探任何私人內容。\n3. 清除瀏覽器快取即可永久刪除全部記錄。");
+    }
+
+    render();
+  </script>
+</body>
+</html>
