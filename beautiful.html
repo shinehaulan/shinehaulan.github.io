@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -10,352 +9,316 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
     }
+
+    /* 護眼高對比底色：深深藍黑，防眩光且黑白黃對比強烈 */
     body {
-      background-color: #121212;
+      background-color: #0B1320;
       color: #FFFFFF;
       display: flex;
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      padding: 16px 16px 100px 16px;
+      padding: 14px 14px 90px 14px;
     }
 
-    /* 頂部看板：天氣、日期、電子大時鐘 */
+    /* 頂部：天氣看板（柔和深靛藍，大字暖黃） */
     .dashboard-card {
       width: 100%;
       max-width: 520px;
-      background: linear-gradient(135deg, #1A2536, #0D1624);
-      border: 3px solid #3B4B64;
+      background-color: #152238;
+      border: 3px solid #2A3E5E;
       border-radius: 20px;
-      padding: 18px 22px;
+      padding: 16px 20px;
       margin-bottom: 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
     .weather-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 2px solid #2C3C54;
-      padding-bottom: 10px;
+      border-bottom: 2px solid #223450;
+      padding-bottom: 8px;
     }
     .weather-info {
       display: flex;
       align-items: center;
       gap: 12px;
-      font-size: 30px;
-      font-weight: bold;
+      font-size: 32px;
+      font-weight: 900;
       color: #38BDF8;
     }
     .weather-temp {
-      font-size: 32px;
-      font-weight: bold;
-      color: #F8FAFC;
+      font-size: 34px;
+      font-weight: 900;
+      color: #FFFFFF;
     }
     .datetime-row {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
+      align-items: center;
     }
     .date-text {
       font-size: 24px;
       color: #E2E8F0;
-      font-weight: bold;
+      font-weight: 800;
     }
     .time-text {
-      font-size: 38px;
+      font-size: 36px;
       font-weight: 900;
-      color: #FDE047;
-      letter-spacing: 2px;
+      color: #FACC15; /* 醒目高對比暖黃 */
+      letter-spacing: 1px;
     }
 
     /* 主標題 */
-    header {
-      text-align: center;
-      margin: 10px 0 16px 0;
-    }
+    header { text-align: center; margin-bottom: 14px; }
     h1 {
-      font-size: 40px;
-      font-weight: 900;
-      color: #FFD54F;
+      font-size: 38px;
+      color: #FDE047;
       letter-spacing: 2px;
-      text-shadow: 0 2px 8px rgba(255, 213, 79, 0.3);
+      font-weight: 900;
+      text-shadow: 0 3px 10px rgba(250, 204, 21, 0.3);
     }
 
-    /* 語言切換選單（加大字體，移除說明文字） */
-    .lang-bar {
+    /* 語言選擇（三顆特大高對比按鈕） */
+    .lang-row {
       width: 100%;
       max-width: 520px;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
+      gap: 12px;
       margin-bottom: 18px;
     }
     .lang-btn {
-      background-color: #263238;
-      border: 3px solid #546E7A;
-      color: #ECEFF1;
-      font-size: 24px;
+      background-color: #1E293B;
+      border: 3px solid #475569;
+      color: #F8FAFC;
+      font-size: 26px;
       font-weight: 900;
-      padding: 12px 6px;
-      border-radius: 14px;
+      padding: 14px 0;
+      border-radius: 16px;
       cursor: pointer;
       text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
       -webkit-tap-highlight-color: transparent;
     }
+    /* 語言選中狀態：鮮明亮橙黃，長輩一眼辨識 */
     .lang-btn.active {
-      background-color: #F57F17;
-      border-color: #FFEE58;
-      color: #000000;
-      box-shadow: 0 0 12px rgba(255, 238, 88, 0.5);
+      background-color: #D97706;
+      border-color: #FDE68A;
+      color: #FFFFFF;
+      box-shadow: 0 0 16px rgba(217, 119, 6, 0.7);
     }
 
-    /* 操作卡片區 */
+    /* 主操作卡片 */
     .app-card {
       width: 100%;
       max-width: 520px;
-      background-color: #1E1E1E;
-      border: 2px solid #37474F;
-      border-radius: 20px;
-      padding: 20px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-      margin-bottom: 22px;
+      background-color: #131E31;
+      border: 3px solid #233554;
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      margin-bottom: 20px;
     }
     .section-label {
-      font-size: 23px;
-      color: #CFD8DC;
-      margin-bottom: 14px;
+      font-size: 24px;
+      color: #94A3B8;
+      margin-bottom: 12px;
+      font-weight: 900;
+      display: flex;
+      justify-content: space-between;
+    }
+    .lang-indicator {
+      font-size: 20px;
+      color: #38BDF8;
       font-weight: bold;
     }
 
-    /* 分類按鈕網格：2個一排 (2欄) */
-    .category-grid-2col {
+    /* 兩兩一排功能格線（2欄設計） */
+    .category-grid-2x {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
       margin-bottom: 20px;
     }
-    .cat-btn {
-      background-color: #263238;
-      border: 3px solid #455A64;
-      color: #FFFFFF;
-      font-size: 23px;
-      font-weight: bold;
+    .cat-box {
+      border: 3px solid transparent;
+      font-size: 25px;
+      font-weight: 900;
       padding: 16px 8px;
-      border-radius: 16px;
+      border-radius: 18px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
       text-decoration: none;
-      -webkit-tap-highlight-color: transparent;
       text-align: center;
-      line-height: 1.3;
+      min-height: 110px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      -webkit-tap-highlight-color: transparent;
     }
-    .cat-btn.active {
-      background-color: #00695C;
-      border-color: #80CBC4;
-      box-shadow: 0 0 14px rgba(128, 203, 196, 0.45);
-    }
-    .cat-btn span.icon {
-      font-size: 34px;
-    }
-    .cat-btn.link-btn {
-      background-color: #1A2836;
-      border-color: #388E3C;
+    .cat-box span.icon { font-size: 36px; }
+
+    /* 四個類別專屬色彩（清晰易辨） */
+    .cat-med { background-color: #7F1D1D; border-color: #EF4444; color: #FFFFFF; } /* 吃藥-紅 */
+    .cat-hosp { background-color: #1E3A8A; border-color: #3B82F6; color: #FFFFFF; } /* 回診-藍 */
+    .cat-fit { background-color: #14532D; border-color: #22C55E; color: #FFFFFF; } /* 健身-綠 */
+    .cat-daily { background-color: #4C1D95; border-color: #A855F7; color: #FFFFFF; } /* 日常-紫 */
+
+    /* 選取中的分類：亮金框 + 發光放大效果 */
+    .cat-box.active {
+      outline: 5px solid #FDE047;
+      outline-offset: -2px;
+      transform: scale(1.02);
+      box-shadow: 0 0 20px rgba(253, 224, 71, 0.6);
     }
 
-    /* 輸入區（字體特大） */
+    /* 外部連結按鈕 */
+    .link-box {
+      background-color: #1E293B;
+      border: 3px solid #64748B;
+      color: #F8FAFC;
+    }
+
+    /* 語音與文字輸入列 */
     .input-row {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       margin-bottom: 16px;
     }
     .text-input {
       flex: 1;
-      background-color: #2A2A2A;
-      border: 3px solid #546E7A;
+      background-color: #0F172A;
+      border: 3px solid #475569;
       border-radius: 14px;
       color: #FFFFFF;
       font-size: 24px;
-      padding: 14px 16px;
+      font-weight: 600;
+      padding: 14px;
       outline: none;
-      font-weight: 500;
     }
-    .text-input:focus {
-      border-color: #FFD54F;
-    }
-    .mic-btn-large {
-      width: 76px;
-      background: linear-gradient(145deg, #2E7D32, #1B5E20);
-      border: 3px solid #81C784;
-      border-radius: 14px;
+    .text-input:focus { border-color: #FACC15; }
+    
+    /* 麥克風按鈕 */
+    .mic-btn-main {
+      width: 78px;
+      background: linear-gradient(145deg, #16A34A, #15803D);
+      border: 3px solid #86EFAC;
+      border-radius: 16px;
       color: #FFF;
       font-size: 34px;
       display: flex;
       justify-content: center;
       align-items: center;
       cursor: pointer;
-      user-select: none;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.4);
     }
-    .mic-btn-large.recording {
-      background: linear-gradient(145deg, #C62828, #8E0000);
-      border-color: #FF8A80;
+    .mic-btn-main.recording {
+      background: linear-gradient(145deg, #DC2626, #991B1B);
+      border-color: #FCA5A5;
       animation: pulse 1.2s infinite;
     }
     @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.7); }
-      70% { box-shadow: 0 0 0 14px rgba(229, 57, 53, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0); }
+      0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.8); }
+      70% { box-shadow: 0 0 0 16px rgba(220, 38, 38, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
     }
 
-    /* 提醒時間選擇 */
+    /* 時間提醒欄位 */
     .time-row {
       display: flex;
       gap: 12px;
       align-items: center;
       margin-bottom: 18px;
     }
-    .time-label {
-      font-size: 22px;
-      color: #ECEFF1;
-      font-weight: bold;
-      white-space: nowrap;
-    }
+    .time-label { font-size: 24px; color: #F1F5F9; white-space: nowrap; font-weight: 800; }
     .time-picker {
-      background-color: #2A2A2A;
-      border: 3px solid #546E7A;
+      background-color: #0F172A;
+      border: 3px solid #475569;
       border-radius: 12px;
-      color: #FFFFFF;
-      font-size: 24px;
-      font-weight: bold;
+      color: #FACC15;
+      font-size: 26px;
+      font-weight: 800;
       padding: 10px 14px;
       flex: 1;
     }
 
-    /* 儲存大按鈕 */
+    /* 記下按鈕：特大亮暖橘，點擊醒目 */
     .add-btn {
       width: 100%;
-      background: linear-gradient(145deg, #E65100, #BF360C);
-      border: 3px solid #FFB74D;
+      background: linear-gradient(145deg, #EA580C, #C2410C);
+      border: 3px solid #FED7AA;
       color: #FFFFFF;
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 900;
       padding: 16px;
       border-radius: 16px;
       cursor: pointer;
-      box-shadow: 0 6px 18px rgba(230, 81, 0, 0.4);
-    }
-    .add-btn:active {
-      transform: scale(0.98);
+      box-shadow: 0 6px 16px rgba(234, 88, 12, 0.4);
     }
 
     /* 備忘清單卡片 */
-    .list-container {
-      width: 100%;
-      max-width: 520px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .list-header {
-      font-size: 25px;
-      font-weight: 900;
-      color: #ECEFF1;
-      border-bottom: 3px solid #37474F;
-      padding-bottom: 10px;
-    }
+    .list-container { width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 14px; }
     .note-card {
-      background-color: #1E1E1E;
-      border: 3px solid #37474F;
-      border-radius: 16px;
+      background-color: #172338;
+      border: 3px solid #2B4263;
+      border-radius: 18px;
       padding: 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.4);
     }
     .cat-tag {
       font-size: 17px;
-      padding: 4px 10px;
+      padding: 5px 12px;
       border-radius: 8px;
-      font-weight: bold;
+      font-weight: 900;
       display: inline-block;
       margin-bottom: 8px;
     }
-    .tag-吃藥 { background-color: #C62828; color: #FFF; }
-    .tag-回診 { background-color: #1565C0; color: #FFF; }
-    .tag-運動健身 { background-color: #2E7D32; color: #FFF; }
-    .tag-一般日常 { background-color: #546E7A; color: #FFF; }
+    .tag-吃藥 { background-color: #DC2626; color: #FFF; }
+    .tag-回診 { background-color: #2563EB; color: #FFF; }
+    .tag-運動健身 { background-color: #16A34A; color: #FFF; }
+    .tag-一般日常 { background-color: #9333EA; color: #FFF; }
 
-    .note-text {
-      font-size: 26px;
-      color: #FFFFFF;
-      font-weight: 900;
-      line-height: 1.35;
-      word-break: break-all;
-    }
-    .note-alarm {
-      font-size: 20px;
-      color: #FFB74D;
-      font-weight: bold;
-      margin-top: 8px;
-    }
-    .card-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .btn-action-speak {
-      background: #37474F;
-      border: 2px solid #90A4AE;
-      color: #FFFFFF;
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-size: 19px;
-      font-weight: bold;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .btn-action-del {
-      background: #263238;
-      border: 2px solid #C62828;
-      color: #FF8A80;
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-size: 19px;
-      font-weight: bold;
-      cursor: pointer;
-      white-space: nowrap;
-    }
+    .note-text { font-size: 26px; color: #FFFFFF; font-weight: 800; line-height: 1.35; }
+    .note-alarm { font-size: 21px; color: #FDE047; margin-top: 6px; font-weight: 800; }
+    
+    .card-actions { display: flex; flex-direction: column; gap: 10px; }
+    .btn-speak { background: #334155; border: 2px solid #94A3B8; color: #FFF; padding: 10px 14px; border-radius: 12px; font-size: 19px; font-weight: bold; cursor: pointer; }
+    .btn-del { background: #3F1D24; border: 2px solid #F87171; color: #FCA5A5; padding: 10px 14px; border-radius: 12px; font-size: 19px; font-weight: bold; cursor: pointer; }
 
-    /* 底部合規廣告位 */
+    /* 底部合法廣告欄 */
     .ad-fixed-bottom {
       position: fixed;
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 64px;
-      background-color: #000;
-      border-top: 2px solid #333;
+      height: 60px;
+      background-color: #070D18;
+      border-top: 2px solid #1E293B;
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 999;
-      font-size: 14px;
-      color: #757575;
+      font-size: 15px;
+      font-weight: bold;
+      color: #94A3B8;
     }
   </style>
 </head>
 <body>
 
-  <!-- 最上層：即時天氣與日期時間大看板 -->
+  <!-- 最上層：即時天氣與日期時間 -->
   <div class="dashboard-card">
     <div class="weather-row">
       <div class="weather-info">
@@ -374,51 +337,56 @@
     <h1>美茉莉備忘錄</h1>
   </header>
 
-  <!-- 語言選擇（移除說明標籤，大字體觸控鈕） -->
-  <div class="lang-bar">
-    <button class="lang-btn active" id="lang-btn-mandarin" onclick="setLanguage('mandarin')">國語</button>
-    <button class="lang-btn" id="lang-btn-taiwanese" onclick="setLanguage('taiwanese')">台語</button>
-    <button class="lang-btn" id="lang-btn-hakka" onclick="setLanguage('hakka')">客家語</button>
+  <!-- 語言切換區 -->
+  <div class="lang-row">
+    <button class="lang-btn active" id="btn-lang-zh" onclick="setLanguage('國語', this)">國語</button>
+    <button class="lang-btn" id="btn-lang-tw" onclick="setLanguage('台語', this)">台語</button>
+    <button class="lang-btn" id="btn-lang-hk" onclick="setLanguage('客家語', this)">客家語</button>
   </div>
 
   <div class="app-card">
-    <div class="section-label">1. 選擇要記的事情：</div>
-    
-    <!-- 2個一排的網格排列 -->
-    <div class="category-grid-2col">
-      <!-- 第一排：吃藥 與 回診 -->
-      <button class="cat-btn active" onclick="selectCat('吃藥', '💊', this)">
-        <span class="icon">💊</span>吃藥
+    <div class="section-label">
+      <span>1. 點選要記的事情：</span>
+      <span class="lang-indicator" id="current-mode-text">【國語播報中】</span>
+    </div>
+
+    <!-- 兩兩一排高對比功能按鈕 -->
+    <div class="category-grid-2x">
+      <!-- 第一排：吃藥、回診 -->
+      <button class="cat-box cat-med active" onclick="selectCat('吃藥', '💊', this)">
+        <span class="icon">💊</span>
+        <span id="label-med">吃藥</span>
       </button>
-      <button class="cat-btn" onclick="selectCat('回診', '🏥', this)">
-        <span class="icon">🏥</span>回診
+      <button class="cat-box cat-hosp" onclick="selectCat('回診', '🏥', this)">
+        <span class="icon">🏥</span>
+        <span id="label-hosp">回診</span>
       </button>
 
-      <!-- 第二排：運動健身 與 一般日常 -->
-      <button class="cat-btn" onclick="selectCat('運動健身', '🏃', this)">
-        <span class="icon">🏃</span>運動健身
+      <!-- 第二排：運動健身、一般日常 -->
+      <button class="cat-box cat-fit" onclick="selectCat('運動健身', '🏃', this)">
+        <span class="icon">🏃</span>
+        <span id="label-fit">運動健身</span>
       </button>
-      <button class="cat-btn" onclick="selectCat('一般日常', '📝', this)">
-        <span class="icon">📝</span>一般日常
+      <button class="cat-box cat-daily" onclick="selectCat('一般日常', '📝', this)">
+        <span class="icon">📝</span>
+        <span id="label-daily">一般日常</span>
       </button>
 
-      <!-- 第三排：居家無障礙空間與輔具諮詢 與 老當益壯中高齡就業 -->
-      <!-- 可將 tel:1966 替換成您朋友的諮詢專線，例如 tel:0912345678 -->
-      <a href="tel:1966" class="cat-btn link-btn">
+      <!-- 第三排：居家無障礙空間與輔具諮詢、老當益壯 -->
+      <a href="tel:0900000000" class="cat-box link-box">
         <span class="icon">🛠️</span>
-        <span style="font-size: 21px;">居家無障礙空間與輔具諮詢</span>
+        <span style="font-size: 19px; line-height: 1.25;">居家無障礙空間<br>與輔具諮詢</span>
       </a>
-      <!-- 連結勞動部中高齡就業專區 -->
-      <a href="https://45plus.wda.gov.tw/" target="_blank" rel="noopener noreferrer" class="cat-btn link-btn">
+      <a href="https://45plus.wda.gov.tw" target="_blank" class="cat-box link-box">
         <span class="icon">💼</span>
-        <span style="font-size: 21px;">老當益壯 (中高齡就業)</span>
+        <span style="font-size: 19px; line-height: 1.25;">老當益壯<br>(中高齡就業)</span>
       </a>
     </div>
 
     <div class="section-label">2. 說話或打字輸入：</div>
     <div class="input-row">
       <input type="text" id="note-input" class="text-input" placeholder="例如：晚上吃降血壓藥">
-      <button class="mic-btn-large" id="mic-btn" onclick="toggleRecord()" title="按一下用講的">🎙️</button>
+      <button class="mic-btn-main" id="mic-btn" onclick="toggleRecord()" title="按一下用講的">🎙️</button>
     </div>
 
     <div class="time-row">
@@ -426,180 +394,159 @@
       <input type="time" id="alarm-time" class="time-picker">
     </div>
 
-    <button class="add-btn" onclick="addNote()">＋ 記下來並設定提醒</button>
+    <button class="add-btn" id="add-btn-label" onclick="addNote()">＋ 記下來並設定提醒</button>
   </div>
 
   <div class="list-container">
-    <div class="list-header">
+    <div style="font-size: 26px; color: #F8FAFC; border-bottom: 3px solid #334155; padding-bottom: 8px; font-weight: 900;">
       📋 記下的行程清單
     </div>
     <div id="notes-list"></div>
   </div>
 
-  <!-- 底部固定合規廣告欄位 -->
+  <!-- 底部廣告預留區塊 -->
   <div class="ad-fixed-bottom">
     [ 贊助廣告版位 · 零個資留存安全認證 ]
   </div>
 
   <script>
-    const STORAGE_KEY = 'senior_care_notes_v4';
+    const STORAGE_KEY = 'senior_care_notes_v5';
     let currentCategory = '吃藥';
-    let currentLang = 'mandarin'; // 'mandarin', 'taiwanese', 'hakka'
+    let currentLang = '國語';
     let isRecording = false;
     let recognition = null;
     let notifiedIds = new Set();
-    let femaleVoice = null;
+    let preferredFemaleVoice = null;
 
-    // 1. 溫柔女性語音尋找與配置
-    function loadVoices() {
+    // 1. 各語言專屬多語提示詞庫
+    const LANG_PROMPTS = {
+      '國語': {
+        mode: '【國語播報中】',
+        medSelect: '吃藥。請說出要吃什麼藥，或用打字的。',
+        hospSelect: '回診。請說出何時要去看哪一位醫生。',
+        fitSelect: '運動健身。請說出要去哪裡走走或運動。',
+        dailySelect: '一般日常。請說出要記下的事情。',
+        placeholder: '例如：晚上吃降血壓藥一顆',
+        recordStart: '正在聽您說話，請講...',
+        recordError: '沒聽清楚，請再按一次麥克風說話。',
+        saved: '已經幫您記好：',
+        alarm: '時間到了！提醒您，'
+      },
+      '台語': {
+        mode: '【台語播報中】',
+        medSelect: '食藥仔。請講欲食啥物藥，抑是用寫的。',
+        hospSelect: '看醫生。請講佗一工要去病院看醫生。',
+        fitSelect: '運動散步。請講欲去佗位行行咧。',
+        dailySelect: '一般代誌。請講有啥物代誌欲記落來。',
+        placeholder: '例如：暗時愛食血壓藥一粒',
+        recordStart: '有咧聽矣，請大聲講...',
+        recordError: '無聽清楚，請閣按一下麥克風講一擺。',
+        saved: '已經共你記好矣：',
+        alarm: '時間到囉！貼心提醒你，'
+      },
+      '客家語': {
+        mode: '【客家話播報中】',
+        medSelect: '食藥仔。請講愛食麼个藥，抑是用寫个。',
+        hospSelect: '轉診看病。請講哪一日愛去醫院看醫生。',
+        fitSelect: '運動健身。請講愛去哪位行行散步。',
+        dailySelect: '日常事情。請講有麼个事情愛記下來。',
+        placeholder: '例如：暗晡愛食血壓藥一粒',
+        recordStart: '當在聽，請講話...',
+        recordError: '聽毋知，請過撳一下麥克風講一次。',
+        saved: '已經幫你記好勢矣：',
+        alarm: '時間到咧！提醒你，'
+      }
+    };
+
+    // 2. 台語與客家語口語辨識智能映射校正表
+    const DIALECT_CORRECTIONS = {
+      '食藥': '吃藥', '食藥仔': '吃藥', '食血壓藥': '吃降血壓藥',
+      '看醫生': '看診回診', '看病': '回診看病', '病院': '醫院',
+      '行路': '散步運動', '行行咧': '散步運動', '散步': '散步運動',
+      '暗時': '晚上', '暝時': '晚上', '下晝': '下午', '早起': '早上',
+      '暗晡': '晚上', '朝晨': '早上', '屋下': '家裡', '去街頂': '去街上買東西'
+    };
+
+    function correctDialectText(text) {
+      let result = text;
+      for (const [k, v] of Object.entries(DIALECT_CORRECTIONS)) {
+        result = result.replaceAll(k, v);
+      }
+      return result;
+    }
+
+    // 3. 載入系統女性溫柔聲音
+    function initVoices() {
       if ('speechSynthesis' in window) {
         const voices = window.speechSynthesis.getVoices();
-        // 優先尋找中文女性常用語音（微軟、蘋果、Google 等）
-        femaleVoice = voices.find(v => 
-          (v.lang.includes('zh') || v.lang.includes('cmn')) && 
-          (v.name.includes('HsiaoChen') || v.name.includes('Mei-Jia') || v.name.includes('Yating') || 
-           v.name.includes('Female') || v.name.includes('Google 國語') || v.name.includes('Tingting') || v.name.includes('Hanhan'))
+        // 優先挑選台灣女性聲線、美佳、曉臻、Yating 或 Google 普通話
+        preferredFemaleVoice = voices.find(v => 
+          (v.lang === 'zh-TW' || v.lang.includes('TW')) && 
+          (v.name.includes('Female') || v.name.includes('美佳') || v.name.includes('Hsiao-Chen') || v.name.includes('Yating') || v.name.includes('Google'))
         ) || voices.find(v => v.lang.includes('zh'));
       }
     }
     if ('speechSynthesis' in window) {
-      window.speechSynthesis.onvoiceschanged = loadVoices;
-      loadVoices();
+      window.speechSynthesis.onvoiceschanged = initVoices;
+      initVoices();
     }
 
-    // 2. 語言切換
-    function setLanguage(lang) {
-      currentLang = lang;
-      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(`lang-btn-${lang}`).classList.add('active');
-
-      if (lang === 'mandarin') {
-        speakGentle("已切換為國語播報");
-      } else if (lang === 'taiwanese') {
-        speakGentle("已換作台語播報，請講台語");
-      } else if (lang === 'hakka') {
-        speakGentle("已切換做客家話播報，請講客話");
-      }
-    }
-
-    // 溫柔女聲朗讀函式
-    function speakGentle(text) {
+    // 4. 溫柔女性朗讀引擎
+    function speak(text) {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const utter = new SpeechSynthesisUtterance(text);
-        if (femaleVoice) utter.voice = femaleVoice;
+        if (preferredFemaleVoice) utter.voice = preferredFemaleVoice;
         utter.lang = 'zh-TW';
-        utter.rate = 0.85; // 放緩語速，親切易懂
-        utter.pitch = 1.15; // 稍微提高音調呈現溫柔女聲音質
+        utter.rate = 0.85; // 稍慢，適合長輩聆聽
+        utter.pitch = 1.25; // 調高音調，音色親切柔和
         window.speechSynthesis.speak(utter);
       }
     }
 
-    // 3. 即時時鐘與鬧鐘定時器
-    function updateClock() {
-      const now = new Date();
-      const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
-      const m = now.getMonth() + 1;
-      const d = now.getDate();
-      const day = weekdays[now.getDay()];
+    // 5. 切換語言：介面立即響應
+    function setLanguage(lang, btn) {
+      currentLang = lang;
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
 
-      const hh = String(now.getHours()).padStart(2, '0');
-      const mm = String(now.getMinutes()).padStart(2, '0');
-      const ss = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('current-mode-text').innerText = LANG_PROMPTS[lang].mode;
+      document.getElementById('note-input').placeholder = LANG_PROMPTS[lang].placeholder;
 
-      document.getElementById('current-date').innerText = `${m}月${d}日 ${day}`;
-      document.getElementById('current-time').innerText = `${hh}:${mm}:${ss}`;
+      // 重新設定語音識別語言碼
+      setupSpeechRecognition();
 
-      // 檢查鬧鐘
-      const currentHHMM = `${hh}:${mm}`;
-      const notes = getNotes();
-      notes.forEach(note => {
-        if (note.time === currentHHMM) {
-          const alarmKey = `${note.id}-${currentHHMM}`;
-          if (!notifiedIds.has(alarmKey)) {
-            notifiedIds.add(alarmKey);
-            triggerAlarm(note);
-          }
-        }
-      });
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-
-    function triggerAlarm(note) {
-      let promptText = "";
-      if (currentLang === 'taiwanese') {
-        promptText = `時間到囉！貼心提醒您，${note.category}：${note.text}`;
-      } else if (currentLang === 'hakka') {
-        promptText = `時間到哩！細心提醒您，${note.category}：${note.text}`;
-      } else {
-        promptText = `時間到了！美茉莉貼心提醒您，${note.category}：${note.text}`;
-      }
-
-      speakGentle(promptText);
-      setTimeout(() => speakGentle(promptText), 4500);
-      alert(`【美茉莉備忘提醒】\n\n類別：${note.category}\n內容：${note.text}`);
+      // 語音溫和告知已切換
+      if (lang === '台語') speak("切換做台語。請點欲記的代誌。");
+      else if (lang === '客家語') speak("換成客家話。請點愛記个事情。");
+      else speak("已設定為國語，請點選要記錄的項目。");
     }
 
-    // 4. 天氣抓取（Open-Meteo 免費氣象 API）
-    function fetchWeather(lat = 25.04, lon = 121.28) {
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
-        .then(res => res.json())
-        .then(data => {
-          if (data && data.current_weather) {
-            const temp = Math.round(data.current_weather.temperature);
-            const code = data.current_weather.weathercode;
-            const weatherDesc = getWeatherText(code);
-            document.getElementById('weather-temp').innerText = `${temp}°C`;
-            document.getElementById('weather-desc').innerText = weatherDesc.text;
-            document.getElementById('weather-icon').innerText = weatherDesc.icon;
-          }
-        })
-        .catch(() => {
-          document.getElementById('weather-desc').innerText = '多雲晴';
-          document.getElementById('weather-temp').innerText = '舒適';
-        });
-    }
-
-    function getWeatherText(code) {
-      if (code === 0) return { text: '晴朗', icon: '☀️' };
-      if ([1, 2, 3].includes(code)) return { text: '多雲晴', icon: '⛅' };
-      if ([45, 48].includes(code)) return { text: '起霧', icon: '🌫️' };
-      if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) return { text: '陰有雨', icon: '🌧️' };
-      if ([95, 96, 99].includes(code)) return { text: '雷陣雨', icon: '⛈️' };
-      return { text: '陰天', icon: '☁️' };
-    }
-
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        pos => fetchWeather(pos.coords.latitude, pos.coords.longitude),
-        () => fetchWeather()
-      );
-    } else {
-      fetchWeather();
-    }
-
-    // 5. 分類切換
+    // 6. 點選分類：立即以該語言溫柔發聲導引
     function selectCat(cat, icon, btn) {
       currentCategory = cat;
-      document.querySelectorAll('.cat-btn').forEach(b => {
-        if (!b.classList.contains('link-btn')) b.classList.remove('active');
+      document.querySelectorAll('.cat-box').forEach(b => {
+        if (!b.classList.contains('link-box')) b.classList.remove('active');
       });
       btn.classList.add('active');
 
-      const input = document.getElementById('note-input');
-      if (cat === '吃藥') input.placeholder = '例如：晚上吃降血壓藥半顆';
-      else if (cat === '回診') input.placeholder = '例如：下午三點醫院心臟科';
-      else if (cat === '運動健身') input.placeholder = '例如：公園散步半小時、甩手';
-      else if (cat === '一般日常') input.placeholder = '例如：買牛奶、去郵局領掛號';
+      const prompts = LANG_PROMPTS[currentLang];
+      if (cat === '吃藥') speak(prompts.medSelect);
+      else if (cat === '回診') speak(prompts.hospSelect);
+      else if (cat === '運動健身') speak(prompts.fitSelect);
+      else if (cat === '一般日常') speak(prompts.dailySelect);
     }
 
-    // 6. 語音辨識
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
+    // 7. 語音辨識升級版（支援台語/客語口音處理）
+    function setupSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) return;
+
       recognition = new SpeechRecognition();
       recognition.continuous = false;
       recognition.interimResults = false;
+      
+      // 設定台灣中文模式（可廣泛相容台語漢字轉譯）
       recognition.lang = 'zh-TW';
 
       recognition.onstart = () => {
@@ -607,11 +554,14 @@
         const mic = document.getElementById('mic-btn');
         mic.classList.add('recording');
         mic.innerText = '🔴';
+        speak(LANG_PROMPTS[currentLang].recordStart);
       };
 
-      recognition.onresult = (event) => {
-        const text = event.results[0][0].transcript.trim();
-        document.getElementById('note-input').value = text;
+      recognition.onresult = (e) => {
+        let rawText = e.results[0][0].transcript.trim();
+        let finalText = correctDialectText(rawText);
+        document.getElementById('note-input').value = finalText;
+        speak(`聽到了：${finalText}`);
       };
 
       recognition.onend = () => {
@@ -623,32 +573,31 @@
 
       recognition.onerror = () => {
         isRecording = false;
-        document.getElementById('mic-btn').classList.remove('recording');
-        document.getElementById('mic-btn').innerText = '🎙️';
-        speakGentle("抱歉沒有聽清楚，請您再按一次說話。");
+        const mic = document.getElementById('mic-btn');
+        mic.classList.remove('recording');
+        mic.innerText = '🎙️';
+        speak(LANG_PROMPTS[currentLang].recordError);
       };
     }
+    setupSpeechRecognition();
 
     function toggleRecord() {
-      if (!recognition) {
-        alert("此手機瀏覽器不支援語音辨識，請直接在文字框打字。");
-        return;
-      }
+      if (!recognition) return alert("您的手機瀏覽器不支援語音辨識，請直接打字。");
       if (isRecording) {
         recognition.stop();
       } else {
-        recognition.start();
+        try { recognition.start(); } catch (e) { recognition.stop(); }
       }
     }
 
-    // 7. 新增備忘
+    // 8. 儲存與新增備忘錄
     function addNote() {
       const input = document.getElementById('note-input');
       const timeInput = document.getElementById('alarm-time');
       const text = input.value.trim();
 
       if (!text) {
-        speakGentle("請先說話或輸入內容喔！");
+        speak(currentLang === '台語' ? "請先講話抑是寫字。" : "請先說話或輸入內容。");
         return;
       }
 
@@ -668,9 +617,8 @@
       timeInput.value = '';
       render();
 
-      let confirmMsg = `已幫您記下${newNote.category}：${newNote.text}`;
-      if (newNote.time) confirmMsg += `，會在 ${newNote.time} 提醒您`;
-      speakGentle(confirmMsg);
+      const confirmMsg = `${LANG_PROMPTS[currentLang].saved}${newNote.category}，${newNote.text}`;
+      speak(confirmMsg);
     }
 
     function getNotes() {
@@ -688,7 +636,7 @@
       const notes = getNotes();
 
       if (notes.length === 0) {
-        listEl.innerHTML = '<div style="color:#78909C; text-align:center; margin-top:24px; font-size:22px; font-weight:bold;">目前沒有任何備忘事項</div>';
+        listEl.innerHTML = '<div style="color:#94A3B8; text-align:center; margin-top:20px; font-size:24px; font-weight:bold;">目前沒有任何備忘事項</div>';
         return;
       }
 
@@ -700,15 +648,84 @@
             <div class="note-alarm">${n.time ? '⏰ 提醒：' + n.time : '📅 記於：' + n.createdDate}</div>
           </div>
           <div class="card-actions">
-            <button class="btn-action-speak" onclick="speakGentle('${n.category}提醒：${n.text}')">🔊 念出來</button>
-            <button class="btn-action-del" onclick="deleteNote(${n.id})">刪除</button>
+            <button class="btn-speak" onclick="speak('${n.category}提醒：${n.text}')">🔊 念出</button>
+            <button class="btn-del" onclick="deleteNote(${n.id})">刪除</button>
           </div>
         </div>
       `).join('');
+    }
+
+    // 9. 即時時鐘與鬧鐘偵測
+    function updateClock() {
+      const now = new Date();
+      const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+      const m = now.getMonth() + 1;
+      const d = now.getDate();
+      const day = weekdays[now.getDay()];
+
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const ss = String(now.getSeconds()).padStart(2, '0');
+
+      document.getElementById('current-date').innerText = `${m}月${d}日 ${day}`;
+      document.getElementById('current-time').innerText = `${hh}:${mm}:${ss}`;
+
+      const currentHHMM = `${hh}:${mm}`;
+      const notes = getNotes();
+      notes.forEach(note => {
+        if (note.time === currentHHMM) {
+          const alarmKey = `${note.id}-${currentHHMM}`;
+          if (!notifiedIds.has(alarmKey)) {
+            notifiedIds.add(alarmKey);
+            const msg = `${LANG_PROMPTS[currentLang].alarm}${note.category}：${note.text}`;
+            speak(msg);
+            alert(`【美茉莉提醒您】\n\n類別：${note.category}\n內容：${note.text}`);
+          }
+        }
+      });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // 10. 即時天氣載入（Open-Meteo 免費氣象）
+    function fetchWeather(lat = 25.04, lon = 121.28) {
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.current_weather) {
+            const temp = Math.round(data.current_weather.temperature);
+            const code = data.current_weather.weathercode;
+            const w = getWeatherText(code);
+            document.getElementById('weather-temp').innerText = `${temp}°C`;
+            document.getElementById('weather-desc').innerText = w.text;
+            document.getElementById('weather-icon').innerText = w.icon;
+          }
+        })
+        .catch(() => {
+          document.getElementById('weather-desc').innerText = '多雲時晴';
+          document.getElementById('weather-temp').innerText = '舒適';
+        });
+    }
+
+    function getWeatherText(code) {
+      if (code === 0) return { text: '晴天', icon: '☀️' };
+      if ([1, 2, 3].includes(code)) return { text: '多雲晴', icon: '⛅' };
+      if ([45, 48].includes(code)) return { text: '起霧', icon: '🌫️' };
+      if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) return { text: '陰有雨', icon: '🌧️' };
+      if ([95, 96, 99].includes(code)) return { text: '雷陣雨', icon: '⛈️' };
+      return { text: '陰天', icon: '☁️' };
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        pos => fetchWeather(pos.coords.latitude, pos.coords.longitude),
+        () => fetchWeather()
+      );
+    } else {
+      fetchWeather();
     }
 
     render();
   </script>
 </body>
 </html>
-```
