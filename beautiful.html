@@ -12,9 +12,9 @@
       font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
     }
 
-    /* 暖燕麥米白護眼背景：柔和不眩光、黑白高對比 */
+    /* 護眼暖燕麥米白底色：告別黑底反光與光暈，溫潤大字清晰 */
     body {
-      background-color: #F3EFEA;
+      background-color: #F5F1EB;
       color: #0F172A;
       display: flex;
       flex-direction: column;
@@ -23,7 +23,7 @@
       padding: 14px 14px 90px 14px;
     }
 
-    /* 頂部看板：深沉雅致深藍底，襯托清晰白色大字 */
+    /* 頂部看板：雅致深海藍底，清晰亮白與天藍時間 */
     .dashboard-card {
       width: 100%;
       max-width: 520px;
@@ -74,8 +74,8 @@
       letter-spacing: 1px;
     }
 
-    /* 主標題：深沉高貴黛黑 */
-    header { text-align: center; margin-bottom: 16px; }
+    /* 主標題：沉穩深墨色 */
+    header { text-align: center; margin-bottom: 14px; }
     h1 {
       font-size: 40px;
       color: #0F172A;
@@ -83,7 +83,55 @@
       font-weight: 900;
     }
 
-    /* 主操作卡片：純白底、深色大字、立體陰影 */
+    /* 子女連線專區（打電話給子女、設定號碼） */
+    .family-box {
+      width: 100%;
+      max-width: 520px;
+      background-color: #FFFFFF;
+      border: 3px solid #0284C7;
+      border-radius: 18px;
+      padding: 14px 18px;
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.15);
+    }
+    .family-title {
+      font-size: 22px;
+      color: #0369A1;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .family-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .call-child-btn {
+      background-color: #0284C7;
+      color: #FFFFFF;
+      font-size: 20px;
+      font-weight: 900;
+      padding: 10px 16px;
+      border-radius: 12px;
+      text-decoration: none;
+      box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3);
+    }
+    .set-child-btn {
+      background-color: #F1F5F9;
+      border: 2px solid #CBD5E1;
+      color: #475569;
+      font-size: 16px;
+      font-weight: bold;
+      padding: 10px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    /* 主操作卡片：純白底，大字對比極強 */
     .app-card {
       width: 100%;
       max-width: 520px;
@@ -91,12 +139,12 @@
       border: 3px solid #E2E8F0;
       border-radius: 22px;
       padding: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
       margin-bottom: 20px;
     }
     .section-label {
       font-size: 24px;
-      color: #475569;
+      color: #334155;
       margin-bottom: 14px;
       font-weight: 900;
     }
@@ -123,29 +171,29 @@
       text-decoration: none;
       text-align: center;
       min-height: 115px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
       -webkit-tap-highlight-color: transparent;
       transition: all 0.2s ease;
     }
     .cat-box span.icon { font-size: 38px; }
 
-    /* 四大類別明亮配色（白底鮮字） */
-    .cat-med { background-color: #FFE4E6; border-color: #FDA4AF; color: #BE123C; } /* 吃藥-溫和玫瑰紅 */
-    .cat-hosp { background-color: #E0F2FE; border-color: #BAE6FD; color: #0369A1; } /* 回診-天青藍 */
-    .cat-fit { background-color: #DCFCE7; border-color: #BBF7D0; color: #15803D; } /* 健身-清新綠 */
-    .cat-daily { background-color: #F3E8FF; border-color: #E9D5FF; color: #7E22CE; } /* 日常-典雅紫 */
+    /* 各類別專屬色彩（白底高對比） */
+    .cat-med { background-color: #FFE4E6; border-color: #FDA4AF; color: #BE123C; } /* 吃藥-紅 */
+    .cat-hosp { background-color: #E0F2FE; border-color: #BAE6FD; color: #0369A1; } /* 回診-藍 */
+    .cat-fit { background-color: #DCFCE7; border-color: #BBF7D0; color: #15803D; } /* 健身-綠 */
+    .cat-daily { background-color: #F3E8FF; border-color: #E9D5FF; color: #7E22CE; } /* 日常-紫 */
 
-    /* 選取中的分類：強烈外框與微放大 */
+    /* 選取中的分類：強烈深色外框 */
     .cat-box.active {
       outline: 5px solid #0F172A;
       outline-offset: -2px;
       transform: scale(1.02);
-      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.25);
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.2);
     }
 
     /* 外部連結按鈕 */
     .link-box {
-      background-color: #F1F5F9;
+      background-color: #F8FAFC;
       border: 3px solid #CBD5E1;
       color: #1E293B;
     }
@@ -213,7 +261,7 @@
       flex: 1;
     }
 
-    /* 記下按鈕：沉穩亮藍色 */
+    /* 記下按鈕 */
     .add-btn {
       width: 100%;
       background: linear-gradient(145deg, #0284C7, #0369A1);
@@ -227,7 +275,7 @@
       box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35);
     }
 
-    /* 備忘清單卡片（白底深字，極度清晰） */
+    /* 備忘清單卡片（純白底深字，極度清晰） */
     .list-container { width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 14px; }
     .note-card {
       background-color: #FFFFFF;
@@ -256,11 +304,12 @@
     .note-text { font-size: 26px; color: #0F172A; font-weight: 800; line-height: 1.35; }
     .note-alarm { font-size: 22px; color: #0284C7; margin-top: 6px; font-weight: 800; }
     
-    .card-actions { display: flex; flex-direction: column; gap: 10px; }
-    .btn-speak { background: #F1F5F9; border: 2px solid #CBD5E1; color: #1E293B; padding: 10px 14px; border-radius: 12px; font-size: 19px; font-weight: 800; cursor: pointer; }
-    .btn-del { background: #FFF1F2; border: 2px solid #FECDD3; color: #E11D48; padding: 10px 14px; border-radius: 12px; font-size: 19px; font-weight: 800; cursor: pointer; }
+    .card-actions { display: flex; flex-direction: column; gap: 8px; min-width: 110px; }
+    .btn-speak { background: #F1F5F9; border: 2px solid #CBD5E1; color: #1E293B; padding: 8px 10px; border-radius: 10px; font-size: 17px; font-weight: 800; cursor: pointer; text-align: center; }
+    .btn-line { background: #06C755; border: 2px solid #05A848; color: #FFFFFF; padding: 8px 10px; border-radius: 10px; font-size: 17px; font-weight: 800; cursor: pointer; text-align: center; text-decoration: none; display: block; }
+    .btn-del { background: #FFF1F2; border: 2px solid #FECDD3; color: #E11D48; padding: 8px 10px; border-radius: 10px; font-size: 17px; font-weight: 800; cursor: pointer; text-align: center; }
 
-    /* 底部廣告欄 */
+    /* 底部廣告欄位 */
     .ad-fixed-bottom {
       position: fixed;
       bottom: 0;
@@ -299,6 +348,17 @@
   <header>
     <h1>美茉莉備忘錄</h1>
   </header>
+
+  <!-- 子女手機連線區（可設定電話、一鍵直撥） -->
+  <div class="family-box">
+    <div class="family-title">
+      <span>👨‍👩‍👧 兒女聯絡專線</span>
+    </div>
+    <div class="family-actions">
+      <a href="tel:0900000000" id="child-call-link" class="call-child-btn">📞 打電話</a>
+      <button class="set-child-btn" onclick="setChildPhone()">⚙️ 設號碼</button>
+    </div>
+  </div>
 
   <div class="app-card">
     <div class="section-label">1. 點選要記的事情：</div>
@@ -357,20 +417,38 @@
     <div id="notes-list"></div>
   </div>
 
-  <!-- 底部廣告預留區塊 -->
+  <!-- 底部廣告欄 -->
   <div class="ad-fixed-bottom">
     [ 贊助廣告版位 · 零個資留存安全認證 ]
   </div>
 
   <script>
-    const STORAGE_KEY = 'senior_care_notes_v7';
+    const STORAGE_KEY = 'senior_care_notes_v8';
+    const CHILD_PHONE_KEY = 'senior_child_phone_v1';
     let currentCategory = '吃藥';
     let isRecording = false;
     let recognition = null;
     let notifiedIds = new Set();
     let preferredFemaleVoice = null;
 
-    // 1. 溫柔女性國語提示語
+    // 1. 初始化子女電話
+    function loadChildPhone() {
+      const savedPhone = localStorage.getItem(CHILD_PHONE_KEY) || '0900000000';
+      document.getElementById('child-call-link').href = `tel:${savedPhone}`;
+    }
+
+    function setChildPhone() {
+      const current = localStorage.getItem(CHILD_PHONE_KEY) || '';
+      const phone = prompt("請輸入子女的手機或電話號碼：", current);
+      if (phone !== null && phone.trim() !== '') {
+        const cleanPhone = phone.trim().replace(/[^0-9]/g, '');
+        localStorage.setItem(CHILD_PHONE_KEY, cleanPhone);
+        loadChildPhone();
+        alert("子女電話已成功儲存！");
+      }
+    }
+
+    // 2. 溫柔女性國語提示語
     const CATEGORY_PROMPTS = {
       '吃藥': '吃藥。請說出要吃什麼藥，也可以用寫的。',
       '回診': '回診。請說出何時要去看哪一位醫生。',
@@ -378,7 +456,7 @@
       '一般日常': '一般日常。請說出要記下的事情。'
     };
 
-    // 2. 鎖定台灣溫柔女聲
+    // 3. 挑選台灣女性溫柔語音
     function initVoices() {
       if ('speechSynthesis' in window) {
         const voices = window.speechSynthesis.getVoices();
@@ -393,20 +471,19 @@
       initVoices();
     }
 
-    // 3. 語音朗讀合成（音調微調親切柔和）
     function speak(text) {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const utter = new SpeechSynthesisUtterance(text);
         if (preferredFemaleVoice) utter.voice = preferredFemaleVoice;
         utter.lang = 'zh-TW';
-        utter.rate = 0.88; // 放慢一點點，長輩聽得最舒服
-        utter.pitch = 1.15; // 柔和女聲音調
+        utter.rate = 0.88;
+        utter.pitch = 1.15;
         window.speechSynthesis.speak(utter);
       }
     }
 
-    // 4. 點選分類：切換並立即以溫柔女聲導引
+    // 4. 點選分類
     function selectCat(cat, btn) {
       currentCategory = cat;
       document.querySelectorAll('.cat-box').forEach(b => {
@@ -423,7 +500,7 @@
       speak(CATEGORY_PROMPTS[cat]);
     }
 
-    // 5. 語音辨識（純國語繁體高準度辨識）
+    // 5. 語音辨識
     function setupSpeechRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) return;
@@ -431,7 +508,7 @@
       recognition = new SpeechRecognition();
       recognition.continuous = false;
       recognition.interimResults = false;
-      recognition.lang = 'zh-TW'; // 鎖定台灣繁體中文，辨識率最高
+      recognition.lang = 'zh-TW';
 
       recognition.onstart = () => {
         isRecording = true;
@@ -514,6 +591,7 @@
       render();
     }
 
+    // 7. 渲染備忘錄清單（附帶 LINE 傳送功能）
     function render() {
       const listEl = document.getElementById('notes-list');
       const notes = getNotes();
@@ -523,22 +601,29 @@
         return;
       }
 
-      listEl.innerHTML = notes.map(n => `
-        <div class="note-card">
-          <div style="flex:1;">
-            <span class="cat-tag tag-${n.category}">${n.category}</span>
-            <div class="note-text">${n.text}</div>
-            <div class="note-alarm">${n.time ? '⏰ 提醒：' + n.time : '📅 記於：' + n.createdDate}</div>
+      listEl.innerHTML = notes.map(n => {
+        // 組合 LINE 分享文字
+        const lineMsg = encodeURIComponent(`【美茉莉備忘提醒】\n事項：${n.category} - ${n.text}\n時間：${n.time ? n.time : n.createdDate}`);
+        const lineUrl = `https://line.me/R/msg/text/?${lineMsg}`;
+
+        return `
+          <div class="note-card">
+            <div style="flex:1;">
+              <span class="cat-tag tag-${n.category}">${n.category}</span>
+              <div class="note-text">${n.text}</div>
+              <div class="note-alarm">${n.time ? '⏰ 提醒：' + n.time : '📅 記於：' + n.createdDate}</div>
+            </div>
+            <div class="card-actions">
+              <button class="btn-speak" onclick="speak('${n.category}提醒：${n.text}')">🔊 念出</button>
+              <a href="${lineUrl}" target="_blank" class="btn-line">📲 LINE兒女</a>
+              <button class="btn-del" onclick="deleteNote(${n.id})">刪除</button>
+            </div>
           </div>
-          <div class="card-actions">
-            <button class="btn-speak" onclick="speak('${n.category}提醒：${n.text}')">🔊 念出</button>
-            <button class="btn-del" onclick="deleteNote(${n.id})">刪除</button>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
-    // 7. 即時時鐘與鬧鐘
+    // 8. 即時時鐘與鬧鐘
     function updateClock() {
       const now = new Date();
       const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
@@ -570,7 +655,7 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // 8. 即時天氣
+    // 9. 即時天氣載入
     function fetchWeather(lat = 25.04, lon = 121.28) {
       fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
         .then(res => res.json())
@@ -608,6 +693,8 @@
       fetchWeather();
     }
 
+    // 初始化載入
+    loadChildPhone();
     render();
   </script>
 </body>
