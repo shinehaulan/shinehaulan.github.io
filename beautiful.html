@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>美茉莉備忘錄</title>
+  <meta name="color-scheme" content="light only">
+  <title>美茉莉 - 銀髮備忘錄</title>
   <style>
+    :root {
+      color-scheme: light only;
+    }
     * {
       box-sizing: border-box;
       margin: 0;
@@ -12,10 +16,10 @@
       font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
     }
 
-    /* 護眼暖燕麥米白底色：告別黑底反光與光暈，溫潤大字清晰 */
+    /* 護眼暖燕麥米白底色：溫潤不反光、高對比易讀 */
     body {
-      background-color: #F5F1EB;
-      color: #0F172A;
+      background-color: #F5F1EB !important;
+      color: #0F172A !important;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -23,7 +27,7 @@
       padding: 14px 14px 90px 14px;
     }
 
-    /* 頂部看板：雅致深海藍底，清晰亮白與天藍時間 */
+    /* 頂部看板：深沉雅致深藍底，襯托清晰白色大字 */
     .dashboard-card {
       width: 100%;
       max-width: 520px;
@@ -31,7 +35,7 @@
       border: 3px solid #334155;
       border-radius: 20px;
       padding: 16px 20px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       box-shadow: 0 6px 18px rgba(0,0,0,0.12);
       display: flex;
       flex-direction: column;
@@ -74,16 +78,24 @@
       letter-spacing: 1px;
     }
 
-    /* 主標題：沉穩深墨色 */
+    /* 主副標題設計 */
     header { text-align: center; margin-bottom: 14px; }
     h1 {
-      font-size: 40px;
+      font-size: 42px;
       color: #0F172A;
       letter-spacing: 2px;
       font-weight: 900;
+      line-height: 1.15;
+    }
+    .sub-title {
+      font-size: 24px;
+      color: #475569;
+      font-weight: 800;
+      letter-spacing: 3px;
+      margin-top: 4px;
     }
 
-    /* 子女連線專區（打電話給子女、設定號碼） */
+    /* 兒女專線卡片 */
     .family-box {
       width: 100%;
       max-width: 520px;
@@ -91,7 +103,7 @@
       border: 3px solid #0284C7;
       border-radius: 18px;
       padding: 14px 18px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -131,7 +143,7 @@
       cursor: pointer;
     }
 
-    /* 主操作卡片：純白底，大字對比極強 */
+    /* 主操作卡片 */
     .app-card {
       width: 100%;
       max-width: 520px;
@@ -158,32 +170,35 @@
     }
     .cat-box {
       border: 4px solid transparent;
-      font-size: 26px;
+      font-size: 25px;
       font-weight: 900;
-      padding: 18px 8px;
+      padding: 16px 8px;
       border-radius: 18px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
       text-decoration: none;
       text-align: center;
-      min-height: 115px;
+      min-height: 110px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.06);
       -webkit-tap-highlight-color: transparent;
       transition: all 0.2s ease;
     }
-    .cat-box span.icon { font-size: 38px; }
+    .cat-box span.icon { font-size: 36px; }
 
-    /* 各類別專屬色彩（白底高對比） */
-    .cat-med { background-color: #FFE4E6; border-color: #FDA4AF; color: #BE123C; } /* 吃藥-紅 */
-    .cat-hosp { background-color: #E0F2FE; border-color: #BAE6FD; color: #0369A1; } /* 回診-藍 */
-    .cat-fit { background-color: #DCFCE7; border-color: #BBF7D0; color: #15803D; } /* 健身-綠 */
-    .cat-daily { background-color: #F3E8FF; border-color: #E9D5FF; color: #7E22CE; } /* 日常-紫 */
+    /* 四大類別專屬色彩 */
+    .cat-med { background-color: #FFE4E6; border-color: #FDA4AF; color: #BE123C; }
+    .cat-hosp { background-color: #E0F2FE; border-color: #BAE6FD; color: #0369A1; }
+    .cat-fit { background-color: #DCFCE7; border-color: #BBF7D0; color: #15803D; }
+    .cat-daily { background-color: #F3E8FF; border-color: #E9D5FF; color: #7E22CE; }
 
-    /* 選取中的分類：強烈深色外框 */
+    /* 每日一唱 / 每日一笑 娛樂色彩 */
+    .cat-sing { background-color: #FFF7ED; border-color: #FED7AA; color: #C2410C; } /* 溫暖橘紅 */
+    .cat-laugh { background-color: #FEF9C3; border-color: #FDE047; color: #A16207; } /* 開心明黃 */
+
     .cat-box.active {
       outline: 5px solid #0F172A;
       outline-offset: -2px;
@@ -191,7 +206,6 @@
       box-shadow: 0 6px 18px rgba(15, 23, 42, 0.2);
     }
 
-    /* 外部連結按鈕 */
     .link-box {
       background-color: #F8FAFC;
       border: 3px solid #CBD5E1;
@@ -219,7 +233,7 @@
     
     /* 麥克風按鈕 */
     .mic-btn-main {
-      width: 78px;
+      width: 80px;
       background: linear-gradient(145deg, #16A34A, #15803D);
       border: 3px solid #86EFAC;
       border-radius: 16px;
@@ -230,6 +244,7 @@
       align-items: center;
       cursor: pointer;
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      flex-shrink: 0;
     }
     .mic-btn-main.recording {
       background: linear-gradient(145deg, #DC2626, #B91C1C);
@@ -240,6 +255,15 @@
       0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.6); }
       70% { box-shadow: 0 0 0 16px rgba(220, 38, 38, 0); }
       100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+    }
+
+    .mic-tip {
+      font-size: 18px;
+      color: #DC2626;
+      font-weight: bold;
+      margin-bottom: 12px;
+      min-height: 24px;
+      text-align: center;
     }
 
     /* 時間提醒欄位 */
@@ -261,7 +285,6 @@
       flex: 1;
     }
 
-    /* 記下按鈕 */
     .add-btn {
       width: 100%;
       background: linear-gradient(145deg, #0284C7, #0369A1);
@@ -275,7 +298,7 @@
       box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35);
     }
 
-    /* 備忘清單卡片（純白底深字，極度清晰） */
+    /* 備忘清單卡片 */
     .list-container { width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 14px; }
     .note-card {
       background-color: #FFFFFF;
@@ -346,10 +369,11 @@
   </div>
 
   <header>
-    <h1>美茉莉備忘錄</h1>
+    <h1>美茉莉</h1>
+    <div class="sub-title">銀髮備忘錄</div>
   </header>
 
-  <!-- 子女手機連線區（可設定電話、一鍵直撥） -->
+  <!-- 兒女專線連線區 -->
   <div class="family-box">
     <div class="family-title">
       <span>👨‍👩‍👧 兒女聯絡專線</span>
@@ -363,7 +387,7 @@
   <div class="app-card">
     <div class="section-label">1. 點選要記的事情：</div>
 
-    <!-- 兩兩一排高對比功能按鈕 -->
+    <!-- 兩兩一排功能按鈕 -->
     <div class="category-grid-2x">
       <!-- 第一排：吃藥、回診 -->
       <button class="cat-box cat-med active" onclick="selectCat('吃藥', this)">
@@ -385,7 +409,17 @@
         <span>一般日常</span>
       </button>
 
-      <!-- 第三排：居家無障礙空間諮詢、老當益壯 -->
+      <!-- 第三排：運動健身下方放「每日一唱」、一般日常下方放「每日一笑」 -->
+      <a href="https://www.youtube.com/results?search_query=%E5%9C%8B%E8%AA%9E%E8%80%81%E6%AD%8C+%E5%8D%A1%E6%8B%89OK+%E4%BC%B4%E5%94%B1" target="_blank" class="cat-box cat-sing">
+        <span class="icon">🎤</span>
+        <span>每日一唱</span>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=%E5%8F%B0%E7%81%A3%E7%AC%91%E8%A9%B1+%E5%B9%BD%E9%BB%98%E7%9F%AD%E5%8A%87+%E6%90%9E%E7%AC%91" target="_blank" class="cat-box cat-laugh">
+        <span class="icon">😄</span>
+        <span>每日一笑</span>
+      </a>
+
+      <!-- 第四排：居家無障礙空間諮詢、老當益壯 -->
       <a href="tel:0900000000" class="cat-box link-box">
         <span class="icon">🛠️</span>
         <span style="font-size: 21px; line-height: 1.25;">居家無障礙<br>空間諮詢</span>
@@ -401,6 +435,7 @@
       <input type="text" id="note-input" class="text-input" placeholder="例如：晚上吃降血壓藥一顆">
       <button class="mic-btn-main" id="mic-btn" onclick="toggleRecord()" title="按一下用講的">🎙️</button>
     </div>
+    <div class="mic-tip" id="mic-tip"></div>
 
     <div class="time-row">
       <span class="time-label">⏰ 提醒時間：</span>
@@ -423,15 +458,17 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'senior_care_notes_v8';
+    const STORAGE_KEY = 'senior_care_notes_v10';
     const CHILD_PHONE_KEY = 'senior_child_phone_v1';
     let currentCategory = '吃藥';
     let isRecording = false;
     let recognition = null;
     let notifiedIds = new Set();
     let preferredFemaleVoice = null;
+    let recordTimer = null;
+    let countdownSec = 10;
 
-    // 1. 初始化子女電話
+    // 1. 初始化兒女電話
     function loadChildPhone() {
       const savedPhone = localStorage.getItem(CHILD_PHONE_KEY) || '0900000000';
       document.getElementById('child-call-link').href = `tel:${savedPhone}`;
@@ -456,7 +493,6 @@
       '一般日常': '一般日常。請說出要記下的事情。'
     };
 
-    // 3. 挑選台灣女性溫柔語音
     function initVoices() {
       if ('speechSynthesis' in window) {
         const voices = window.speechSynthesis.getVoices();
@@ -483,11 +519,13 @@
       }
     }
 
-    // 4. 點選分類
+    // 3. 點選分類
     function selectCat(cat, btn) {
       currentCategory = cat;
       document.querySelectorAll('.cat-box').forEach(b => {
-        if (!b.classList.contains('link-box')) b.classList.remove('active');
+        if (!b.classList.contains('link-box') && !b.classList.contains('cat-sing') && !b.classList.contains('cat-laugh')) {
+          b.classList.remove('active');
+        }
       });
       btn.classList.add('active');
 
@@ -500,14 +538,14 @@
       speak(CATEGORY_PROMPTS[cat]);
     }
 
-    // 5. 語音辨識
+    // 4. 語音辨識（加長秒數）
     function setupSpeechRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) return;
 
       recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
+      recognition.continuous = true;
+      recognition.interimResults = true;
       recognition.lang = 'zh-TW';
 
       recognition.onstart = () => {
@@ -515,28 +553,38 @@
         const mic = document.getElementById('mic-btn');
         mic.classList.add('recording');
         mic.innerText = '🔴';
-        speak("正在聽您說話，請講。");
+        
+        countdownSec = 10;
+        document.getElementById('mic-tip').innerText = `🔴 正在聽您說話（還有 ${countdownSec} 秒，講完可再按一下）`;
+        
+        clearInterval(recordTimer);
+        recordTimer = setInterval(() => {
+          countdownSec--;
+          if (countdownSec > 0) {
+            document.getElementById('mic-tip').innerText = `🔴 正在聽您說話（還有 ${countdownSec} 秒，講完可再按一下）`;
+          } else {
+            stopRecord();
+          }
+        }, 1000);
       };
 
       recognition.onresult = (e) => {
-        const text = e.results[0][0].transcript.trim();
-        document.getElementById('note-input').value = text;
-        speak(`聽到了：${text}`);
+        let resultText = '';
+        for (let i = 0; i < e.results.length; i++) {
+          resultText += e.results[i][0].transcript;
+        }
+        if (resultText.trim()) {
+          document.getElementById('note-input').value = resultText.trim();
+        }
       };
 
       recognition.onend = () => {
-        isRecording = false;
-        const mic = document.getElementById('mic-btn');
-        mic.classList.remove('recording');
-        mic.innerText = '🎙️';
+        cleanupRecordUI();
       };
 
       recognition.onerror = () => {
-        isRecording = false;
-        const mic = document.getElementById('mic-btn');
-        mic.classList.remove('recording');
-        mic.innerText = '🎙️';
-        speak("沒聽清楚，請再按一次麥克風說話。");
+        cleanupRecordUI();
+        document.getElementById('mic-tip').innerText = '沒聽清楚，請再按一次麥克風慢慢說。';
       };
     }
     setupSpeechRecognition();
@@ -544,13 +592,36 @@
     function toggleRecord() {
       if (!recognition) return alert("您的手機瀏覽器不支援語音辨識，請直接打字。");
       if (isRecording) {
-        recognition.stop();
+        stopRecord();
       } else {
-        try { recognition.start(); } catch (e) { recognition.stop(); }
+        document.getElementById('mic-tip').innerText = '';
+        try {
+          recognition.start();
+        } catch (e) {
+          recognition.stop();
+        }
       }
     }
 
-    // 6. 儲存與新增備忘錄
+    function stopRecord() {
+      if (recognition && isRecording) {
+        recognition.stop();
+      }
+      cleanupRecordUI();
+    }
+
+    function cleanupRecordUI() {
+      isRecording = false;
+      clearInterval(recordTimer);
+      const mic = document.getElementById('mic-btn');
+      mic.classList.remove('recording');
+      mic.innerText = '🎙️';
+      setTimeout(() => {
+        document.getElementById('mic-tip').innerText = '';
+      }, 2500);
+    }
+
+    // 5. 儲存與新增備忘錄
     function addNote() {
       const input = document.getElementById('note-input');
       const timeInput = document.getElementById('alarm-time');
@@ -591,7 +662,7 @@
       render();
     }
 
-    // 7. 渲染備忘錄清單（附帶 LINE 傳送功能）
+    // 6. 渲染備忘錄清單
     function render() {
       const listEl = document.getElementById('notes-list');
       const notes = getNotes();
@@ -602,7 +673,6 @@
       }
 
       listEl.innerHTML = notes.map(n => {
-        // 組合 LINE 分享文字
         const lineMsg = encodeURIComponent(`【美茉莉備忘提醒】\n事項：${n.category} - ${n.text}\n時間：${n.time ? n.time : n.createdDate}`);
         const lineUrl = `https://line.me/R/msg/text/?${lineMsg}`;
 
@@ -623,7 +693,7 @@
       }).join('');
     }
 
-    // 8. 即時時鐘與鬧鐘
+    // 7. 即時時鐘與鬧鐘
     function updateClock() {
       const now = new Date();
       const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
@@ -655,7 +725,7 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // 9. 即時天氣載入
+    // 8. 即時天氣
     function fetchWeather(lat = 25.04, lon = 121.28) {
       fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
         .then(res => res.json())
@@ -693,7 +763,6 @@
       fetchWeather();
     }
 
-    // 初始化載入
     loadChildPhone();
     render();
   </script>
