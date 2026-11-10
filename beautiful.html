@@ -12,10 +12,10 @@
       font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
     }
 
-    /* 護眼高對比底色：深謐墨藍，無反光不刺眼 */
+    /* 暖燕麥米白護眼背景：柔和不眩光、黑白高對比 */
     body {
-      background-color: #0A111E;
-      color: #FFFFFF;
+      background-color: #F3EFEA;
+      color: #0F172A;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -23,16 +23,16 @@
       padding: 14px 14px 90px 14px;
     }
 
-    /* 頂部看板：柔和深藍背景，白藍高對比時間 */
+    /* 頂部看板：深沉雅致深藍底，襯托清晰白色大字 */
     .dashboard-card {
       width: 100%;
       max-width: 520px;
-      background-color: #131E31;
-      border: 3px solid #283C5C;
+      background-color: #1E293B;
+      border: 3px solid #334155;
       border-radius: 20px;
       padding: 16px 20px;
       margin-bottom: 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -41,7 +41,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 2px solid #20314A;
+      border-bottom: 2px solid #334155;
       padding-bottom: 8px;
     }
     .weather-info {
@@ -70,72 +70,35 @@
     .time-text {
       font-size: 36px;
       font-weight: 900;
-      color: #38BDF8; /* 換掉原本的泥黃色，改為清爽高對比冰藍 */
+      color: #F8FAFC;
       letter-spacing: 1px;
     }
 
-    /* 主標題：去除黃色，採用溫潤高對比象牙暖白漸層 */
+    /* 主標題：深沉高貴黛黑 */
     header { text-align: center; margin-bottom: 16px; }
     h1 {
-      font-size: 38px;
-      color: #FFFFFF;
+      font-size: 40px;
+      color: #0F172A;
       letter-spacing: 2px;
       font-weight: 900;
-      text-shadow: 0 4px 12px rgba(255, 255, 255, 0.25);
     }
 
-    /* 語言切換：僅留國語、台語（平分兩欄，按鈕超大） */
-    .lang-row {
-      width: 100%;
-      max-width: 520px;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
-      margin-bottom: 18px;
-    }
-    .lang-btn {
-      background-color: #1E293B;
-      border: 3px solid #475569;
-      color: #F8FAFC;
-      font-size: 28px;
-      font-weight: 900;
-      padding: 14px 0;
-      border-radius: 16px;
-      cursor: pointer;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      -webkit-tap-highlight-color: transparent;
-    }
-    .lang-btn.active {
-      background-color: #0284C7; /* 醒目寶藍，清晰易讀 */
-      border-color: #7DD3FC;
-      color: #FFFFFF;
-      box-shadow: 0 0 16px rgba(2, 132, 199, 0.7);
-    }
-
-    /* 主操作卡片 */
+    /* 主操作卡片：純白底、深色大字、立體陰影 */
     .app-card {
       width: 100%;
       max-width: 520px;
-      background-color: #111A2B;
-      border: 3px solid #233554;
+      background-color: #FFFFFF;
+      border: 3px solid #E2E8F0;
       border-radius: 22px;
-      padding: 18px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
       margin-bottom: 20px;
     }
     .section-label {
       font-size: 24px;
-      color: #94A3B8;
-      margin-bottom: 12px;
+      color: #475569;
+      margin-bottom: 14px;
       font-weight: 900;
-      display: flex;
-      justify-content: space-between;
-    }
-    .lang-indicator {
-      font-size: 20px;
-      color: #38BDF8;
-      font-weight: bold;
     }
 
     /* 兩兩一排功能格線（2欄設計） */
@@ -146,44 +109,45 @@
       margin-bottom: 20px;
     }
     .cat-box {
-      border: 3px solid transparent;
-      font-size: 25px;
+      border: 4px solid transparent;
+      font-size: 26px;
       font-weight: 900;
-      padding: 16px 8px;
+      padding: 18px 8px;
       border-radius: 18px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 8px;
       text-decoration: none;
       text-align: center;
-      min-height: 110px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      min-height: 115px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
       -webkit-tap-highlight-color: transparent;
+      transition: all 0.2s ease;
     }
-    .cat-box span.icon { font-size: 36px; }
+    .cat-box span.icon { font-size: 38px; }
 
-    /* 各類別專屬色彩 */
-    .cat-med { background-color: #7F1D1D; border-color: #EF4444; color: #FFFFFF; } /* 吃藥-紅 */
-    .cat-hosp { background-color: #1E3A8A; border-color: #3B82F6; color: #FFFFFF; } /* 回診-藍 */
-    .cat-fit { background-color: #14532D; border-color: #22C55E; color: #FFFFFF; } /* 健身-綠 */
-    .cat-daily { background-color: #4C1D95; border-color: #A855F7; color: #FFFFFF; } /* 日常-紫 */
+    /* 四大類別明亮配色（白底鮮字） */
+    .cat-med { background-color: #FFE4E6; border-color: #FDA4AF; color: #BE123C; } /* 吃藥-溫和玫瑰紅 */
+    .cat-hosp { background-color: #E0F2FE; border-color: #BAE6FD; color: #0369A1; } /* 回診-天青藍 */
+    .cat-fit { background-color: #DCFCE7; border-color: #BBF7D0; color: #15803D; } /* 健身-清新綠 */
+    .cat-daily { background-color: #F3E8FF; border-color: #E9D5FF; color: #7E22CE; } /* 日常-典雅紫 */
 
-    /* 選取中的分類邊框 */
+    /* 選取中的分類：強烈外框與微放大 */
     .cat-box.active {
-      outline: 5px solid #38BDF8;
+      outline: 5px solid #0F172A;
       outline-offset: -2px;
       transform: scale(1.02);
-      box-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.25);
     }
 
     /* 外部連結按鈕 */
     .link-box {
-      background-color: #1E293B;
-      border: 3px solid #64748B;
-      color: #F8FAFC;
+      background-color: #F1F5F9;
+      border: 3px solid #CBD5E1;
+      color: #1E293B;
     }
 
     /* 語音與文字輸入列 */
@@ -194,16 +158,16 @@
     }
     .text-input {
       flex: 1;
-      background-color: #0B1320;
-      border: 3px solid #475569;
+      background-color: #F8FAFC;
+      border: 3px solid #CBD5E1;
       border-radius: 14px;
-      color: #FFFFFF;
+      color: #0F172A;
       font-size: 24px;
-      font-weight: 600;
+      font-weight: 700;
       padding: 14px;
       outline: none;
     }
-    .text-input:focus { border-color: #38BDF8; }
+    .text-input:focus { border-color: #0284C7; background-color: #FFFFFF; }
     
     /* 麥克風按鈕 */
     .mic-btn-main {
@@ -217,15 +181,15 @@
       justify-content: center;
       align-items: center;
       cursor: pointer;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
     .mic-btn-main.recording {
-      background: linear-gradient(145deg, #DC2626, #991B1B);
-      border-color: #FCA5A5;
+      background: linear-gradient(145deg, #DC2626, #B91C1C);
+      border-color: #FECACA;
       animation: pulse 1.2s infinite;
     }
     @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.8); }
+      0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.6); }
       70% { box-shadow: 0 0 0 16px rgba(220, 38, 38, 0); }
       100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
     }
@@ -237,64 +201,64 @@
       align-items: center;
       margin-bottom: 18px;
     }
-    .time-label { font-size: 24px; color: #F1F5F9; white-space: nowrap; font-weight: 800; }
+    .time-label { font-size: 24px; color: #334155; white-space: nowrap; font-weight: 800; }
     .time-picker {
-      background-color: #0B1320;
-      border: 3px solid #475569;
+      background-color: #F8FAFC;
+      border: 3px solid #CBD5E1;
       border-radius: 12px;
-      color: #38BDF8;
+      color: #0369A1;
       font-size: 26px;
       font-weight: 800;
       padding: 10px 14px;
       flex: 1;
     }
 
-    /* 記下按鈕：亮珊瑚橘紅 */
+    /* 記下按鈕：沉穩亮藍色 */
     .add-btn {
       width: 100%;
       background: linear-gradient(145deg, #0284C7, #0369A1);
-      border: 3px solid #BAE6FD;
+      border: none;
       color: #FFFFFF;
       font-size: 28px;
       font-weight: 900;
       padding: 16px;
       border-radius: 16px;
       cursor: pointer;
-      box-shadow: 0 6px 16px rgba(2, 132, 199, 0.4);
+      box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35);
     }
 
-    /* 備忘清單卡片 */
+    /* 備忘清單卡片（白底深字，極度清晰） */
     .list-container { width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 14px; }
     .note-card {
-      background-color: #131E31;
-      border: 3px solid #2B4263;
+      background-color: #FFFFFF;
+      border: 3px solid #E2E8F0;
       border-radius: 18px;
       padding: 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     }
     .cat-tag {
-      font-size: 17px;
-      padding: 5px 12px;
+      font-size: 18px;
+      padding: 5px 14px;
       border-radius: 8px;
       font-weight: 900;
       display: inline-block;
       margin-bottom: 8px;
     }
-    .tag-吃藥 { background-color: #DC2626; color: #FFF; }
-    .tag-回診 { background-color: #2563EB; color: #FFF; }
-    .tag-運動健身 { background-color: #16A34A; color: #FFF; }
-    .tag-一般日常 { background-color: #9333EA; color: #FFF; }
+    .tag-吃藥 { background-color: #FFE4E6; color: #BE123C; }
+    .tag-回診 { background-color: #E0F2FE; color: #0369A1; }
+    .tag-運動健身 { background-color: #DCFCE7; color: #15803D; }
+    .tag-一般日常 { background-color: #F3E8FF; color: #7E22CE; }
 
-    .note-text { font-size: 26px; color: #FFFFFF; font-weight: 800; line-height: 1.35; }
-    .note-alarm { font-size: 21px; color: #38BDF8; margin-top: 6px; font-weight: 800; }
+    .note-text { font-size: 26px; color: #0F172A; font-weight: 800; line-height: 1.35; }
+    .note-alarm { font-size: 22px; color: #0284C7; margin-top: 6px; font-weight: 800; }
     
     .card-actions { display: flex; flex-direction: column; gap: 10px; }
-    .btn-speak { background: #334155; border: 2px solid #94A3B8; color: #FFF; padding: 10px 14px; border-radius: 12px; font-size: 19px; font-weight: bold; cursor: pointer; }
-    .btn-del { background: #3F1D24; border: 2px solid #F87171; color: #FCA5A5; padding: 10px 14px; border-radius: 12px; font-size: 19px; font-weight: bold; cursor: pointer; }
+    .btn-speak { background: #F1F5F9; border: 2px solid #CBD5E1; color: #1E293B; padding: 10px 14px; border-radius: 12px; font-size: 19px; font-weight: 800; cursor: pointer; }
+    .btn-del { background: #FFF1F2; border: 2px solid #FECDD3; color: #E11D48; padding: 10px 14px; border-radius: 12px; font-size: 19px; font-weight: 800; cursor: pointer; }
 
     /* 底部廣告欄 */
     .ad-fixed-bottom {
@@ -303,15 +267,15 @@
       left: 0;
       width: 100%;
       height: 60px;
-      background-color: #070D18;
-      border-top: 2px solid #1E293B;
+      background-color: #FFFFFF;
+      border-top: 2px solid #E2E8F0;
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 999;
       font-size: 15px;
       font-weight: bold;
-      color: #94A3B8;
+      color: #64748B;
     }
   </style>
 </head>
@@ -336,41 +300,32 @@
     <h1>美茉莉備忘錄</h1>
   </header>
 
-  <!-- 語言切換區：只留 國語 與 台語 -->
-  <div class="lang-row">
-    <button class="lang-btn active" id="btn-lang-zh" onclick="setLanguage('國語', this)">國語</button>
-    <button class="lang-btn" id="btn-lang-tw" onclick="setLanguage('台語', this)">台語</button>
-  </div>
-
   <div class="app-card">
-    <div class="section-label">
-      <span>1. 點選要記的事情：</span>
-      <span class="lang-indicator" id="current-mode-text">【國語播報中】</span>
-    </div>
+    <div class="section-label">1. 點選要記的事情：</div>
 
     <!-- 兩兩一排高對比功能按鈕 -->
     <div class="category-grid-2x">
       <!-- 第一排：吃藥、回診 -->
-      <button class="cat-box cat-med active" onclick="selectCat('吃藥', '💊', this)">
+      <button class="cat-box cat-med active" onclick="selectCat('吃藥', this)">
         <span class="icon">💊</span>
-        <span id="label-med">吃藥</span>
+        <span>吃藥</span>
       </button>
-      <button class="cat-box cat-hosp" onclick="selectCat('回診', '🏥', this)">
+      <button class="cat-box cat-hosp" onclick="selectCat('回診', this)">
         <span class="icon">🏥</span>
-        <span id="label-hosp">回診</span>
+        <span>回診</span>
       </button>
 
       <!-- 第二排：運動健身、一般日常 -->
-      <button class="cat-box cat-fit" onclick="selectCat('運動健身', '🏃', this)">
+      <button class="cat-box cat-fit" onclick="selectCat('運動健身', this)">
         <span class="icon">🏃</span>
-        <span id="label-fit">運動健身</span>
+        <span>運動健身</span>
       </button>
-      <button class="cat-box cat-daily" onclick="selectCat('一般日常', '📝', this)">
+      <button class="cat-box cat-daily" onclick="selectCat('一般日常', this)">
         <span class="icon">📝</span>
-        <span id="label-daily">一般日常</span>
+        <span>一般日常</span>
       </button>
 
-      <!-- 第三排：居家無障礙空間諮詢（拿掉輔具字樣）、老當益壯 -->
+      <!-- 第三排：居家無障礙空間諮詢、老當益壯 -->
       <a href="tel:0900000000" class="cat-box link-box">
         <span class="icon">🛠️</span>
         <span style="font-size: 21px; line-height: 1.25;">居家無障礙<br>空間諮詢</span>
@@ -383,7 +338,7 @@
 
     <div class="section-label">2. 說話或打字輸入：</div>
     <div class="input-row">
-      <input type="text" id="note-input" class="text-input" placeholder="例如：晚上吃降血壓藥">
+      <input type="text" id="note-input" class="text-input" placeholder="例如：晚上吃降血壓藥一顆">
       <button class="mic-btn-main" id="mic-btn" onclick="toggleRecord()" title="按一下用講的">🎙️</button>
     </div>
 
@@ -392,11 +347,11 @@
       <input type="time" id="alarm-time" class="time-picker">
     </div>
 
-    <button class="add-btn" id="add-btn-label" onclick="addNote()">＋ 記下來並設定提醒</button>
+    <button class="add-btn" onclick="addNote()">＋ 記下來並設定提醒</button>
   </div>
 
   <div class="list-container">
-    <div style="font-size: 26px; color: #F8FAFC; border-bottom: 3px solid #334155; padding-bottom: 8px; font-weight: 900;">
+    <div style="font-size: 26px; color: #0F172A; border-bottom: 3px solid #CBD5E1; padding-bottom: 8px; font-weight: 900;">
       📋 記下的行程清單
     </div>
     <div id="notes-list"></div>
@@ -408,60 +363,22 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'senior_care_notes_v6';
+    const STORAGE_KEY = 'senior_care_notes_v7';
     let currentCategory = '吃藥';
-    let currentLang = '國語';
     let isRecording = false;
     let recognition = null;
     let notifiedIds = new Set();
     let preferredFemaleVoice = null;
 
-    // 1. 雙語專屬提示詞
-    const LANG_PROMPTS = {
-      '國語': {
-        mode: '【國語播報中】',
-        medSelect: '吃藥。請說出要吃什麼藥，或用打字的。',
-        hospSelect: '回診。請說出何時要去看哪一位醫生。',
-        fitSelect: '運動健身。請說出要去哪裡走走或運動。',
-        dailySelect: '一般日常。請說出要記下的事情。',
-        placeholder: '例如：晚上吃降血壓藥一顆',
-        recordStart: '正在聽您說話，請講...',
-        recordError: '沒聽清楚，請再按一次麥克風說話。',
-        saved: '已經幫您記好：',
-        alarm: '時間到了！提醒您，'
-      },
-      '台語': {
-        mode: '【台語播報中】',
-        medSelect: '食藥仔。請講欲食啥物藥，抑是用寫的。',
-        hospSelect: '看醫生。請講佗一工要去病院看醫生。',
-        fitSelect: '運動散步。請講欲去佗位行行散步。',
-        dailySelect: '一般代誌。請講有啥物代誌欲記落來。',
-        placeholder: '例如：暗時愛食血壓藥一粒',
-        recordStart: '有咧聽矣，請大聲講...',
-        recordError: '無聽清楚，請閣按一下麥克風講一擺。',
-        saved: '已經共你記好矣：',
-        alarm: '時間到囉！貼心提醒你，'
-      }
+    // 1. 溫柔女性國語提示語
+    const CATEGORY_PROMPTS = {
+      '吃藥': '吃藥。請說出要吃什麼藥，也可以用寫的。',
+      '回診': '回診。請說出何時要去看哪一位醫生。',
+      '運動健身': '運動健身。請說出要去哪裡走走或運動。',
+      '一般日常': '一般日常。請說出要記下的事情。'
     };
 
-    // 2. 強化台語口語辨識智能映射補正庫
-    const DIALECT_CORRECTIONS = {
-      '食藥': '吃藥', '食藥仔': '吃藥', '食血壓藥': '吃降血壓藥', '呷藥': '吃藥',
-      '看醫生': '回診看醫生', '看病': '回診看病', '病院': '醫院', '醫生館': '診所',
-      '行路': '散步運動', '行行咧': '散步運動', '散步': '散步運動', '運動': '運動健身',
-      '暗時': '晚上', '暝時': '晚上', '下晝': '下午', '早起': '早上', '透早': '清晨早上',
-      '屋下': '家裡', '去街頂': '去街上買東西', '買菜': '去市場買菜', '關火': '關瓦斯火'
-    };
-
-    function correctDialectText(text) {
-      let result = text;
-      for (const [k, v] of Object.entries(DIALECT_CORRECTIONS)) {
-        result = result.replaceAll(k, v);
-      }
-      return result;
-    }
-
-    // 3. 挑選溫柔女性聲音
+    // 2. 鎖定台灣溫柔女聲
     function initVoices() {
       if ('speechSynthesis' in window) {
         const voices = window.speechSynthesis.getVoices();
@@ -476,50 +393,37 @@
       initVoices();
     }
 
-    // 4. 溫柔女性朗讀
+    // 3. 語音朗讀合成（音調微調親切柔和）
     function speak(text) {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const utter = new SpeechSynthesisUtterance(text);
         if (preferredFemaleVoice) utter.voice = preferredFemaleVoice;
         utter.lang = 'zh-TW';
-        utter.rate = 0.85; // 稍慢，適合長輩聆聽
-        utter.pitch = 1.22; // 柔和女聲音調
+        utter.rate = 0.88; // 放慢一點點，長輩聽得最舒服
+        utter.pitch = 1.15; // 柔和女聲音調
         window.speechSynthesis.speak(utter);
       }
     }
 
-    // 5. 切換語言
-    function setLanguage(lang, btn) {
-      currentLang = lang;
-      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      document.getElementById('current-mode-text').innerText = LANG_PROMPTS[lang].mode;
-      document.getElementById('note-input').placeholder = LANG_PROMPTS[lang].placeholder;
-
-      setupSpeechRecognition();
-
-      if (lang === '台語') speak("切換做台語。請點欲記的代誌。");
-      else speak("已設定為國語，請點選要記錄的項目。");
-    }
-
-    // 6. 點選分類：立即以該語言發聲導引
-    function selectCat(cat, icon, btn) {
+    // 4. 點選分類：切換並立即以溫柔女聲導引
+    function selectCat(cat, btn) {
       currentCategory = cat;
       document.querySelectorAll('.cat-box').forEach(b => {
         if (!b.classList.contains('link-box')) b.classList.remove('active');
       });
       btn.classList.add('active');
 
-      const prompts = LANG_PROMPTS[currentLang];
-      if (cat === '吃藥') speak(prompts.medSelect);
-      else if (cat === '回診') speak(prompts.hospSelect);
-      else if (cat === '運動健身') speak(prompts.fitSelect);
-      else if (cat === '一般日常') speak(prompts.dailySelect);
+      const input = document.getElementById('note-input');
+      if (cat === '吃藥') input.placeholder = '例如：晚上吃降血壓藥一顆';
+      else if (cat === '回診') input.placeholder = '例如：下午三點醫院心臟科';
+      else if (cat === '運動健身') input.placeholder = '例如：公園散步三十分鐘';
+      else if (cat === '一般日常') input.placeholder = '例如：買水果、關瓦斯';
+
+      speak(CATEGORY_PROMPTS[cat]);
     }
 
-    // 7. 高精準語音辨識
+    // 5. 語音辨識（純國語繁體高準度辨識）
     function setupSpeechRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) return;
@@ -527,21 +431,20 @@
       recognition = new SpeechRecognition();
       recognition.continuous = false;
       recognition.interimResults = false;
-      recognition.lang = 'zh-TW';
+      recognition.lang = 'zh-TW'; // 鎖定台灣繁體中文，辨識率最高
 
       recognition.onstart = () => {
         isRecording = true;
         const mic = document.getElementById('mic-btn');
         mic.classList.add('recording');
         mic.innerText = '🔴';
-        speak(LANG_PROMPTS[currentLang].recordStart);
+        speak("正在聽您說話，請講。");
       };
 
       recognition.onresult = (e) => {
-        let rawText = e.results[0][0].transcript.trim();
-        let finalText = correctDialectText(rawText);
-        document.getElementById('note-input').value = finalText;
-        speak(`聽到了：${finalText}`);
+        const text = e.results[0][0].transcript.trim();
+        document.getElementById('note-input').value = text;
+        speak(`聽到了：${text}`);
       };
 
       recognition.onend = () => {
@@ -556,7 +459,7 @@
         const mic = document.getElementById('mic-btn');
         mic.classList.remove('recording');
         mic.innerText = '🎙️';
-        speak(LANG_PROMPTS[currentLang].recordError);
+        speak("沒聽清楚，請再按一次麥克風說話。");
       };
     }
     setupSpeechRecognition();
@@ -570,14 +473,14 @@
       }
     }
 
-    // 8. 儲存與新增備忘錄
+    // 6. 儲存與新增備忘錄
     function addNote() {
       const input = document.getElementById('note-input');
       const timeInput = document.getElementById('alarm-time');
       const text = input.value.trim();
 
       if (!text) {
-        speak(currentLang === '台語' ? "請先講話抑是寫字。" : "請先說話或輸入內容。");
+        speak("請先說話或輸入內容。");
         return;
       }
 
@@ -597,7 +500,7 @@
       timeInput.value = '';
       render();
 
-      const confirmMsg = `${LANG_PROMPTS[currentLang].saved}${newNote.category}，${newNote.text}`;
+      const confirmMsg = `已經幫您記好：${newNote.category}，${newNote.text}`;
       speak(confirmMsg);
     }
 
@@ -616,7 +519,7 @@
       const notes = getNotes();
 
       if (notes.length === 0) {
-        listEl.innerHTML = '<div style="color:#94A3B8; text-align:center; margin-top:20px; font-size:24px; font-weight:bold;">目前沒有任何備忘事項</div>';
+        listEl.innerHTML = '<div style="color:#64748B; text-align:center; margin-top:20px; font-size:24px; font-weight:bold;">目前沒有任何備忘事項</div>';
         return;
       }
 
@@ -635,7 +538,7 @@
       `).join('');
     }
 
-    // 9. 即時時鐘與鬧鐘偵測
+    // 7. 即時時鐘與鬧鐘
     function updateClock() {
       const now = new Date();
       const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
@@ -657,7 +560,7 @@
           const alarmKey = `${note.id}-${currentHHMM}`;
           if (!notifiedIds.has(alarmKey)) {
             notifiedIds.add(alarmKey);
-            const msg = `${LANG_PROMPTS[currentLang].alarm}${note.category}：${note.text}`;
+            const msg = `時間到了！提醒您，${note.category}：${note.text}`;
             speak(msg);
             alert(`【美茉莉提醒您】\n\n類別：${note.category}\n內容：${note.text}`);
           }
@@ -667,7 +570,7 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // 10. 即時天氣載入
+    // 8. 即時天氣
     function fetchWeather(lat = 25.04, lon = 121.28) {
       fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
         .then(res => res.json())
