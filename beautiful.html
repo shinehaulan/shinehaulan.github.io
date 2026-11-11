@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <!-- 測試階段防爬蟲收錄：禁止 Google 及所有搜尋引擎搜尋到本頁 -->
+  <!-- 測試階段防爬蟲收錄 -->
   <meta name="robots" content="noindex, nofollow">
-  <!-- 強制淺色護眼模式，防止瀏覽器暗黑模式反黑 -->
+  <!-- 強制淺色護眼模式 -->
   <meta name="color-scheme" content="light only">
   <title>美茉莉 - 銀髮備忘錄</title>
   <style>
@@ -19,7 +19,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
     }
 
-    /* 暖燕麥米白護眼底色：溫潤不反光、高對比易讀 */
+    /* 暖燕麥米白護眼底色 */
     body {
       background-color: #F5F1EB !important;
       color: #0F172A !important;
@@ -30,7 +30,7 @@
       padding: 14px 14px 90px 14px;
     }
 
-    /* 頂部看板：深沉雅致深藍底，襯托清晰白色大字 */
+    /* 頂部看板 */
     .dashboard-card {
       width: 100%;
       max-width: 520px;
@@ -81,72 +81,25 @@
       letter-spacing: 1px;
     }
 
-    /* 主副標題設計 */
-    header { text-align: center; margin-bottom: 14px; }
+    /* 主副標題設計：美茉莉改綠色、銀髮備忘錄改銀色 */
+    header { text-align: center; margin-bottom: 16px; }
     h1 {
-      font-size: 42px;
-      color: #0F172A;
-      letter-spacing: 2px;
+      font-size: 44px;
+      color: #10B981; /* 活力翡翠綠 */
+      letter-spacing: 3px;
       font-weight: 900;
       line-height: 1.15;
+      text-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
     }
     .sub-title {
-      font-size: 24px;
-      color: #475569;
-      font-weight: 800;
-      letter-spacing: 3px;
+      font-size: 26px;
+      color: #94A3B8; /* 典雅金屬銀色 */
+      font-weight: 900;
+      letter-spacing: 4px;
       margin-top: 4px;
     }
 
-    /* 兒女專線卡片 */
-    .family-box {
-      width: 100%;
-      max-width: 520px;
-      background-color: #FFFFFF;
-      border: 3px solid #0284C7;
-      border-radius: 18px;
-      padding: 14px 18px;
-      margin-bottom: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.15);
-    }
-    .family-title {
-      font-size: 22px;
-      color: #0369A1;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .family-actions {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-    .call-child-btn {
-      background-color: #0284C7;
-      color: #FFFFFF;
-      font-size: 20px;
-      font-weight: 900;
-      padding: 10px 16px;
-      border-radius: 12px;
-      text-decoration: none;
-      box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3);
-    }
-    .set-child-btn {
-      background-color: #F1F5F9;
-      border: 2px solid #CBD5E1;
-      color: #475569;
-      font-size: 16px;
-      font-weight: bold;
-      padding: 10px 10px;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-
-    /* 主操作卡片 */
+    /* 區塊卡片共通樣式 */
     .app-card {
       width: 100%;
       max-width: 520px;
@@ -154,7 +107,7 @@
       border: 3px solid #E2E8F0;
       border-radius: 22px;
       padding: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
       margin-bottom: 20px;
     }
     .section-label {
@@ -164,12 +117,12 @@
       font-weight: 900;
     }
 
-    /* 兩兩一排功能格線（2欄設計） */
+    /* 2 欄按鈕格線 */
     .category-grid-2x {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 14px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
     .cat-box {
       border: 4px solid transparent;
@@ -192,18 +145,13 @@
     }
     .cat-box span.icon { font-size: 36px; }
 
-    /* 各類別專屬色彩 */
+    /* 備忘錄四大類色彩 */
     .cat-med { background-color: #FFE4E6; border-color: #FDA4AF; color: #BE123C; }
     .cat-hosp { background-color: #E0F2FE; border-color: #BAE6FD; color: #0369A1; }
     .cat-fit { background-color: #DCFCE7; border-color: #BBF7D0; color: #15803D; }
     .cat-daily { background-color: #F3E8FF; border-color: #E9D5FF; color: #7E22CE; }
 
-    /* 娛樂與學習類別色彩 */
-    .cat-sing { background-color: #FFF7ED; border-color: #FED7AA; color: #C2410C; }
-    .cat-laugh { background-color: #FEF9C3; border-color: #FDE047; color: #A16207; }
-    .cat-fraud { background-color: #FEE2E2; border-color: #FCA5A5; color: #991B1B; } /* 警示防詐紅 */
-    .cat-nou { background-color: #E0E7FF; border-color: #C7D2FE; color: #3730A3; } /* 空大知性靛藍 */
-
+    /* 備忘項目選中樣式 */
     .cat-box.active {
       outline: 5px solid #0F172A;
       outline-offset: -2px;
@@ -211,13 +159,14 @@
       box-shadow: 0 6px 18px rgba(15, 23, 42, 0.2);
     }
 
-    .link-box {
-      background-color: #F8FAFC;
-      border: 3px solid #CBD5E1;
-      color: #1E293B;
-    }
+    /* 娛樂與樂活服務色彩 */
+    .cat-sing { background-color: #FFF7ED; border-color: #FED7AA; color: #C2410C; }
+    .cat-laugh { background-color: #FEF9C3; border-color: #FDE047; color: #A16207; }
+    .cat-fraud { background-color: #FEE2E2; border-color: #FCA5A5; color: #991B1B; }
+    .cat-nou { background-color: #E0E7FF; border-color: #C7D2FE; color: #3730A3; }
+    .link-box { background-color: #F8FAFC; border: 3px solid #CBD5E1; color: #1E293B; }
 
-    /* 語音與文字輸入列 */
+    /* 輸入區 */
     .input-row {
       display: flex;
       gap: 10px;
@@ -236,7 +185,6 @@
     }
     .text-input:focus { border-color: #0284C7; background-color: #FFFFFF; }
     
-    /* 麥克風按鈕 */
     .mic-btn-main {
       width: 80px;
       background: linear-gradient(145deg, #16A34A, #15803D);
@@ -271,7 +219,7 @@
       text-align: center;
     }
 
-    /* 時間提醒欄位 */
+    /* 時間提醒與記下 */
     .time-row {
       display: flex;
       gap: 12px;
@@ -378,23 +326,11 @@
     <div class="sub-title">銀髮備忘錄</div>
   </header>
 
-  <!-- 兒女專線連線區 -->
-  <div class="family-box">
-    <div class="family-title">
-      <span>👨‍👩‍👧 兒女聯絡專線</span>
-    </div>
-    <div class="family-actions">
-      <a href="tel:0900000000" id="child-call-link" class="call-child-btn">📞 打電話</a>
-      <button class="set-child-btn" onclick="setChildPhone()">⚙️ 設號碼</button>
-    </div>
-  </div>
-
+  <!-- 區塊一：長輩日常備忘（吃藥、回診、運動健身、一般日常） -->
   <div class="app-card">
-    <div class="section-label">1. 點選要記的事情：</div>
+    <div class="section-label">📌 點選要記的事情：</div>
 
-    <!-- 兩兩一排功能按鈕 -->
     <div class="category-grid-2x">
-      <!-- 第一排：吃藥、回診 -->
       <button class="cat-box cat-med active" onclick="selectCat('吃藥', this)">
         <span class="icon">💊</span>
         <span>吃藥</span>
@@ -403,8 +339,6 @@
         <span class="icon">🏥</span>
         <span>回診</span>
       </button>
-
-      <!-- 第二排：運動健身、一般日常 -->
       <button class="cat-box cat-fit" onclick="selectCat('運動健身', this)">
         <span class="icon">🏃</span>
         <span>運動健身</span>
@@ -413,39 +347,9 @@
         <span class="icon">📝</span>
         <span>一般日常</span>
       </button>
-
-      <!-- 第三排：每日一唱、每日一笑 -->
-      <a href="https://www.youtube.com/results?search_query=%E5%9C%8B%E8%AA%9E%E8%80%81%E6%AD%8C+%E5%8D%A1%E6%8B%89OK+%E4%BC%B4%E5%94%B1" target="_blank" rel="noopener noreferrer" class="cat-box cat-sing">
-        <span class="icon">🎤</span>
-        <span>每日一唱</span>
-      </a>
-      <a href="https://www.youtube.com/results?search_query=%E5%8F%B0%E7%81%A3%E7%AC%91%E8%A9%B1+%E5%B9%BD%E9%BB%98%E7%9F%AD%E5%8A%87+%E6%90%9E%E7%AC%91" target="_blank" rel="noopener noreferrer" class="cat-box cat-laugh">
-        <span class="icon">😄</span>
-        <span>每日一笑</span>
-      </a>
-
-      <!-- 第四排：每日一唱下方放防詐騙、每日一笑下方放空中大學 -->
-      <a href="tel:165" class="cat-box cat-fraud">
-        <span class="icon">🛡️</span>
-        <span style="font-size: 21px; line-height: 1.25;">防詐騙提醒<br>(直撥 165)</span>
-      </a>
-      <a href="https://www.nou.edu.tw" target="_blank" rel="noopener noreferrer" class="cat-box cat-nou">
-        <span class="icon">🎓</span>
-        <span style="font-size: 20px; line-height: 1.25;">活到老學到老<br>(空中大學)</span>
-      </a>
-
-      <!-- 第五排：居家無障礙空間諮詢、老當益壯 -->
-      <a href="tel:0900000000" class="cat-box link-box">
-        <span class="icon">🛠️</span>
-        <span style="font-size: 21px; line-height: 1.25;">居家無障礙<br>空間諮詢</span>
-      </a>
-      <a href="https://45plus.wda.gov.tw" target="_blank" rel="noopener noreferrer" class="cat-box link-box">
-        <span class="icon">💼</span>
-        <span style="font-size: 21px; line-height: 1.25;">老當益壯<br>(中高齡就業)</span>
-      </a>
     </div>
 
-    <div class="section-label">2. 說話或打字輸入：</div>
+    <div class="section-label" style="font-size: 21px; margin-top: 8px;">說話或打字輸入：</div>
     <div class="input-row">
       <input type="text" id="note-input" class="text-input" placeholder="例如：晚上吃降血壓藥一顆">
       <button class="mic-btn-main" id="mic-btn" onclick="toggleRecord()" title="按一下用講的">🎙️</button>
@@ -458,6 +362,53 @@
     </div>
 
     <button class="add-btn" onclick="addNote()">＋ 記下來並設定提醒</button>
+  </div>
+
+  <!-- 區塊二：銀髮樂活與實用服務（獨立卡片） -->
+  <div class="app-card">
+    <div class="section-label">🌸 銀髮樂活與生活服務：</div>
+
+    <div class="category-grid-2x">
+      <!-- 每日一唱 -->
+      <a href="https://www.youtube.com/results?search_query=%E5%9C%8B%E8%AA%9E%E8%80%81%E6%AD%8C+%E5%8D%A1%E6%8B%89OK+%E4%BC%B4%E5%94%B1" target="_blank" rel="noopener noreferrer" class="cat-box cat-sing">
+        <span class="icon">🎤</span>
+        <span>每日一唱</span>
+      </a>
+
+      <!-- 每日一笑（幽默相聲、脫口秀、短劇精選） -->
+      <a href="https://www.youtube.com/results?search_query=%E7%9B%B8%E8%81%B2%E7%B2%BE%E9%81%B8+%E5%B9%BD%E9%BB%98%E5%96%9C%E5%8A%87+%E9%80%97%E7%AC%91%E7%9F%AD%E7%89%87" target="_blank" rel="noopener noreferrer" class="cat-box cat-laugh">
+        <span class="icon">😄</span>
+        <span>每日一笑</span>
+      </a>
+
+      <!-- 防詐騙提醒：直連 165 官方網頁 -->
+      <a href="https://165.npa.gov.tw" target="_blank" rel="noopener noreferrer" class="cat-box cat-fraud">
+        <span class="icon">🛡️</span>
+        <span style="font-size: 21px; line-height: 1.25;">防詐騙提醒<br>(165 官網)</span>
+      </a>
+
+      <!-- 活到老學到老：直連空中大學 -->
+      <a href="https://www.nou.edu.tw" target="_blank" rel="noopener noreferrer" class="cat-box cat-nou">
+        <span class="icon">🎓</span>
+        <span style="font-size: 20px; line-height: 1.25;">活到老學到老<br>(空中大學)</span>
+      </a>
+
+      <!-- 居家無障礙空間諮詢：直連店家地圖與粉絲頁 -->
+      <div class="cat-box link-box" style="padding: 10px 4px;">
+        <span class="icon" style="font-size: 28px;">🛠️</span>
+        <span style="font-size: 19px; line-height: 1.2; margin-bottom: 6px;">居家無障礙<br>空間諮詢</span>
+        <div style="display: flex; gap: 6px; width: 100%; justify-content: center;">
+          <a href="https://maps.app.goo.gl/tiNDgm5CQbmy8PhT7?g_st=al" target="_blank" rel="noopener noreferrer" style="background:#0284C7; color:#FFF; font-size:15px; font-weight:bold; padding:4px 8px; border-radius:6px; text-decoration:none;">地圖</a>
+          <a href="https://www.facebook.com/share/1DvCdVuFQJ/" target="_blank" rel="noopener noreferrer" style="background:#1877F2; color:#FFF; font-size:15px; font-weight:bold; padding:4px 8px; border-radius:6px; text-decoration:none;">臉書</a>
+        </div>
+      </div>
+
+      <!-- 老當益壯：中高齡就業 -->
+      <a href="https://45plus.wda.gov.tw" target="_blank" rel="noopener noreferrer" class="cat-box link-box">
+        <span class="icon">💼</span>
+        <span style="font-size: 21px; line-height: 1.25;">老當益壯<br>(中高齡就業)</span>
+      </a>
+    </div>
   </div>
 
   <div class="list-container">
@@ -473,8 +424,7 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'senior_care_notes_v11';
-    const CHILD_PHONE_KEY = 'senior_child_phone_v1';
+    const STORAGE_KEY = 'senior_care_notes_v12';
     let currentCategory = '吃藥';
     let isRecording = false;
     let recognition = null;
@@ -483,7 +433,6 @@
     let recordTimer = null;
     let countdownSec = 10;
 
-    // 安全防護：XSS 字串跳脫函式
     function escapeHtml(str) {
       if (!str) return '';
       return String(str)
@@ -494,24 +443,7 @@
         .replace(/'/g, '&#39;');
     }
 
-    // 1. 初始化兒女電話
-    function loadChildPhone() {
-      const savedPhone = localStorage.getItem(CHILD_PHONE_KEY) || '0900000000';
-      document.getElementById('child-call-link').href = `tel:${savedPhone}`;
-    }
-
-    function setChildPhone() {
-      const current = localStorage.getItem(CHILD_PHONE_KEY) || '';
-      const phone = prompt("請輸入子女的手機或電話號碼：", current);
-      if (phone !== null && phone.trim() !== '') {
-        const cleanPhone = phone.trim().replace(/[^0-9]/g, '');
-        localStorage.setItem(CHILD_PHONE_KEY, cleanPhone);
-        loadChildPhone();
-        alert("子女電話已成功儲存！");
-      }
-    }
-
-    // 2. 溫柔女性國語提示語
+    // 1. 溫柔女性國語提示
     const CATEGORY_PROMPTS = {
       '吃藥': '吃藥。請說出要吃什麼藥，也可以用寫的。',
       '回診': '回診。請說出何時要去看哪一位醫生。',
@@ -545,13 +477,11 @@
       }
     }
 
-    // 3. 點選分類
+    // 2. 點選分類
     function selectCat(cat, btn) {
       currentCategory = cat;
-      document.querySelectorAll('.cat-box').forEach(b => {
-        if (!b.classList.contains('link-box') && !b.classList.contains('cat-sing') && !b.classList.contains('cat-laugh') && !b.classList.contains('cat-fraud') && !b.classList.contains('cat-nou')) {
-          b.classList.remove('active');
-        }
+      document.querySelectorAll('.app-card:first-of-type .cat-box').forEach(b => {
+        b.classList.remove('active');
       });
       btn.classList.add('active');
 
@@ -564,7 +494,7 @@
       speak(CATEGORY_PROMPTS[cat]);
     }
 
-    // 4. 語音辨識（加長秒數）
+    // 3. 語音辨識
     function setupSpeechRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) return;
@@ -647,7 +577,7 @@
       }, 2500);
     }
 
-    // 5. 儲存與新增備忘錄
+    // 4. 儲存與新增備忘錄
     function addNote() {
       const input = document.getElementById('note-input');
       const timeInput = document.getElementById('alarm-time');
@@ -688,7 +618,7 @@
       render();
     }
 
-    // 6. 渲染備忘錄清單
+    // 5. 渲染備忘錄清單
     function render() {
       const listEl = document.getElementById('notes-list');
       const notes = getNotes();
@@ -724,7 +654,7 @@
       }).join('');
     }
 
-    // 7. 即時時鐘與鬧鐘
+    // 6. 即時時鐘與鬧鐘
     function updateClock() {
       const now = new Date();
       const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
@@ -756,7 +686,7 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // 8. 即時天氣
+    // 7. 即時天氣
     function fetchWeather(lat = 25.04, lon = 121.28) {
       fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
         .then(res => res.json())
@@ -794,7 +724,6 @@
       fetchWeather();
     }
 
-    loadChildPhone();
     render();
   </script>
 </body>
