@@ -192,15 +192,17 @@
     }
     .cat-box span.icon { font-size: 36px; }
 
-    /* 四大類別專屬色彩 */
+    /* 各類別專屬色彩 */
     .cat-med { background-color: #FFE4E6; border-color: #FDA4AF; color: #BE123C; }
     .cat-hosp { background-color: #E0F2FE; border-color: #BAE6FD; color: #0369A1; }
     .cat-fit { background-color: #DCFCE7; border-color: #BBF7D0; color: #15803D; }
     .cat-daily { background-color: #F3E8FF; border-color: #E9D5FF; color: #7E22CE; }
 
-    /* 每日一唱 / 每日一笑 娛樂色彩 */
+    /* 娛樂與學習類別色彩 */
     .cat-sing { background-color: #FFF7ED; border-color: #FED7AA; color: #C2410C; }
     .cat-laugh { background-color: #FEF9C3; border-color: #FDE047; color: #A16207; }
+    .cat-fraud { background-color: #FEE2E2; border-color: #FCA5A5; color: #991B1B; } /* 警示防詐紅 */
+    .cat-nou { background-color: #E0E7FF; border-color: #C7D2FE; color: #3730A3; } /* 空大知性靛藍 */
 
     .cat-box.active {
       outline: 5px solid #0F172A;
@@ -412,7 +414,7 @@
         <span>一般日常</span>
       </button>
 
-      <!-- 第三排：每日一唱、每日一笑（加強安全防護標籤） -->
+      <!-- 第三排：每日一唱、每日一笑 -->
       <a href="https://www.youtube.com/results?search_query=%E5%9C%8B%E8%AA%9E%E8%80%81%E6%AD%8C+%E5%8D%A1%E6%8B%89OK+%E4%BC%B4%E5%94%B1" target="_blank" rel="noopener noreferrer" class="cat-box cat-sing">
         <span class="icon">🎤</span>
         <span>每日一唱</span>
@@ -422,7 +424,17 @@
         <span>每日一笑</span>
       </a>
 
-      <!-- 第四排：居家無障礙空間諮詢、老當益壯 -->
+      <!-- 第四排：每日一唱下方放防詐騙、每日一笑下方放空中大學 -->
+      <a href="tel:165" class="cat-box cat-fraud">
+        <span class="icon">🛡️</span>
+        <span style="font-size: 21px; line-height: 1.25;">防詐騙提醒<br>(直撥 165)</span>
+      </a>
+      <a href="https://www.nou.edu.tw" target="_blank" rel="noopener noreferrer" class="cat-box cat-nou">
+        <span class="icon">🎓</span>
+        <span style="font-size: 20px; line-height: 1.25;">活到老學到老<br>(空中大學)</span>
+      </a>
+
+      <!-- 第五排：居家無障礙空間諮詢、老當益壯 -->
       <a href="tel:0900000000" class="cat-box link-box">
         <span class="icon">🛠️</span>
         <span style="font-size: 21px; line-height: 1.25;">居家無障礙<br>空間諮詢</span>
@@ -461,7 +473,7 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'senior_care_notes_v10';
+    const STORAGE_KEY = 'senior_care_notes_v11';
     const CHILD_PHONE_KEY = 'senior_child_phone_v1';
     let currentCategory = '吃藥';
     let isRecording = false;
@@ -471,7 +483,7 @@
     let recordTimer = null;
     let countdownSec = 10;
 
-    // 安全防護：XSS 字串跳脫函式，防止惡意代碼注入
+    // 安全防護：XSS 字串跳脫函式
     function escapeHtml(str) {
       if (!str) return '';
       return String(str)
@@ -537,7 +549,7 @@
     function selectCat(cat, btn) {
       currentCategory = cat;
       document.querySelectorAll('.cat-box').forEach(b => {
-        if (!b.classList.contains('link-box') && !b.classList.contains('cat-sing') && !b.classList.contains('cat-laugh')) {
+        if (!b.classList.contains('link-box') && !b.classList.contains('cat-sing') && !b.classList.contains('cat-laugh') && !b.classList.contains('cat-fraud') && !b.classList.contains('cat-nou')) {
           b.classList.remove('active');
         }
       });
@@ -676,7 +688,7 @@
       render();
     }
 
-    // 6. 渲染備忘錄清單（附帶安全轉義防護）
+    // 6. 渲染備忘錄清單
     function render() {
       const listEl = document.getElementById('notes-list');
       const notes = getNotes();
