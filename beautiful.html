@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <!-- 測試階段防爬蟲收錄：禁止 Google 及所有搜尋引擎搜尋到本頁 -->
+  <meta name="robots" content="noindex, nofollow">
+  <!-- 強制淺色護眼模式，防止瀏覽器暗黑模式反黑 -->
   <meta name="color-scheme" content="light only">
   <title>美茉莉 - 銀髮備忘錄</title>
   <style>
@@ -16,7 +19,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
     }
 
-    /* 護眼暖燕麥米白底色：溫潤不反光、高對比易讀 */
+    /* 暖燕麥米白護眼底色：溫潤不反光、高對比易讀 */
     body {
       background-color: #F5F1EB !important;
       color: #0F172A !important;
@@ -196,8 +199,8 @@
     .cat-daily { background-color: #F3E8FF; border-color: #E9D5FF; color: #7E22CE; }
 
     /* 每日一唱 / 每日一笑 娛樂色彩 */
-    .cat-sing { background-color: #FFF7ED; border-color: #FED7AA; color: #C2410C; } /* 溫暖橘紅 */
-    .cat-laugh { background-color: #FEF9C3; border-color: #FDE047; color: #A16207; } /* 開心明黃 */
+    .cat-sing { background-color: #FFF7ED; border-color: #FED7AA; color: #C2410C; }
+    .cat-laugh { background-color: #FEF9C3; border-color: #FDE047; color: #A16207; }
 
     .cat-box.active {
       outline: 5px solid #0F172A;
@@ -324,7 +327,7 @@
     .tag-運動健身 { background-color: #DCFCE7; color: #15803D; }
     .tag-一般日常 { background-color: #F3E8FF; color: #7E22CE; }
 
-    .note-text { font-size: 26px; color: #0F172A; font-weight: 800; line-height: 1.35; }
+    .note-text { font-size: 26px; color: #0F172A; font-weight: 800; line-height: 1.35; word-break: break-all; }
     .note-alarm { font-size: 22px; color: #0284C7; margin-top: 6px; font-weight: 800; }
     
     .card-actions { display: flex; flex-direction: column; gap: 8px; min-width: 110px; }
@@ -409,12 +412,12 @@
         <span>一般日常</span>
       </button>
 
-      <!-- 第三排：運動健身下方放「每日一唱」、一般日常下方放「每日一笑」 -->
-      <a href="https://www.youtube.com/results?search_query=%E5%9C%8B%E8%AA%9E%E8%80%81%E6%AD%8C+%E5%8D%A1%E6%8B%89OK+%E4%BC%B4%E5%94%B1" target="_blank" class="cat-box cat-sing">
+      <!-- 第三排：每日一唱、每日一笑（加強安全防護標籤） -->
+      <a href="https://www.youtube.com/results?search_query=%E5%9C%8B%E8%AA%9E%E8%80%81%E6%AD%8C+%E5%8D%A1%E6%8B%89OK+%E4%BC%B4%E5%94%B1" target="_blank" rel="noopener noreferrer" class="cat-box cat-sing">
         <span class="icon">🎤</span>
         <span>每日一唱</span>
       </a>
-      <a href="https://www.youtube.com/results?search_query=%E5%8F%B0%E7%81%A3%E7%AC%91%E8%A9%B1+%E5%B9%BD%E9%BB%98%E7%9F%AD%E5%8A%87+%E6%90%9E%E7%AC%91" target="_blank" class="cat-box cat-laugh">
+      <a href="https://www.youtube.com/results?search_query=%E5%8F%B0%E7%81%A3%E7%AC%91%E8%A9%B1+%E5%B9%BD%E9%BB%98%E7%9F%AD%E5%8A%87+%E6%90%9E%E7%AC%91" target="_blank" rel="noopener noreferrer" class="cat-box cat-laugh">
         <span class="icon">😄</span>
         <span>每日一笑</span>
       </a>
@@ -424,7 +427,7 @@
         <span class="icon">🛠️</span>
         <span style="font-size: 21px; line-height: 1.25;">居家無障礙<br>空間諮詢</span>
       </a>
-      <a href="https://45plus.wda.gov.tw" target="_blank" class="cat-box link-box">
+      <a href="https://45plus.wda.gov.tw" target="_blank" rel="noopener noreferrer" class="cat-box link-box">
         <span class="icon">💼</span>
         <span style="font-size: 21px; line-height: 1.25;">老當益壯<br>(中高齡就業)</span>
       </a>
@@ -467,6 +470,17 @@
     let preferredFemaleVoice = null;
     let recordTimer = null;
     let countdownSec = 10;
+
+    // 安全防護：XSS 字串跳脫函式，防止惡意代碼注入
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
 
     // 1. 初始化兒女電話
     function loadChildPhone() {
@@ -662,7 +676,7 @@
       render();
     }
 
-    // 6. 渲染備忘錄清單
+    // 6. 渲染備忘錄清單（附帶安全轉義防護）
     function render() {
       const listEl = document.getElementById('notes-list');
       const notes = getNotes();
@@ -673,19 +687,24 @@
       }
 
       listEl.innerHTML = notes.map(n => {
+        const safeText = escapeHtml(n.text);
+        const safeCategory = escapeHtml(n.category);
+        const safeTime = escapeHtml(n.time);
+        const safeDate = escapeHtml(n.createdDate);
+
         const lineMsg = encodeURIComponent(`【美茉莉備忘提醒】\n事項：${n.category} - ${n.text}\n時間：${n.time ? n.time : n.createdDate}`);
         const lineUrl = `https://line.me/R/msg/text/?${lineMsg}`;
 
         return `
           <div class="note-card">
             <div style="flex:1;">
-              <span class="cat-tag tag-${n.category}">${n.category}</span>
-              <div class="note-text">${n.text}</div>
-              <div class="note-alarm">${n.time ? '⏰ 提醒：' + n.time : '📅 記於：' + n.createdDate}</div>
+              <span class="cat-tag tag-${safeCategory}">${safeCategory}</span>
+              <div class="note-text">${safeText}</div>
+              <div class="note-alarm">${safeTime ? '⏰ 提醒：' + safeTime : '📅 記於：' + safeDate}</div>
             </div>
             <div class="card-actions">
-              <button class="btn-speak" onclick="speak('${n.category}提醒：${n.text}')">🔊 念出</button>
-              <a href="${lineUrl}" target="_blank" class="btn-line">📲 LINE兒女</a>
+              <button class="btn-speak" onclick="speak('${safeCategory}提醒：${safeText}')">🔊 念出</button>
+              <a href="${lineUrl}" target="_blank" rel="noopener noreferrer" class="btn-line">📲 LINE兒女</a>
               <button class="btn-del" onclick="deleteNote(${n.id})">刪除</button>
             </div>
           </div>
