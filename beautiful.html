@@ -190,7 +190,7 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     }
 
-    /* 輸入區（修正寬度防溢出） */
+    /* 輸入區 */
     .sub-input-label {
       font-size: 22px;
       color: #334155;
@@ -425,7 +425,7 @@
         <span style="font-size: 24px; line-height: 1.25;">終身學習<br><span style="font-size: 19px;">(空中大學)</span></span>
       </a>
 
-      <!-- 第三排：居家無障礙空間諮詢（地圖/臉書上下排列放大）、老當益壯 -->
+      <!-- 第三排：居家無障礙空間諮詢、老當益壯 -->
       <div class="cat-box link-box" style="padding: 14px 6px;">
         <span class="icon" style="font-size: 32px;">🛠️</span>
         <span style="font-size: 20px; line-height: 1.25; margin-bottom: 4px;">居家無障礙<br>空間諮詢</span>
@@ -462,14 +462,15 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'senior_care_notes_v13';
+    const STORAGE_KEY = 'senior_care_notes_v14';
     let currentCategory = '吃藥';
     let isRecording = false;
     let recognition = null;
     let notifiedIds = new Set();
     let preferredFemaleVoice = null;
     let recordTimer = null;
-    let countdownSec = 15; // 延長為 15 秒
+    let countdownSec = 15;
+    let finalTranscriptBuffer = ''; // 儲存已確定的語音句子，徹底避免手機瀏覽器重複疊字
 
     function escapeHtml(str) {
       if (!str) return '';
@@ -532,7 +533,7 @@
       speak(CATEGORY_PROMPTS[cat]);
     }
 
-    // 3. 語音辨識（15 秒充裕錄音時間）
+    // 3. 語音辨識（修正手機 Chrome 重複疊字 Bug + 15 秒從容錄音）
     function setupSpeechRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) return;
@@ -544,6 +545,7 @@
 
       recognition.onstart = () => {
         isRecording = true;
+        finalTranscriptBuffer = ''; // 每次開始錄音清空暫存
         const mic = document.getElementById('mic-btn');
         mic.classList.add('recording');
         mic.innerText = '🔴';
@@ -563,12 +565,22 @@
       };
 
       recognition.onresult = (e) => {
-        let resultText = '';
-        for (let i = 0; i < e.results.length; i++) {
-          resultText += e.results[i][0].transcript;
+        let interimTranscript = '';
+        // 僅從 resultIndex 開始讀取最新段落，避免從頭重覆累加舊字句
+        for (let i = e.resultIndex; i < e.results.length; ++i) {
+          const transcript = e.results[i][0].transcript;
+          if (e.results[i].isFinal) {
+            // 過濾手機瀏覽器偶發送出完全相同的重複段落
+            if (!finalTranscriptBuffer.endsWith(transcript.trim())) {
+              finalTranscriptBuffer += transcript;
+            }
+          } else {
+            interimTranscript += transcript;
+          }
         }
-        if (resultText.trim()) {
-          document.getElementById('note-input').value = resultText.trim();
+        const combined = (finalTranscriptBuffer + interimTranscript).trim();
+        if (combined) {
+          document.getElementById('note-input').value = combined;
         }
       };
 
@@ -589,6 +601,7 @@
         stopRecord();
       } else {
         document.getElementById('mic-tip').innerText = '';
+        document.getElementById('note-input').value = ''; // 重新錄音時清空舊框內容
         try {
           recognition.start();
         } catch (e) {
