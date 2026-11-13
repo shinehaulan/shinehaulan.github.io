@@ -81,22 +81,23 @@
       letter-spacing: 1px;
     }
 
-    /* 主副標題設計：美茉莉改綠色、銀髮備忘錄改銀色 */
+    /* 主副標題設計：美茉莉用綠色、銀髮備忘錄用銀色且字體放大 */
     header { text-align: center; margin-bottom: 16px; }
     h1 {
-      font-size: 44px;
-      color: #10B981; /* 活力翡翠綠 */
+      font-size: 46px;
+      color: #10B981;
       letter-spacing: 3px;
       font-weight: 900;
       line-height: 1.15;
       text-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
     }
     .sub-title {
-      font-size: 26px;
-      color: #94A3B8; /* 典雅金屬銀色 */
+      font-size: 32px;
+      color: #94A3B8;
       font-weight: 900;
       letter-spacing: 4px;
-      margin-top: 4px;
+      margin-top: 6px;
+      text-shadow: 0 1px 2px rgba(15, 23, 42, 0.15);
     }
 
     /* 區塊卡片共通樣式 */
@@ -106,15 +107,16 @@
       background-color: #FFFFFF;
       border: 3px solid #E2E8F0;
       border-radius: 22px;
-      padding: 20px;
+      padding: 18px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.06);
       margin-bottom: 20px;
     }
     .section-label {
-      font-size: 24px;
-      color: #334155;
+      font-size: 28px;
+      color: #1E293B;
       margin-bottom: 14px;
       font-weight: 900;
+      text-align: center;
     }
 
     /* 2 欄按鈕格線 */
@@ -138,7 +140,7 @@
       gap: 6px;
       text-decoration: none;
       text-align: center;
-      min-height: 110px;
+      min-height: 115px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.06);
       -webkit-tap-highlight-color: transparent;
       transition: all 0.2s ease;
@@ -159,39 +161,70 @@
       box-shadow: 0 6px 18px rgba(15, 23, 42, 0.2);
     }
 
-    /* 娛樂與樂活服務色彩 */
+    /* 銀髮生活服務色彩 */
     .cat-sing { background-color: #FFF7ED; border-color: #FED7AA; color: #C2410C; }
     .cat-laugh { background-color: #FEF9C3; border-color: #FDE047; color: #A16207; }
     .cat-fraud { background-color: #FEE2E2; border-color: #FCA5A5; color: #991B1B; }
     .cat-nou { background-color: #E0E7FF; border-color: #C7D2FE; color: #3730A3; }
+    .cat-mind { background-color: #CCFBF1; border-color: #99F6E4; color: #0F766E; }
     .link-box { background-color: #F8FAFC; border: 3px solid #CBD5E1; color: #1E293B; }
 
-    /* 輸入區 */
+    /* 居家無障礙上下按鈕樣式 */
+    .sub-link-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 90%;
+      margin-top: 4px;
+    }
+    .sub-link-btn {
+      display: block;
+      width: 100%;
+      color: #FFFFFF;
+      font-size: 19px;
+      font-weight: 900;
+      padding: 8px 0;
+      border-radius: 10px;
+      text-decoration: none;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    /* 輸入區（修正寬度防溢出） */
+    .sub-input-label {
+      font-size: 22px;
+      color: #334155;
+      margin-top: 8px;
+      margin-bottom: 10px;
+      font-weight: 900;
+    }
     .input-row {
       display: flex;
-      gap: 10px;
-      margin-bottom: 16px;
+      gap: 8px;
+      margin-bottom: 14px;
+      width: 100%;
     }
     .text-input {
       flex: 1;
+      min-width: 0;
       background-color: #F8FAFC;
       border: 3px solid #CBD5E1;
       border-radius: 14px;
       color: #0F172A;
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 700;
-      padding: 14px;
+      padding: 14px 12px;
       outline: none;
     }
     .text-input:focus { border-color: #0284C7; background-color: #FFFFFF; }
     
     .mic-btn-main {
-      width: 80px;
+      width: 72px;
       background: linear-gradient(145deg, #16A34A, #15803D);
       border: 3px solid #86EFAC;
       border-radius: 16px;
       color: #FFF;
-      font-size: 34px;
+      font-size: 32px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -211,7 +244,7 @@
     }
 
     .mic-tip {
-      font-size: 18px;
+      font-size: 19px;
       color: #DC2626;
       font-weight: bold;
       margin-bottom: 12px;
@@ -222,20 +255,21 @@
     /* 時間提醒與記下 */
     .time-row {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       align-items: center;
       margin-bottom: 18px;
     }
-    .time-label { font-size: 24px; color: #334155; white-space: nowrap; font-weight: 800; }
+    .time-label { font-size: 23px; color: #334155; white-space: nowrap; font-weight: 800; }
     .time-picker {
       background-color: #F8FAFC;
       border: 3px solid #CBD5E1;
       border-radius: 12px;
       color: #0369A1;
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 800;
-      padding: 10px 14px;
+      padding: 10px 10px;
       flex: 1;
+      min-width: 0;
     }
 
     .add-btn {
@@ -326,9 +360,9 @@
     <div class="sub-title">銀髮備忘錄</div>
   </header>
 
-  <!-- 區塊一：長輩日常備忘（吃藥、回診、運動健身、一般日常） -->
+  <!-- 區塊一：長輩日常備忘 -->
   <div class="app-card">
-    <div class="section-label">📌 點選要記的事情：</div>
+    <div class="section-label">點選要記的事情</div>
 
     <div class="category-grid-2x">
       <button class="cat-box cat-med active" onclick="selectCat('吃藥', this)">
@@ -349,7 +383,7 @@
       </button>
     </div>
 
-    <div class="section-label" style="font-size: 21px; margin-top: 8px;">說話或打字輸入：</div>
+    <div class="sub-input-label">說話或打字輸入：</div>
     <div class="input-row">
       <input type="text" id="note-input" class="text-input" placeholder="例如：晚上吃降血壓藥一顆">
       <button class="mic-btn-main" id="mic-btn" onclick="toggleRecord()" title="按一下用講的">🎙️</button>
@@ -364,49 +398,53 @@
     <button class="add-btn" onclick="addNote()">＋ 記下來並設定提醒</button>
   </div>
 
-  <!-- 區塊二：銀髮樂活與實用服務（獨立卡片） -->
+  <!-- 區塊二：銀髮生活 -->
   <div class="app-card">
-    <div class="section-label">🌸 銀髮樂活與生活服務：</div>
+    <div class="section-label">銀髮生活</div>
 
     <div class="category-grid-2x">
-      <!-- 每日一唱 -->
+      <!-- 第一排：每日一唱、每日一笑 -->
       <a href="https://www.youtube.com/results?search_query=%E5%9C%8B%E8%AA%9E%E8%80%81%E6%AD%8C+%E5%8D%A1%E6%8B%89OK+%E4%BC%B4%E5%94%B1" target="_blank" rel="noopener noreferrer" class="cat-box cat-sing">
         <span class="icon">🎤</span>
         <span>每日一唱</span>
       </a>
 
-      <!-- 每日一笑（幽默相聲、脫口秀、短劇精選） -->
       <a href="https://www.youtube.com/results?search_query=%E7%9B%B8%E8%81%B2%E7%B2%BE%E9%81%B8+%E5%B9%BD%E9%BB%98%E5%96%9C%E5%8A%87+%E9%80%97%E7%AC%91%E7%9F%AD%E7%89%87" target="_blank" rel="noopener noreferrer" class="cat-box cat-laugh">
         <span class="icon">😄</span>
         <span>每日一笑</span>
       </a>
 
-      <!-- 防詐騙提醒：直連 165 官方網頁 -->
+      <!-- 第二排：防詐騙提醒、終身學習 -->
       <a href="https://165.npa.gov.tw" target="_blank" rel="noopener noreferrer" class="cat-box cat-fraud">
         <span class="icon">🛡️</span>
-        <span style="font-size: 21px; line-height: 1.25;">防詐騙提醒<br>(165 官網)</span>
+        <span style="font-size: 22px; line-height: 1.25;">防詐騙提醒<br>(165 官網)</span>
       </a>
 
-      <!-- 活到老學到老：直連空中大學 -->
       <a href="https://www.nou.edu.tw" target="_blank" rel="noopener noreferrer" class="cat-box cat-nou">
         <span class="icon">🎓</span>
-        <span style="font-size: 20px; line-height: 1.25;">活到老學到老<br>(空中大學)</span>
+        <span style="font-size: 24px; line-height: 1.25;">終身學習<br><span style="font-size: 19px;">(空中大學)</span></span>
       </a>
 
-      <!-- 居家無障礙空間諮詢：直連店家地圖與粉絲頁 -->
-      <div class="cat-box link-box" style="padding: 10px 4px;">
-        <span class="icon" style="font-size: 28px;">🛠️</span>
-        <span style="font-size: 19px; line-height: 1.2; margin-bottom: 6px;">居家無障礙<br>空間諮詢</span>
-        <div style="display: flex; gap: 6px; width: 100%; justify-content: center;">
-          <a href="https://maps.app.goo.gl/tiNDgm5CQbmy8PhT7?g_st=al" target="_blank" rel="noopener noreferrer" style="background:#0284C7; color:#FFF; font-size:15px; font-weight:bold; padding:4px 8px; border-radius:6px; text-decoration:none;">地圖</a>
-          <a href="https://www.facebook.com/share/1DvCdVuFQJ/" target="_blank" rel="noopener noreferrer" style="background:#1877F2; color:#FFF; font-size:15px; font-weight:bold; padding:4px 8px; border-radius:6px; text-decoration:none;">臉書</a>
+      <!-- 第三排：居家無障礙空間諮詢（地圖/臉書上下排列放大）、老當益壯 -->
+      <div class="cat-box link-box" style="padding: 14px 6px;">
+        <span class="icon" style="font-size: 32px;">🛠️</span>
+        <span style="font-size: 20px; line-height: 1.25; margin-bottom: 4px;">居家無障礙<br>空間諮詢</span>
+        <div class="sub-link-stack">
+          <a href="https://maps.app.goo.gl/tiNDgm5CQbmy8PhT7?g_st=al" target="_blank" rel="noopener noreferrer" class="sub-link-btn" style="background:#0284C7;">📍 地圖導航</a>
+          <a href="https://www.facebook.com/share/1DvCdVuFQJ/" target="_blank" rel="noopener noreferrer" class="sub-link-btn" style="background:#1877F2;">📘 臉書專頁</a>
         </div>
       </div>
 
-      <!-- 老當益壯：中高齡就業 -->
       <a href="https://45plus.wda.gov.tw" target="_blank" rel="noopener noreferrer" class="cat-box link-box">
         <span class="icon">💼</span>
-        <span style="font-size: 21px; line-height: 1.25;">老當益壯<br>(中高齡就業)</span>
+        <span style="font-size: 23px; line-height: 1.25;">老當益壯<br><span style="font-size: 19px;">(中高齡就業)</span></span>
+      </a>
+
+      <!-- 第四排（老當益壯下方加入心靈有方） -->
+      <div></div>
+      <a href="https://m.youtube.com/@fongyuanacademy" target="_blank" rel="noopener noreferrer" class="cat-box cat-mind">
+        <span class="icon">🧘</span>
+        <span style="font-size: 25px; line-height: 1.25;">心靈有方</span>
       </a>
     </div>
   </div>
@@ -424,14 +462,14 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'senior_care_notes_v12';
+    const STORAGE_KEY = 'senior_care_notes_v13';
     let currentCategory = '吃藥';
     let isRecording = false;
     let recognition = null;
     let notifiedIds = new Set();
     let preferredFemaleVoice = null;
     let recordTimer = null;
-    let countdownSec = 10;
+    let countdownSec = 15; // 延長為 15 秒
 
     function escapeHtml(str) {
       if (!str) return '';
@@ -494,7 +532,7 @@
       speak(CATEGORY_PROMPTS[cat]);
     }
 
-    // 3. 語音辨識
+    // 3. 語音辨識（15 秒充裕錄音時間）
     function setupSpeechRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) return;
@@ -510,7 +548,7 @@
         mic.classList.add('recording');
         mic.innerText = '🔴';
         
-        countdownSec = 10;
+        countdownSec = 15;
         document.getElementById('mic-tip').innerText = `🔴 正在聽您說話（還有 ${countdownSec} 秒，講完可再按一下）`;
         
         clearInterval(recordTimer);
