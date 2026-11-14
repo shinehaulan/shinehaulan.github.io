@@ -27,22 +27,23 @@
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      padding: 14px 14px 90px 14px;
+      padding: 14px 14px 36px 14px;
     }
 
-    /* 頂部看板：氣候與時間字體全面放大 */
+    /* 頂部看板：自適應寬度，確保時間絕對不超出框框 */
     .dashboard-card {
       width: 100%;
       max-width: 520px;
       background-color: #1E293B;
       border: 3px solid #334155;
       border-radius: 22px;
-      padding: 18px 20px;
+      padding: 16px 16px;
       margin-bottom: 16px;
       box-shadow: 0 6px 18px rgba(0,0,0,0.12);
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
+      overflow: hidden;
     }
     .weather-row {
       display: flex;
@@ -50,17 +51,18 @@
       align-items: center;
       border-bottom: 2px solid #334155;
       padding-bottom: 10px;
+      gap: 8px;
     }
     .weather-info {
       display: flex;
       align-items: center;
-      gap: 12px;
-      font-size: 38px;
+      gap: 10px;
+      font-size: clamp(28px, 7.5vw, 36px);
       font-weight: 900;
       color: #38BDF8;
     }
     .weather-temp {
-      font-size: 42px;
+      font-size: clamp(32px, 8.5vw, 40px);
       font-weight: 900;
       color: #FFFFFF;
     }
@@ -68,20 +70,22 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
+      flex-wrap: wrap;
+      gap: 6px;
     }
     .date-text {
-      font-size: 26px;
+      font-size: clamp(20px, 5.2vw, 25px);
       color: #E2E8F0;
       font-weight: 900;
       white-space: nowrap;
     }
     .time-text {
-      font-size: 38px;
+      font-size: clamp(26px, 6.8vw, 34px);
       font-weight: 900;
       color: #F8FAFC;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
       white-space: nowrap;
+      margin-left: auto;
     }
 
     /* 主副標題設計 */
@@ -314,7 +318,7 @@
       box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35);
     }
 
-    /* 備忘清單區塊（已移至銀髮生活上方） */
+    /* 備忘清單區塊 */
     .list-container {
       width: 100%;
       max-width: 520px;
@@ -354,6 +358,26 @@
     .btn-speak { background: #F1F5F9; border: 2px solid #CBD5E1; color: #1E293B; padding: 10px 10px; border-radius: 10px; font-size: 19px; font-weight: 900; cursor: pointer; text-align: center; }
     .btn-line { background: #06C755; border: 2px solid #05A848; color: #FFFFFF; padding: 10px 10px; border-radius: 10px; font-size: 19px; font-weight: 900; cursor: pointer; text-align: center; text-decoration: none; display: block; }
     .btn-del { background: #FFF1F2; border: 2px solid #FECDD3; color: #E11D48; padding: 10px 10px; border-radius: 10px; font-size: 19px; font-weight: 900; cursor: pointer; text-align: center; }
+
+    /* 免責聲明區塊 */
+    .disclaimer-box {
+      width: 100%;
+      max-width: 520px;
+      background-color: #EAE5DC;
+      border: 2px solid #D6D0C4;
+      border-radius: 16px;
+      padding: 16px 18px;
+      margin-top: 6px;
+      color: #475569;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .disclaimer-title {
+      font-size: 18px;
+      font-weight: 900;
+      color: #334155;
+      margin-bottom: 6px;
+    }
 
     /* 互動有聲教學彈窗 */
     .modal-overlay {
@@ -431,29 +455,11 @@
       cursor: pointer;
       margin-top: 8px;
     }
-
-    /* 底部廣告欄位 */
-    .ad-fixed-bottom {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 60px;
-      background-color: #FFFFFF;
-      border-top: 2px solid #E2E8F0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-      font-size: 15px;
-      font-weight: bold;
-      color: #64748B;
-    }
   </style>
 </head>
 <body>
 
-  <!-- 最上層：即時天氣與日期時間（放大版） -->
+  <!-- 最上層：即時天氣與日期時間（修正對齊，絕對不出框） -->
   <div class="dashboard-card">
     <div class="weather-row">
       <div class="weather-info">
@@ -511,7 +517,7 @@
     <button class="add-btn" onclick="addNote()">＋ 記下來並設定提醒</button>
   </div>
 
-  <!-- 區塊二：記下的行程清單（已移至銀髮生活上方） -->
+  <!-- 區塊二：記下的行程清單 -->
   <div class="list-container">
     <div style="font-size: 30px; color: #0F172A; border-bottom: 3px solid #CBD5E1; padding-bottom: 8px; font-weight: 900;">
       📋 記下的行程清單
@@ -574,6 +580,14 @@
     </div>
   </div>
 
+  <!-- 免責聲明與隱私宣告區塊 -->
+  <div class="disclaimer-box">
+    <div class="disclaimer-title">⚖️ 服務免責與隱私聲明</div>
+    <p>1. <strong>醫療與用藥免責</strong>：本網站僅提供日常生活備忘輔助，用藥劑量、時間及回診事宜，請務必遵照專業醫師與藥師指示。</p>
+    <p>2. <strong>提醒功能說明</strong>：網頁鬧鐘提醒可能受限於手機瀏覽器背景休眠或省電模式影響，重要事項建議同步設定手機內建鬧鐘。</p>
+    <p>3. <strong>零個資留存安全</strong>：您的所有輸入與備忘紀錄僅儲存於您個人的手機瀏覽器內部，本站不設資料庫、絕不蒐集或上傳任何個人隱私資料。</p>
+  </div>
+
   <!-- 互動式有聲圖文教學視窗 -->
   <div class="modal-overlay" id="guide-modal" onclick="if(event.target === this) closeGuideModal()">
     <div class="modal-card">
@@ -604,21 +618,16 @@
     </div>
   </div>
 
-  <!-- 底部廣告欄 -->
-  <div class="ad-fixed-bottom">
-    [ 贊助廣告版位 · 零個資留存安全認證 ]
-  </div>
-
   <script>
-    const STORAGE_KEY = 'senior_care_notes_v17';
+    const STORAGE_KEY = 'senior_care_notes_v18';
     let currentCategory = '吃藥';
     let isRecording = false;
     let recognition = null;
     let notifiedIds = new Set();
-    let preferredFemaleVoice = null;
+    let energeticGirlVoice = null;
     let recordTimer = null;
     let countdownSec = 15;
-    let savedPhrases = []; // 儲存已完成且不重複的句子陣列
+    let savedPhrases = [];
 
     function escapeHtml(str) {
       if (!str) return '';
@@ -630,21 +639,15 @@
         .replace(/'/g, '&#39;');
     }
 
-    // 1. 溫柔女性國語提示
-    const CATEGORY_PROMPTS = {
-      '吃藥': '吃藥。請說出要吃什麼藥，也可以用寫的。',
-      '回診': '回診。請說出何時要去看哪一位醫生。',
-      '運動健身': '運動健身。請說出要去哪裡走走或運動。',
-      '一般日常': '一般日常。請說出要記下的事情。'
-    };
-
+    // 1. 挑選有活力朝氣的年輕女孩聲線
     function initVoices() {
       if ('speechSynthesis' in window) {
         const voices = window.speechSynthesis.getVoices();
-        preferredFemaleVoice = voices.find(v => 
+        // 優先尋找年輕清亮的台灣女生語音（HsiaoChen / Yating / Mei-Jia 等）
+        energeticGirlVoice = voices.find(v => 
           (v.lang === 'zh-TW' || v.lang.includes('TW')) && 
-          (v.name.includes('Female') || v.name.includes('美佳') || v.name.includes('Hsiao-Chen') || v.name.includes('Yating') || v.name.includes('Google'))
-        ) || voices.find(v => v.lang.includes('zh'));
+          (v.name.includes('HsiaoChen') || v.name.includes('Hsiao-Chen') || v.name.includes('Yating') || v.name.includes('Xiaoxiao') || v.name.includes('Female'))
+        ) || voices.find(v => v.lang === 'zh-TW') || voices.find(v => v.lang.includes('zh'));
       }
     }
     if ('speechSynthesis' in window) {
@@ -652,14 +655,15 @@
       initVoices();
     }
 
+    // 朝氣年輕女孩語氣（微提高音調與輕快語速）
     function speak(text) {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const utter = new SpeechSynthesisUtterance(text);
-        if (preferredFemaleVoice) utter.voice = preferredFemaleVoice;
+        if (energeticGirlVoice) utter.voice = energeticGirlVoice;
         utter.lang = 'zh-TW';
-        utter.rate = 0.88;
-        utter.pitch = 1.15;
+        utter.rate = 1.05;  // 輕快有精神的節奏
+        utter.pitch = 1.32; // 清亮活潑的女孩音高
         window.speechSynthesis.speak(utter);
       }
     }
@@ -678,11 +682,11 @@
     }
 
     function playFullVoiceGuide() {
-      const fullText = "歡迎使用美茉莉銀髮備忘錄。第一步，先點選上方要記的事情，例如吃藥或回診。第二步，按一下綠色麥克風，對著手機慢慢說話，文字就會自動打出來。第三步，選好提醒時間，按藍色按鈕記下來。最後，在下面清單點念出，就能聽見提醒，也能按綠色按鈕傳 LINE 給兒女看喔！";
+      const fullText = "歡迎使用美茉莉銀髮備忘錄！第一步，先點選上方要記的事情，例如吃藥或回診。第二步，按一下綠色麥克風，對著手機慢慢說話，文字就會自動打出來。第三步，選好提醒時間，按藍色按鈕記下來。最後，在下面清單點念出，就能聽見提醒，也能按綠色按鈕傳 LINE 給兒女看喔！";
       speak(fullText);
     }
 
-    // 2. 點選分類
+    // 2. 點選分類：只念出該類別名稱（乾淨俐落）
     function selectCat(cat, btn) {
       currentCategory = cat;
       document.querySelectorAll('.memo-box').forEach(b => {
@@ -696,16 +700,16 @@
       else if (cat === '運動健身') input.placeholder = '例如：公園散步三十分鐘';
       else if (cat === '一般日常') input.placeholder = '例如：買水果、關瓦斯';
 
-      speak(CATEGORY_PROMPTS[cat]);
+      // 只念出分類本身
+      speak(cat);
     }
 
-    // 3. 徹底防重複疊字的語音辨識架構（單句隔離＋15秒接續）
+    // 3. 徹底防重複疊字的語音辨識架構
     function createRecognitionInstance() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) return null;
 
       const rec = new SpeechRecognition();
-      // 關閉 continuous 與 interimResults，從底層切斷 Android Chrome 重複吐字
       rec.continuous = false;
       rec.interimResults = false;
       rec.lang = 'zh-TW';
@@ -714,7 +718,6 @@
         if (e.results && e.results[0] && e.results[0][0]) {
           const newText = e.results[0][0].transcript.trim();
           if (newText) {
-            // 檢查新句子是否包含或重複上一句的開頭，徹底過濾重疊
             const lastPhrase = savedPhrases[savedPhrases.length - 1] || '';
             if (newText !== lastPhrase && !lastPhrase.endsWith(newText)) {
               if (lastPhrase && newText.startsWith(lastPhrase)) {
@@ -729,7 +732,6 @@
       };
 
       rec.onend = () => {
-        // 如果還在 15 秒倒數期間且使用者沒按停止，自動開啟下一輪乾淨監聽
         if (isRecording && countdownSec > 0) {
           try {
             rec.start();
@@ -742,7 +744,6 @@
       };
 
       rec.onerror = (e) => {
-        // 沒聲音（no-speech）時若倒數未結束則繼續等長輩開口
         if (e.error === 'no-speech' && isRecording && countdownSec > 0) {
           return;
         }
@@ -823,7 +824,7 @@
       const text = input.value.trim();
 
       if (!text) {
-        speak("請先說話或輸入內容。");
+        speak("請先說話或輸入內容喔！");
         return;
       }
 
@@ -843,7 +844,7 @@
       timeInput.value = '';
       render();
 
-      const confirmMsg = `已經幫您記好：${newNote.category}，${newNote.text}`;
+      const confirmMsg = `已經幫您記好啦！${newNote.category}，${newNote.text}`;
       speak(confirmMsg);
     }
 
