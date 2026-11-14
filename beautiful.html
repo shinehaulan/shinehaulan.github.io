@@ -81,10 +81,10 @@
       letter-spacing: 1px;
     }
 
-    /* 主副標題設計：美茉莉用綠色、銀髮備忘錄用銀色且字體放大 */
-    header { text-align: center; margin-bottom: 16px; }
+    /* 主副標題設計：美茉莉用綠色、銀髮備忘錄放大並改用醒目紅色 */
+    header { text-align: center; margin-bottom: 18px; }
     h1 {
-      font-size: 46px;
+      font-size: 48px;
       color: #10B981;
       letter-spacing: 3px;
       font-weight: 900;
@@ -92,12 +92,12 @@
       text-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
     }
     .sub-title {
-      font-size: 32px;
-      color: #94A3B8;
+      font-size: 36px;
+      color: #DC2626;
       font-weight: 900;
       letter-spacing: 4px;
       margin-top: 6px;
-      text-shadow: 0 1px 2px rgba(15, 23, 42, 0.15);
+      text-shadow: 0 2px 6px rgba(220, 38, 38, 0.18);
     }
 
     /* 區塊卡片共通樣式 */
@@ -112,9 +112,9 @@
       margin-bottom: 20px;
     }
     .section-label {
-      font-size: 28px;
-      color: #1E293B;
-      margin-bottom: 14px;
+      font-size: 32px;
+      color: #0F172A;
+      margin-bottom: 16px;
       font-weight: 900;
       text-align: center;
     }
@@ -124,79 +124,104 @@
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 14px;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
-    .cat-box {
+
+    /* 備忘錄四大類：長輩專用特大字體與圖示 */
+    .memo-box {
       border: 4px solid transparent;
-      font-size: 25px;
+      font-size: 30px;
       font-weight: 900;
-      padding: 16px 8px;
+      padding: 20px 8px;
       border-radius: 18px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      text-decoration: none;
+      gap: 8px;
       text-align: center;
-      min-height: 115px;
+      min-height: 130px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.06);
       -webkit-tap-highlight-color: transparent;
       transition: all 0.2s ease;
     }
-    .cat-box span.icon { font-size: 36px; }
+    .memo-box span.icon { font-size: 44px; }
 
-    /* 備忘錄四大類色彩 */
     .cat-med { background-color: #FFE4E6; border-color: #FDA4AF; color: #BE123C; }
     .cat-hosp { background-color: #E0F2FE; border-color: #BAE6FD; color: #0369A1; }
     .cat-fit { background-color: #DCFCE7; border-color: #BBF7D0; color: #15803D; }
     .cat-daily { background-color: #F3E8FF; border-color: #E9D5FF; color: #7E22CE; }
 
-    /* 備忘項目選中樣式 */
-    .cat-box.active {
+    .memo-box.active {
       outline: 5px solid #0F172A;
       outline-offset: -2px;
       transform: scale(1.02);
-      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.2);
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.25);
     }
 
-    /* 銀髮生活服務色彩 */
+    /* 銀髮生活區按鈕：全面放大字體 */
+    .life-box {
+      border: 4px solid transparent;
+      font-size: 27px;
+      font-weight: 900;
+      padding: 18px 8px;
+      border-radius: 18px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      text-align: center;
+      min-height: 130px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      -webkit-tap-highlight-color: transparent;
+      transition: all 0.2s ease;
+    }
+    .life-box span.icon { font-size: 40px; }
+    .life-sub-text {
+      font-size: 21px;
+      font-weight: 800;
+      margin-top: 2px;
+    }
+
+    .cat-guide { background-color: #FCE7F3; border-color: #FBCFE8; color: #BE185D; }
+    .link-box { background-color: #F8FAFC; border: 3px solid #CBD5E1; color: #1E293B; }
+    .cat-nou { background-color: #E0E7FF; border-color: #C7D2FE; color: #3730A3; }
+    .cat-fraud { background-color: #FEE2E2; border-color: #FCA5A5; color: #991B1B; }
+    .cat-mind { background-color: #CCFBF1; border-color: #99F6E4; color: #0F766E; }
     .cat-sing { background-color: #FFF7ED; border-color: #FED7AA; color: #C2410C; }
     .cat-laugh { background-color: #FEF9C3; border-color: #FDE047; color: #A16207; }
-    .cat-fraud { background-color: #FEE2E2; border-color: #FCA5A5; color: #991B1B; }
-    .cat-nou { background-color: #E0E7FF; border-color: #C7D2FE; color: #3730A3; }
-    .cat-guide { background-color: #FCE7F3; border-color: #FBCFE8; color: #BE185D; } /* 使用教學-溫馨粉紅 */
-    .cat-mind { background-color: #CCFBF1; border-color: #99F6E4; color: #0F766E; }
-    .link-box { background-color: #F8FAFC; border: 3px solid #CBD5E1; color: #1E293B; }
 
-    /* 居家無障礙上下按鈕樣式 */
+    /* 居家無障礙上下按鈕樣式（放大） */
     .sub-link-stack {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      width: 90%;
+      width: 92%;
       margin-top: 4px;
     }
     .sub-link-btn {
       display: block;
       width: 100%;
       color: #FFFFFF;
-      font-size: 19px;
+      font-size: 21px;
       font-weight: 900;
-      padding: 8px 0;
+      padding: 10px 0;
       border-radius: 10px;
       text-decoration: none;
       text-align: center;
       box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     }
 
-    /* 輸入區 */
+    /* 輸入區（長輩特大字體） */
     .sub-input-label {
-      font-size: 22px;
-      color: #334155;
-      margin-top: 8px;
-      margin-bottom: 10px;
+      font-size: 26px;
+      color: #1E293B;
+      margin-top: 10px;
+      margin-bottom: 12px;
       font-weight: 900;
     }
     .input-row {
@@ -212,20 +237,20 @@
       border: 3px solid #CBD5E1;
       border-radius: 14px;
       color: #0F172A;
-      font-size: 22px;
-      font-weight: 700;
-      padding: 14px 12px;
+      font-size: 25px;
+      font-weight: 800;
+      padding: 16px 12px;
       outline: none;
     }
     .text-input:focus { border-color: #0284C7; background-color: #FFFFFF; }
     
     .mic-btn-main {
-      width: 72px;
+      width: 76px;
       background: linear-gradient(145deg, #16A34A, #15803D);
       border: 3px solid #86EFAC;
       border-radius: 16px;
       color: #FFF;
-      font-size: 32px;
+      font-size: 36px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -245,9 +270,9 @@
     }
 
     .mic-tip {
-      font-size: 19px;
+      font-size: 20px;
       color: #DC2626;
-      font-weight: bold;
+      font-weight: 900;
       margin-bottom: 12px;
       min-height: 24px;
       text-align: center;
@@ -260,15 +285,15 @@
       align-items: center;
       margin-bottom: 18px;
     }
-    .time-label { font-size: 23px; color: #334155; white-space: nowrap; font-weight: 800; }
+    .time-label { font-size: 26px; color: #1E293B; white-space: nowrap; font-weight: 900; }
     .time-picker {
       background-color: #F8FAFC;
       border: 3px solid #CBD5E1;
       border-radius: 12px;
       color: #0369A1;
-      font-size: 24px;
-      font-weight: 800;
-      padding: 10px 10px;
+      font-size: 26px;
+      font-weight: 900;
+      padding: 12px 10px;
       flex: 1;
       min-width: 0;
     }
@@ -278,9 +303,9 @@
       background: linear-gradient(145deg, #0284C7, #0369A1);
       border: none;
       color: #FFFFFF;
-      font-size: 28px;
+      font-size: 30px;
       font-weight: 900;
-      padding: 16px;
+      padding: 18px;
       border-radius: 16px;
       cursor: pointer;
       box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35);
@@ -300,7 +325,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     }
     .cat-tag {
-      font-size: 18px;
+      font-size: 20px;
       padding: 5px 14px;
       border-radius: 8px;
       font-weight: 900;
@@ -312,13 +337,13 @@
     .tag-運動健身 { background-color: #DCFCE7; color: #15803D; }
     .tag-一般日常 { background-color: #F3E8FF; color: #7E22CE; }
 
-    .note-text { font-size: 26px; color: #0F172A; font-weight: 800; line-height: 1.35; word-break: break-all; }
-    .note-alarm { font-size: 22px; color: #0284C7; margin-top: 6px; font-weight: 800; }
+    .note-text { font-size: 28px; color: #0F172A; font-weight: 900; line-height: 1.35; word-break: break-all; }
+    .note-alarm { font-size: 23px; color: #0284C7; margin-top: 6px; font-weight: 800; }
     
-    .card-actions { display: flex; flex-direction: column; gap: 8px; min-width: 110px; }
-    .btn-speak { background: #F1F5F9; border: 2px solid #CBD5E1; color: #1E293B; padding: 8px 10px; border-radius: 10px; font-size: 17px; font-weight: 800; cursor: pointer; text-align: center; }
-    .btn-line { background: #06C755; border: 2px solid #05A848; color: #FFFFFF; padding: 8px 10px; border-radius: 10px; font-size: 17px; font-weight: 800; cursor: pointer; text-align: center; text-decoration: none; display: block; }
-    .btn-del { background: #FFF1F2; border: 2px solid #FECDD3; color: #E11D48; padding: 8px 10px; border-radius: 10px; font-size: 17px; font-weight: 800; cursor: pointer; text-align: center; }
+    .card-actions { display: flex; flex-direction: column; gap: 8px; min-width: 115px; }
+    .btn-speak { background: #F1F5F9; border: 2px solid #CBD5E1; color: #1E293B; padding: 10px 10px; border-radius: 10px; font-size: 19px; font-weight: 900; cursor: pointer; text-align: center; }
+    .btn-line { background: #06C755; border: 2px solid #05A848; color: #FFFFFF; padding: 10px 10px; border-radius: 10px; font-size: 19px; font-weight: 900; cursor: pointer; text-align: center; text-decoration: none; display: block; }
+    .btn-del { background: #FFF1F2; border: 2px solid #FECDD3; color: #E11D48; padding: 10px 10px; border-radius: 10px; font-size: 19px; font-weight: 900; cursor: pointer; text-align: center; }
 
     /* 互動有聲教學彈窗 */
     .modal-overlay {
@@ -346,7 +371,7 @@
       box-shadow: 0 15px 35px rgba(0,0,0,0.4);
     }
     .modal-title {
-      font-size: 30px;
+      font-size: 32px;
       font-weight: 900;
       color: #0F172A;
       text-align: center;
@@ -357,9 +382,9 @@
       background: linear-gradient(145deg, #10B981, #059669);
       color: #FFFFFF;
       border: none;
-      font-size: 24px;
+      font-size: 25px;
       font-weight: 900;
-      padding: 14px;
+      padding: 16px;
       border-radius: 14px;
       cursor: pointer;
       margin-bottom: 18px;
@@ -373,13 +398,13 @@
       margin-bottom: 12px;
     }
     .step-num {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 900;
       color: #0284C7;
       margin-bottom: 4px;
     }
     .step-desc {
-      font-size: 21px;
+      font-size: 22px;
       color: #1E293B;
       font-weight: 700;
       line-height: 1.4;
@@ -389,9 +414,9 @@
       background-color: #334155;
       color: #FFFFFF;
       border: none;
-      font-size: 24px;
+      font-size: 25px;
       font-weight: 900;
-      padding: 14px;
+      padding: 16px;
       border-radius: 14px;
       cursor: pointer;
       margin-top: 8px;
@@ -438,24 +463,24 @@
     <div class="sub-title">銀髮備忘錄</div>
   </header>
 
-  <!-- 區塊一：長輩日常備忘 -->
+  <!-- 區塊一：點選要記的事情（長輩特大字體版） -->
   <div class="app-card">
     <div class="section-label">點選要記的事情</div>
 
     <div class="category-grid-2x">
-      <button class="cat-box cat-med active" onclick="selectCat('吃藥', this)">
+      <button class="memo-box cat-med active" onclick="selectCat('吃藥', this)">
         <span class="icon">💊</span>
         <span>吃藥</span>
       </button>
-      <button class="cat-box cat-hosp" onclick="selectCat('回診', this)">
+      <button class="memo-box cat-hosp" onclick="selectCat('回診', this)">
         <span class="icon">🏥</span>
         <span>回診</span>
       </button>
-      <button class="cat-box cat-fit" onclick="selectCat('運動健身', this)">
+      <button class="memo-box cat-fit" onclick="selectCat('運動健身', this)">
         <span class="icon">🏃</span>
         <span>運動健身</span>
       </button>
-      <button class="cat-box cat-daily" onclick="selectCat('一般日常', this)">
+      <button class="memo-box cat-daily" onclick="selectCat('一般日常', this)">
         <span class="icon">📝</span>
         <span>一般日常</span>
       </button>
@@ -463,7 +488,7 @@
 
     <div class="sub-input-label">說話或打字輸入：</div>
     <div class="input-row">
-      <input type="text" id="note-input" class="text-input" placeholder="例如：晚上吃降血壓藥一顆">
+      <input type="text" id="note-input" class="text-input" placeholder="例如：晚上吃降血壓藥">
       <button class="mic-btn-main" id="mic-btn" onclick="toggleRecord()" title="按一下用講的">🎙️</button>
     </div>
     <div class="mic-tip" id="mic-tip"></div>
@@ -476,63 +501,63 @@
     <button class="add-btn" onclick="addNote()">＋ 記下來並設定提醒</button>
   </div>
 
-  <!-- 區塊二：銀髮生活 -->
+  <!-- 區塊二：銀髮生活（重新排列與全區字體放大） -->
   <div class="app-card">
     <div class="section-label">銀髮生活</div>
 
     <div class="category-grid-2x">
-      <!-- 第一排：每日一唱、每日一笑 -->
-      <a href="https://www.youtube.com/results?search_query=%E5%9C%8B%E8%AA%9E%E8%80%81%E6%AD%8C+%E5%8D%A1%E6%8B%89OK+%E4%BC%B4%E5%94%B1" target="_blank" rel="noopener noreferrer" class="cat-box cat-sing">
-        <span class="icon">🎤</span>
-        <span>每日一唱</span>
-      </a>
+      <!-- 第一排（移至最上層）：使用教學、居家無障礙空間諮詢 -->
+      <button class="life-box cat-guide" onclick="openGuideModal()">
+        <span class="icon">📖</span>
+        <span>使用教學</span>
+      </button>
 
-      <a href="https://www.youtube.com/results?search_query=%E7%9B%B8%E8%81%B2%E7%B2%BE%E9%81%B8+%E5%B9%BD%E9%BB%98%E5%96%9C%E5%8A%87+%E9%80%97%E7%AC%91%E7%9F%AD%E7%89%87" target="_blank" rel="noopener noreferrer" class="cat-box cat-laugh">
-        <span class="icon">😄</span>
-        <span>每日一笑</span>
-      </a>
-
-      <!-- 第二排：防詐騙提醒、終身學習 -->
-      <a href="https://165.npa.gov.tw" target="_blank" rel="noopener noreferrer" class="cat-box cat-fraud">
-        <span class="icon">🛡️</span>
-        <span style="font-size: 22px; line-height: 1.25;">防詐騙提醒<br>(165 官網)</span>
-      </a>
-
-      <a href="https://www.nou.edu.tw" target="_blank" rel="noopener noreferrer" class="cat-box cat-nou">
-        <span class="icon">🎓</span>
-        <span style="font-size: 24px; line-height: 1.25;">終身學習<br><span style="font-size: 19px;">(空中大學)</span></span>
-      </a>
-
-      <!-- 第三排：居家無障礙空間諮詢、老當益壯 -->
-      <div class="cat-box link-box" style="padding: 14px 6px;">
-        <span class="icon" style="font-size: 32px;">🛠️</span>
-        <span style="font-size: 20px; line-height: 1.25; margin-bottom: 4px;">居家無障礙<br>空間諮詢</span>
+      <div class="life-box link-box" style="padding: 14px 6px;">
+        <span class="icon">🛠️</span>
+        <span style="font-size: 24px; line-height: 1.25; margin-bottom: 4px;">居家無障礙<br>空間諮詢</span>
         <div class="sub-link-stack">
           <a href="https://maps.app.goo.gl/tiNDgm5CQbmy8PhT7?g_st=al" target="_blank" rel="noopener noreferrer" class="sub-link-btn" style="background:#0284C7;">📍 地圖導航</a>
           <a href="https://www.facebook.com/share/1DvCdVuFQJ/" target="_blank" rel="noopener noreferrer" class="sub-link-btn" style="background:#1877F2;">📘 臉書專頁</a>
         </div>
       </div>
 
-      <a href="https://45plus.wda.gov.tw" target="_blank" rel="noopener noreferrer" class="cat-box link-box">
-        <span class="icon">💼</span>
-        <span style="font-size: 23px; line-height: 1.25;">老當益壯<br><span style="font-size: 19px;">(中高齡就業)</span></span>
+      <!-- 第二排：終身學習、老當益壯 -->
+      <a href="https://www.nou.edu.tw" target="_blank" rel="noopener noreferrer" class="life-box cat-nou">
+        <span class="icon">🎓</span>
+        <span style="line-height: 1.25;">終身學習<br><span class="life-sub-text">(空中大學)</span></span>
       </a>
 
-      <!-- 第四排：使用教學（放在心靈有方旁邊）、心靈有方 -->
-      <button class="cat-box cat-guide" onclick="openGuideModal()">
-        <span class="icon">📖</span>
-        <span style="font-size: 25px; line-height: 1.25;">使用教學</span>
-      </button>
+      <a href="https://45plus.wda.gov.tw" target="_blank" rel="noopener noreferrer" class="life-box link-box">
+        <span class="icon">💼</span>
+        <span style="line-height: 1.25;">老當益壯<br><span class="life-sub-text">(中高齡就業)</span></span>
+      </a>
 
-      <a href="https://m.youtube.com/@fongyuanacademy" target="_blank" rel="noopener noreferrer" class="cat-box cat-mind">
+      <!-- 第三排（心靈有方與防詐騙同排） -->
+      <a href="https://165.npa.gov.tw" target="_blank" rel="noopener noreferrer" class="life-box cat-fraud">
+        <span class="icon">🛡️</span>
+        <span style="line-height: 1.25;">防詐騙提醒<br><span class="life-sub-text">(165 官網)</span></span>
+      </a>
+
+      <a href="https://m.youtube.com/@fongyuanacademy" target="_blank" rel="noopener noreferrer" class="life-box cat-mind">
         <span class="icon">🧘</span>
-        <span style="font-size: 25px; line-height: 1.25;">心靈有方</span>
+        <span>心靈有方</span>
+      </a>
+
+      <!-- 第四排（每日一唱、每日一笑移到最下面） -->
+      <a href="https://www.youtube.com/results?search_query=%E5%9C%8B%E8%AA%9E%E8%80%81%E6%AD%8C+%E5%8D%A1%E6%8B%89OK+%E4%BC%B4%E5%94%B1" target="_blank" rel="noopener noreferrer" class="life-box cat-sing">
+        <span class="icon">🎤</span>
+        <span>每日一唱</span>
+      </a>
+
+      <a href="https://www.youtube.com/results?search_query=%E7%9B%B8%E8%81%B2%E7%B2%BE%E9%81%B8+%E5%B9%BD%E9%BB%98%E5%96%9C%E5%8A%87+%E9%80%97%E7%AC%91%E7%9F%AD%E7%89%87" target="_blank" rel="noopener noreferrer" class="life-box cat-laugh">
+        <span class="icon">😄</span>
+        <span>每日一笑</span>
       </a>
     </div>
   </div>
 
   <div class="list-container">
-    <div style="font-size: 26px; color: #0F172A; border-bottom: 3px solid #CBD5E1; padding-bottom: 8px; font-weight: 900;">
+    <div style="font-size: 28px; color: #0F172A; border-bottom: 3px solid #CBD5E1; padding-bottom: 8px; font-weight: 900;">
       📋 記下的行程清單
     </div>
     <div id="notes-list"></div>
@@ -574,7 +599,7 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'senior_care_notes_v15';
+    const STORAGE_KEY = 'senior_care_notes_v16';
     let currentCategory = '吃藥';
     let isRecording = false;
     let recognition = null;
@@ -649,13 +674,13 @@
     // 2. 點選分類
     function selectCat(cat, btn) {
       currentCategory = cat;
-      document.querySelectorAll('.app-card:first-of-type .cat-box').forEach(b => {
+      document.querySelectorAll('.memo-box').forEach(b => {
         b.classList.remove('active');
       });
       btn.classList.add('active');
 
       const input = document.getElementById('note-input');
-      if (cat === '吃藥') input.placeholder = '例如：晚上吃降血壓藥一顆';
+      if (cat === '吃藥') input.placeholder = '例如：晚上吃降血壓藥';
       else if (cat === '回診') input.placeholder = '例如：下午三點醫院心臟科';
       else if (cat === '運動健身') input.placeholder = '例如：公園散步三十分鐘';
       else if (cat === '一般日常') input.placeholder = '例如：買水果、關瓦斯';
@@ -803,7 +828,7 @@
       const notes = getNotes();
 
       if (notes.length === 0) {
-        listEl.innerHTML = '<div style="color:#64748B; text-align:center; margin-top:20px; font-size:24px; font-weight:bold;">目前沒有任何備忘事項</div>';
+        listEl.innerHTML = '<div style="color:#64748B; text-align:center; margin-top:20px; font-size:26px; font-weight:bold;">目前沒有任何備忘事項</div>';
         return;
       }
 
