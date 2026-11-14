@@ -30,19 +30,19 @@
       padding: 14px 14px 36px 14px;
     }
 
-    /* 頂部看板：天氣字體放到最大且絕不出框 */
+    /* 頂部看板：天氣、日期、時間各自滿版一行，放到最大絕不出框 */
     .dashboard-card {
       width: 100%;
       max-width: 520px;
       background-color: #1E293B;
       border: 3px solid #334155;
       border-radius: 22px;
-      padding: 18px 16px;
+      padding: 16px 16px;
       margin-bottom: 16px;
       box-shadow: 0 6px 18px rgba(0,0,0,0.12);
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       overflow: hidden;
     }
     .weather-row {
@@ -50,7 +50,7 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 2px solid #334155;
-      padding-bottom: 12px;
+      padding-bottom: 10px;
       gap: 6px;
       width: 100%;
     }
@@ -58,39 +58,41 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: clamp(34px, 9.5vw, 44px);
+      font-size: clamp(32px, 9vw, 42px);
       font-weight: 900;
       color: #38BDF8;
       white-space: nowrap;
       line-height: 1.1;
     }
     .weather-temp {
-      font-size: clamp(38px, 10.5vw, 48px);
+      font-size: clamp(36px, 10vw, 46px);
       font-weight: 900;
       color: #FFFFFF;
       white-space: nowrap;
       line-height: 1.1;
     }
-    .datetime-row {
+    .datetime-col {
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       align-items: center;
-      flex-wrap: wrap;
+      justify-content: center;
       gap: 6px;
+      width: 100%;
     }
     .date-text {
-      font-size: clamp(20px, 5.2vw, 25px);
+      font-size: clamp(28px, 7.8vw, 36px);
       color: #E2E8F0;
       font-weight: 900;
       white-space: nowrap;
+      line-height: 1.15;
     }
     .time-text {
-      font-size: clamp(26px, 6.8vw, 34px);
+      font-size: clamp(40px, 11.5vw, 52px);
       font-weight: 900;
       color: #F8FAFC;
-      letter-spacing: 0.5px;
+      letter-spacing: 2px;
       white-space: nowrap;
-      margin-left: auto;
+      line-height: 1.1;
     }
 
     /* 主副標題設計 */
@@ -139,7 +141,7 @@
       margin-bottom: 18px;
     }
 
-    /* 備忘錄四大類：長輩專用特大字體與圖示 */
+    /* 備忘錄四大類 */
     .memo-box {
       border: 4px solid transparent;
       font-size: 30px;
@@ -290,7 +292,7 @@
       text-align: center;
     }
 
-    /* 銀髮友善大字鬧鐘設定區 */
+    /* 極簡大字鬧鐘設定區（純數字選單） */
     .alarm-box {
       background-color: #F8FAFC;
       border: 3px solid #CBD5E1;
@@ -299,56 +301,28 @@
       margin-bottom: 18px;
     }
     .alarm-header {
-      font-size: 25px;
+      font-size: 26px;
       color: #1E293B;
       font-weight: 900;
       margin-bottom: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .alarm-preview {
-      font-size: 22px;
-      color: #0284C7;
-      font-weight: 900;
-    }
-    .quick-time-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    .quick-time-btn {
-      background-color: #E0F2FE;
-      border: 2px solid #7DD3FC;
-      color: #0369A1;
-      font-size: 21px;
-      font-weight: 900;
-      padding: 12px 6px;
-      border-radius: 12px;
-      cursor: pointer;
-      text-align: center;
-    }
-    .quick-time-btn.selected {
-      background-color: #0284C7;
-      border-color: #0369A1;
-      color: #FFFFFF;
     }
     .select-time-row {
       display: flex;
-      gap: 10px;
+      gap: 12px;
       align-items: center;
     }
     .big-select {
       flex: 1;
+      min-width: 0;
       background-color: #FFFFFF;
-      border: 3px solid #94A3B8;
-      border-radius: 12px;
+      border: 3px solid #64748B;
+      border-radius: 14px;
       color: #0F172A;
-      font-size: 25px;
+      font-size: 28px;
       font-weight: 900;
-      padding: 12px 10px;
+      padding: 14px 8px;
       text-align: center;
+      text-align-last: center;
       outline: none;
     }
     .big-select:focus {
@@ -509,7 +483,7 @@
 </head>
 <body>
 
-  <!-- 最上層：即時天氣與日期時間（天氣字體放到最大且不出框） -->
+  <!-- 最上層：天氣、日期、時間各占一行放到最大且不出框 -->
   <div class="dashboard-card">
     <div class="weather-row">
       <div class="weather-info">
@@ -518,7 +492,7 @@
       </div>
       <div class="weather-temp" id="weather-temp">--°C</div>
     </div>
-    <div class="datetime-row">
+    <div class="datetime-col">
       <div class="date-text" id="current-date">--月--日 星期-</div>
       <div class="time-text" id="current-time">00:00:00</div>
     </div>
@@ -554,53 +528,44 @@
 
     <div class="sub-input-label">說話或打字輸入：</div>
     <div class="input-row">
-      <input type="text" id="note-input" class="text-input" placeholder="例如：晚上吃降血壓藥">
+      <input type="text" id="note-input" class="text-input" placeholder="例如：吃降血壓藥">
       <button class="mic-btn-main" id="mic-btn" onclick="toggleRecord()" title="按一下用講的">🎙️</button>
     </div>
     <div class="mic-tip" id="mic-tip"></div>
 
-    <!-- 銀髮友善大字鬧鐘設定區（取代原本難轉的圓形時鐘） -->
+    <!-- 極簡純數字大字鬧鐘設定區 -->
     <div class="alarm-box">
-      <div class="alarm-header">
-        <span>⏰ 提醒時間：</span>
-        <span class="alarm-preview" id="alarm-preview-text">不設鬧鐘</span>
-      </div>
-
-      <!-- 常用時段一鍵點選 -->
-      <div class="quick-time-grid">
-        <button type="button" class="quick-time-btn" onclick="setQuickTime('08', '00', this)">🌅 早上 8:00</button>
-        <button type="button" class="quick-time-btn" onclick="setQuickTime('12', '00', this)">☀️ 中午 12:00</button>
-        <button type="button" class="quick-time-btn" onclick="setQuickTime('15', '00', this)">🍵 下午 3:00</button>
-        <button type="button" class="quick-time-btn" onclick="setQuickTime('20', '00', this)">🌙 晚上 8:00</button>
-      </div>
-
-      <!-- 自訂幾點幾分（大字下拉選單） -->
+      <div class="alarm-header">⏰ 提醒時間：</div>
       <div class="select-time-row">
-        <select id="alarm-hour" class="big-select" onchange="onSelectTimeChange()">
+        <select id="alarm-hour" class="big-select">
           <option value="">不設鬧鐘</option>
-          <option value="05">早上 5 點</option>
-          <option value="06">早上 6 點</option>
-          <option value="07">早上 7 點</option>
-          <option value="08">早上 8 點</option>
-          <option value="09">早上 9 點</option>
-          <option value="10">早上 10 點</option>
-          <option value="11">早上 11 點</option>
-          <option value="12">中午 12 點</option>
-          <option value="13">下午 1 點</option>
-          <option value="14">下午 2 點</option>
-          <option value="15">下午 3 點</option>
-          <option value="16">下午 4 點</option>
-          <option value="17">下午 5 點</option>
-          <option value="18">晚上 6 點</option>
-          <option value="19">晚上 7 點</option>
-          <option value="20">晚上 8 點</option>
-          <option value="21">晚上 9 點</option>
-          <option value="22">晚上 10 點</option>
-          <option value="23">晚上 11 點</option>
-          <option value="00">半夜 12 點</option>
+          <option value="00">00 時</option>
+          <option value="01">01 時</option>
+          <option value="02">02 時</option>
+          <option value="03">03 時</option>
+          <option value="04">04 時</option>
+          <option value="05">05 時</option>
+          <option value="06">06 時</option>
+          <option value="07">07 時</option>
+          <option value="08">08 時</option>
+          <option value="09">09 時</option>
+          <option value="10">10 時</option>
+          <option value="11">11 時</option>
+          <option value="12">12 時</option>
+          <option value="13">13 時</option>
+          <option value="14">14 時</option>
+          <option value="15">15 時</option>
+          <option value="16">16 時</option>
+          <option value="17">17 時</option>
+          <option value="18">18 時</option>
+          <option value="19">19 時</option>
+          <option value="20">20 時</option>
+          <option value="21">21 時</option>
+          <option value="22">22 時</option>
+          <option value="23">23 時</option>
         </select>
 
-        <select id="alarm-minute" class="big-select" onchange="onSelectTimeChange()">
+        <select id="alarm-minute" class="big-select">
           <option value="00">00 分</option>
           <option value="05">05 分</option>
           <option value="10">10 分</option>
@@ -708,8 +673,8 @@
       </div>
 
       <div class="step-item">
-        <div class="step-num">第三步：點選提醒時間並記下來</div>
-        <div class="step-desc">直接點【早上 8:00】等常用按鈕，或用下方大字選單選幾點幾分，再按藍色按鈕【記下來並設定提醒】。</div>
+        <div class="step-num">第三步：選幾時幾分並記下來</div>
+        <div class="step-desc">在【提醒時間】選好幾時、幾分，再按藍色按鈕【記下來並設定提醒】。</div>
       </div>
 
       <div class="step-item">
@@ -722,7 +687,7 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'senior_care_notes_v19';
+    const STORAGE_KEY = 'senior_care_notes_v20';
     let currentCategory = '吃藥';
     let isRecording = false;
     let recognition = null;
@@ -783,7 +748,7 @@
     }
 
     function playFullVoiceGuide() {
-      const fullText = "歡迎使用美茉莉銀髮備忘錄！第一步，先點選上方要記的事情，例如吃藥或回診。第二步，按一下綠色麥克風，對著手機慢慢說話，文字就會自動打出來。第三步，點選提醒時間，按藍色按鈕記下來。最後，在下面清單點念出，就能聽見提醒，也能按綠色按鈕傳 LINE 給兒女看喔！";
+      const fullText = "歡迎使用美茉莉銀髮備忘錄！第一步，先點選上方要記的事情，例如吃藥或回診。第二步，按一下綠色麥克風，對著手機慢慢說話，文字就會自動打出來。第三步，在提醒時間選好幾時幾分，按藍色按鈕記下來。最後，在下面清單點念出，就能聽見提醒，也能按綠色按鈕傳 LINE 給兒女看喔！";
       speak(fullText);
     }
 
@@ -796,46 +761,12 @@
       btn.classList.add('active');
 
       const input = document.getElementById('note-input');
-      if (cat === '吃藥') input.placeholder = '例如：晚上吃降血壓藥';
-      else if (cat === '回診') input.placeholder = '例如：下午三點醫院心臟科';
+      if (cat === '吃藥') input.placeholder = '例如：吃降血壓藥';
+      else if (cat === '回診') input.placeholder = '例如：三點醫院心臟科';
       else if (cat === '運動健身') input.placeholder = '例如：公園散步三十分鐘';
       else if (cat === '一般日常') input.placeholder = '例如：買水果、關瓦斯';
 
       speak(cat);
-    }
-
-    // 2-1. 銀髮友善鬧鐘控制函式
-    function setQuickTime(hh, mm, btn) {
-      document.getElementById('alarm-hour').value = hh;
-      document.getElementById('alarm-minute').value = mm;
-      document.querySelectorAll('.quick-time-btn').forEach(b => b.classList.remove('selected'));
-      if (btn) btn.classList.add('selected');
-      updateAlarmPreview();
-    }
-
-    function onSelectTimeChange() {
-      document.querySelectorAll('.quick-time-btn').forEach(b => b.classList.remove('selected'));
-      updateAlarmPreview();
-    }
-
-    function updateAlarmPreview() {
-      const hh = document.getElementById('alarm-hour').value;
-      const mm = document.getElementById('alarm-minute').value;
-      const previewEl = document.getElementById('alarm-preview-text');
-      if (!hh) {
-        previewEl.innerText = '不設鬧鐘';
-      } else {
-        const hourSelect = document.getElementById('alarm-hour');
-        const hourLabel = hourSelect.options[hourSelect.selectedIndex].text;
-        previewEl.innerText = `${hourLabel} ${mm} 分`;
-      }
-    }
-
-    function resetAlarmPicker() {
-      document.getElementById('alarm-hour').value = '';
-      document.getElementById('alarm-minute').value = '00';
-      document.querySelectorAll('.quick-time-btn').forEach(b => b.classList.remove('selected'));
-      updateAlarmPreview();
     }
 
     // 3. 徹底防重複疊字的語音辨識架構
@@ -977,7 +908,8 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
 
       input.value = '';
-      resetAlarmPicker();
+      document.getElementById('alarm-hour').value = '';
+      document.getElementById('alarm-minute').value = '00';
       render();
 
       const confirmMsg = `已經幫您記好啦！${newNote.category}，${newNote.text}`;
