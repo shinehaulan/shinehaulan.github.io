@@ -166,6 +166,7 @@
     .cat-laugh { background-color: #FEF9C3; border-color: #FDE047; color: #A16207; }
     .cat-fraud { background-color: #FEE2E2; border-color: #FCA5A5; color: #991B1B; }
     .cat-nou { background-color: #E0E7FF; border-color: #C7D2FE; color: #3730A3; }
+    .cat-guide { background-color: #FCE7F3; border-color: #FBCFE8; color: #BE185D; } /* 使用教學-溫馨粉紅 */
     .cat-mind { background-color: #CCFBF1; border-color: #99F6E4; color: #0F766E; }
     .link-box { background-color: #F8FAFC; border: 3px solid #CBD5E1; color: #1E293B; }
 
@@ -319,6 +320,83 @@
     .btn-line { background: #06C755; border: 2px solid #05A848; color: #FFFFFF; padding: 8px 10px; border-radius: 10px; font-size: 17px; font-weight: 800; cursor: pointer; text-align: center; text-decoration: none; display: block; }
     .btn-del { background: #FFF1F2; border: 2px solid #FECDD3; color: #E11D48; padding: 8px 10px; border-radius: 10px; font-size: 17px; font-weight: 800; cursor: pointer; text-align: center; }
 
+    /* 互動有聲教學彈窗 */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(15, 23, 42, 0.75);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+    .modal-card {
+      background-color: #FFFFFF;
+      width: 100%;
+      max-width: 480px;
+      max-height: 88vh;
+      overflow-y: auto;
+      border-radius: 24px;
+      padding: 24px 20px;
+      border: 4px solid #10B981;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    }
+    .modal-title {
+      font-size: 30px;
+      font-weight: 900;
+      color: #0F172A;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .play-guide-btn {
+      width: 100%;
+      background: linear-gradient(145deg, #10B981, #059669);
+      color: #FFFFFF;
+      border: none;
+      font-size: 24px;
+      font-weight: 900;
+      padding: 14px;
+      border-radius: 14px;
+      cursor: pointer;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+    }
+    .step-item {
+      background-color: #F8FAFC;
+      border: 2px solid #E2E8F0;
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+    .step-num {
+      font-size: 22px;
+      font-weight: 900;
+      color: #0284C7;
+      margin-bottom: 4px;
+    }
+    .step-desc {
+      font-size: 21px;
+      color: #1E293B;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+    .close-modal-btn {
+      width: 100%;
+      background-color: #334155;
+      color: #FFFFFF;
+      border: none;
+      font-size: 24px;
+      font-weight: 900;
+      padding: 14px;
+      border-radius: 14px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
     /* 底部廣告欄位 */
     .ad-fixed-bottom {
       position: fixed;
@@ -440,8 +518,12 @@
         <span style="font-size: 23px; line-height: 1.25;">老當益壯<br><span style="font-size: 19px;">(中高齡就業)</span></span>
       </a>
 
-      <!-- 第四排（老當益壯下方加入心靈有方） -->
-      <div></div>
+      <!-- 第四排：使用教學（放在心靈有方旁邊）、心靈有方 -->
+      <button class="cat-box cat-guide" onclick="openGuideModal()">
+        <span class="icon">📖</span>
+        <span style="font-size: 25px; line-height: 1.25;">使用教學</span>
+      </button>
+
       <a href="https://m.youtube.com/@fongyuanacademy" target="_blank" rel="noopener noreferrer" class="cat-box cat-mind">
         <span class="icon">🧘</span>
         <span style="font-size: 25px; line-height: 1.25;">心靈有方</span>
@@ -456,13 +538,43 @@
     <div id="notes-list"></div>
   </div>
 
+  <!-- 互動式有聲圖文教學視窗 -->
+  <div class="modal-overlay" id="guide-modal" onclick="if(event.target === this) closeGuideModal()">
+    <div class="modal-card">
+      <div class="modal-title">📖 美茉莉使用教學</div>
+      <button class="play-guide-btn" onclick="playFullVoiceGuide()">🔊 點這裡，語音念給您聽</button>
+
+      <div class="step-item">
+        <div class="step-num">第一步：點選分類</div>
+        <div class="step-desc">先點一下【吃藥】、【回診】、【運動健身】或【一般日常】。</div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">第二步：按綠色麥克風說話</div>
+        <div class="step-desc">按一下綠色麥克風 🎙️，對著手機慢慢說出要記的事情（有 15 秒可以說），文字會自動跑出來。</div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">第三步：選時間並記下來</div>
+        <div class="step-desc">設定好【提醒時間】，再按藍色大按鈕【記下來並設定提醒】，時間到手機就會大聲提醒您。</div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">第四步：傳給兒女或念出來</div>
+        <div class="step-desc">在下方清單中，按【🔊 念出】可再聽一次，按【📲 LINE兒女】可直接傳給家人看。</div>
+      </div>
+
+      <button class="close-modal-btn" onclick="closeGuideModal()">我知道了，關閉教學</button>
+    </div>
+  </div>
+
   <!-- 底部廣告欄 -->
   <div class="ad-fixed-bottom">
     [ 贊助廣告版位 · 零個資留存安全認證 ]
   </div>
 
   <script>
-    const STORAGE_KEY = 'senior_care_notes_v14';
+    const STORAGE_KEY = 'senior_care_notes_v15';
     let currentCategory = '吃藥';
     let isRecording = false;
     let recognition = null;
@@ -470,7 +582,7 @@
     let preferredFemaleVoice = null;
     let recordTimer = null;
     let countdownSec = 15;
-    let finalTranscriptBuffer = ''; // 儲存已確定的語音句子，徹底避免手機瀏覽器重複疊字
+    let finalTranscriptBuffer = '';
 
     function escapeHtml(str) {
       if (!str) return '';
@@ -516,6 +628,24 @@
       }
     }
 
+    // 開啟與關閉有聲教學視窗
+    function openGuideModal() {
+      document.getElementById('guide-modal').style.display = 'flex';
+      playFullVoiceGuide();
+    }
+
+    function closeGuideModal() {
+      document.getElementById('guide-modal').style.display = 'none';
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    }
+
+    function playFullVoiceGuide() {
+      const fullText = "歡迎使用美茉莉銀髮備忘錄。第一步，先點選上方要記的事情，例如吃藥或回診。第二步，按一下綠色麥克風，對著手機慢慢說話，文字就會自動打出來。第三步，選好提醒時間，按藍色按鈕記下來。最後，在下面清單點念出，就能聽見提醒，也能按綠色按鈕傳 LINE 給兒女看喔！";
+      speak(fullText);
+    }
+
     // 2. 點選分類
     function selectCat(cat, btn) {
       currentCategory = cat;
@@ -533,7 +663,7 @@
       speak(CATEGORY_PROMPTS[cat]);
     }
 
-    // 3. 語音辨識（修正手機 Chrome 重複疊字 Bug + 15 秒從容錄音）
+    // 3. 語音辨識（無疊字 Bug + 15 秒錄音）
     function setupSpeechRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) return;
@@ -545,7 +675,7 @@
 
       recognition.onstart = () => {
         isRecording = true;
-        finalTranscriptBuffer = ''; // 每次開始錄音清空暫存
+        finalTranscriptBuffer = '';
         const mic = document.getElementById('mic-btn');
         mic.classList.add('recording');
         mic.innerText = '🔴';
@@ -566,11 +696,9 @@
 
       recognition.onresult = (e) => {
         let interimTranscript = '';
-        // 僅從 resultIndex 開始讀取最新段落，避免從頭重覆累加舊字句
         for (let i = e.resultIndex; i < e.results.length; ++i) {
           const transcript = e.results[i][0].transcript;
           if (e.results[i].isFinal) {
-            // 過濾手機瀏覽器偶發送出完全相同的重複段落
             if (!finalTranscriptBuffer.endsWith(transcript.trim())) {
               finalTranscriptBuffer += transcript;
             }
@@ -601,7 +729,7 @@
         stopRecord();
       } else {
         document.getElementById('mic-tip').innerText = '';
-        document.getElementById('note-input').value = ''; // 重新錄音時清空舊框內容
+        document.getElementById('note-input').value = '';
         try {
           recognition.start();
         } catch (e) {
