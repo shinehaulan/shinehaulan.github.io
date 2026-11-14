@@ -30,37 +30,37 @@
       padding: 14px 14px 90px 14px;
     }
 
-    /* 頂部看板 */
+    /* 頂部看板：氣候與時間字體全面放大 */
     .dashboard-card {
       width: 100%;
       max-width: 520px;
       background-color: #1E293B;
       border: 3px solid #334155;
-      border-radius: 20px;
-      padding: 16px 20px;
-      margin-bottom: 14px;
+      border-radius: 22px;
+      padding: 18px 20px;
+      margin-bottom: 16px;
       box-shadow: 0 6px 18px rgba(0,0,0,0.12);
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
     }
     .weather-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 2px solid #334155;
-      padding-bottom: 8px;
+      padding-bottom: 10px;
     }
     .weather-info {
       display: flex;
       align-items: center;
       gap: 12px;
-      font-size: 32px;
+      font-size: 38px;
       font-weight: 900;
       color: #38BDF8;
     }
     .weather-temp {
-      font-size: 34px;
+      font-size: 42px;
       font-weight: 900;
       color: #FFFFFF;
     }
@@ -68,20 +68,23 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 8px;
     }
     .date-text {
-      font-size: 24px;
+      font-size: 26px;
       color: #E2E8F0;
-      font-weight: 800;
+      font-weight: 900;
+      white-space: nowrap;
     }
     .time-text {
-      font-size: 36px;
+      font-size: 38px;
       font-weight: 900;
       color: #F8FAFC;
       letter-spacing: 1px;
+      white-space: nowrap;
     }
 
-    /* 主副標題設計：美茉莉用綠色、銀髮備忘錄放大並改用醒目紅色 */
+    /* 主副標題設計 */
     header { text-align: center; margin-bottom: 18px; }
     h1 {
       font-size: 48px;
@@ -109,7 +112,7 @@
       border-radius: 22px;
       padding: 18px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
     .section-label {
       font-size: 32px;
@@ -160,7 +163,7 @@
       box-shadow: 0 6px 18px rgba(15, 23, 42, 0.25);
     }
 
-    /* 銀髮生活區按鈕：全面放大字體 */
+    /* 銀髮生活區按鈕 */
     .life-box {
       border: 4px solid transparent;
       font-size: 27px;
@@ -195,7 +198,7 @@
     .cat-sing { background-color: #FFF7ED; border-color: #FED7AA; color: #C2410C; }
     .cat-laugh { background-color: #FEF9C3; border-color: #FDE047; color: #A16207; }
 
-    /* 居家無障礙上下按鈕樣式（放大） */
+    /* 居家無障礙上下按鈕樣式 */
     .sub-link-stack {
       display: flex;
       flex-direction: column;
@@ -216,7 +219,7 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     }
 
-    /* 輸入區（長輩特大字體） */
+    /* 輸入區 */
     .sub-input-label {
       font-size: 26px;
       color: #1E293B;
@@ -311,8 +314,15 @@
       box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35);
     }
 
-    /* 備忘清單卡片 */
-    .list-container { width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 14px; }
+    /* 備忘清單區塊（已移至銀髮生活上方） */
+    .list-container {
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
     .note-card {
       background-color: #FFFFFF;
       border: 3px solid #E2E8F0;
@@ -443,12 +453,12 @@
 </head>
 <body>
 
-  <!-- 最上層：即時天氣與日期時間 -->
+  <!-- 最上層：即時天氣與日期時間（放大版） -->
   <div class="dashboard-card">
     <div class="weather-row">
       <div class="weather-info">
         <span id="weather-icon">⛅</span>
-        <span id="weather-desc">載入天氣中...</span>
+        <span id="weather-desc">載入天氣...</span>
       </div>
       <div class="weather-temp" id="weather-temp">--°C</div>
     </div>
@@ -463,7 +473,7 @@
     <div class="sub-title">銀髮備忘錄</div>
   </header>
 
-  <!-- 區塊一：點選要記的事情（長輩特大字體版） -->
+  <!-- 區塊一：點選要記的事情 -->
   <div class="app-card">
     <div class="section-label">點選要記的事情</div>
 
@@ -501,12 +511,20 @@
     <button class="add-btn" onclick="addNote()">＋ 記下來並設定提醒</button>
   </div>
 
-  <!-- 區塊二：銀髮生活（重新排列與全區字體放大） -->
+  <!-- 區塊二：記下的行程清單（已移至銀髮生活上方） -->
+  <div class="list-container">
+    <div style="font-size: 30px; color: #0F172A; border-bottom: 3px solid #CBD5E1; padding-bottom: 8px; font-weight: 900;">
+      📋 記下的行程清單
+    </div>
+    <div id="notes-list"></div>
+  </div>
+
+  <!-- 區塊三：銀髮生活 -->
   <div class="app-card">
     <div class="section-label">銀髮生活</div>
 
     <div class="category-grid-2x">
-      <!-- 第一排（移至最上層）：使用教學、居家無障礙空間諮詢 -->
+      <!-- 第一排：使用教學、居家無障礙空間諮詢 -->
       <button class="life-box cat-guide" onclick="openGuideModal()">
         <span class="icon">📖</span>
         <span>使用教學</span>
@@ -532,7 +550,7 @@
         <span style="line-height: 1.25;">老當益壯<br><span class="life-sub-text">(中高齡就業)</span></span>
       </a>
 
-      <!-- 第三排（心靈有方與防詐騙同排） -->
+      <!-- 第三排：防詐騙提醒、心靈有方 -->
       <a href="https://165.npa.gov.tw" target="_blank" rel="noopener noreferrer" class="life-box cat-fraud">
         <span class="icon">🛡️</span>
         <span style="line-height: 1.25;">防詐騙提醒<br><span class="life-sub-text">(165 官網)</span></span>
@@ -543,7 +561,7 @@
         <span>心靈有方</span>
       </a>
 
-      <!-- 第四排（每日一唱、每日一笑移到最下面） -->
+      <!-- 第四排：每日一唱、每日一笑 -->
       <a href="https://www.youtube.com/results?search_query=%E5%9C%8B%E8%AA%9E%E8%80%81%E6%AD%8C+%E5%8D%A1%E6%8B%89OK+%E4%BC%B4%E5%94%B1" target="_blank" rel="noopener noreferrer" class="life-box cat-sing">
         <span class="icon">🎤</span>
         <span>每日一唱</span>
@@ -554,13 +572,6 @@
         <span>每日一笑</span>
       </a>
     </div>
-  </div>
-
-  <div class="list-container">
-    <div style="font-size: 28px; color: #0F172A; border-bottom: 3px solid #CBD5E1; padding-bottom: 8px; font-weight: 900;">
-      📋 記下的行程清單
-    </div>
-    <div id="notes-list"></div>
   </div>
 
   <!-- 互動式有聲圖文教學視窗 -->
@@ -599,7 +610,7 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'senior_care_notes_v16';
+    const STORAGE_KEY = 'senior_care_notes_v17';
     let currentCategory = '吃藥';
     let isRecording = false;
     let recognition = null;
@@ -607,7 +618,7 @@
     let preferredFemaleVoice = null;
     let recordTimer = null;
     let countdownSec = 15;
-    let finalTranscriptBuffer = '';
+    let savedPhrases = []; // 儲存已完成且不重複的句子陣列
 
     function escapeHtml(str) {
       if (!str) return '';
@@ -688,84 +699,104 @@
       speak(CATEGORY_PROMPTS[cat]);
     }
 
-    // 3. 語音辨識（無疊字 Bug + 15 秒錄音）
-    function setupSpeechRecognition() {
+    // 3. 徹底防重複疊字的語音辨識架構（單句隔離＋15秒接續）
+    function createRecognitionInstance() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) return;
+      if (!SpeechRecognition) return null;
 
-      recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = 'zh-TW';
+      const rec = new SpeechRecognition();
+      // 關閉 continuous 與 interimResults，從底層切斷 Android Chrome 重複吐字
+      rec.continuous = false;
+      rec.interimResults = false;
+      rec.lang = 'zh-TW';
 
-      recognition.onstart = () => {
+      rec.onresult = (e) => {
+        if (e.results && e.results[0] && e.results[0][0]) {
+          const newText = e.results[0][0].transcript.trim();
+          if (newText) {
+            // 檢查新句子是否包含或重複上一句的開頭，徹底過濾重疊
+            const lastPhrase = savedPhrases[savedPhrases.length - 1] || '';
+            if (newText !== lastPhrase && !lastPhrase.endsWith(newText)) {
+              if (lastPhrase && newText.startsWith(lastPhrase)) {
+                savedPhrases[savedPhrases.length - 1] = newText;
+              } else {
+                savedPhrases.push(newText);
+              }
+            }
+            document.getElementById('note-input').value = savedPhrases.join('，');
+          }
+        }
+      };
+
+      rec.onend = () => {
+        // 如果還在 15 秒倒數期間且使用者沒按停止，自動開啟下一輪乾淨監聽
+        if (isRecording && countdownSec > 0) {
+          try {
+            rec.start();
+          } catch (err) {
+            cleanupRecordUI();
+          }
+        } else {
+          cleanupRecordUI();
+        }
+      };
+
+      rec.onerror = (e) => {
+        // 沒聲音（no-speech）時若倒數未結束則繼續等長輩開口
+        if (e.error === 'no-speech' && isRecording && countdownSec > 0) {
+          return;
+        }
+        cleanupRecordUI();
+        if (e.error !== 'aborted') {
+          document.getElementById('mic-tip').innerText = '沒聽清楚，請再按一次麥克風慢慢說。';
+        }
+      };
+
+      return rec;
+    }
+
+    function toggleRecord() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) return alert("您的手機瀏覽器不支援語音辨識，請直接打字。");
+
+      if (isRecording) {
+        stopRecord();
+      } else {
         isRecording = true;
-        finalTranscriptBuffer = '';
+        savedPhrases = [];
+        document.getElementById('note-input').value = '';
+        document.getElementById('mic-tip').innerText = '';
+        
         const mic = document.getElementById('mic-btn');
         mic.classList.add('recording');
         mic.innerText = '🔴';
-        
+
         countdownSec = 15;
         document.getElementById('mic-tip').innerText = `🔴 正在聽您說話（還有 ${countdownSec} 秒，講完可再按一下）`;
-        
+
         clearInterval(recordTimer);
         recordTimer = setInterval(() => {
           countdownSec--;
-          if (countdownSec > 0) {
+          if (countdownSec > 0 && isRecording) {
             document.getElementById('mic-tip').innerText = `🔴 正在聽您說話（還有 ${countdownSec} 秒，講完可再按一下）`;
           } else {
             stopRecord();
           }
         }, 1000);
-      };
 
-      recognition.onresult = (e) => {
-        let interimTranscript = '';
-        for (let i = e.resultIndex; i < e.results.length; ++i) {
-          const transcript = e.results[i][0].transcript;
-          if (e.results[i].isFinal) {
-            if (!finalTranscriptBuffer.endsWith(transcript.trim())) {
-              finalTranscriptBuffer += transcript;
-            }
-          } else {
-            interimTranscript += transcript;
-          }
-        }
-        const combined = (finalTranscriptBuffer + interimTranscript).trim();
-        if (combined) {
-          document.getElementById('note-input').value = combined;
-        }
-      };
-
-      recognition.onend = () => {
-        cleanupRecordUI();
-      };
-
-      recognition.onerror = () => {
-        cleanupRecordUI();
-        document.getElementById('mic-tip').innerText = '沒聽清楚，請再按一次麥克風慢慢說。';
-      };
-    }
-    setupSpeechRecognition();
-
-    function toggleRecord() {
-      if (!recognition) return alert("您的手機瀏覽器不支援語音辨識，請直接打字。");
-      if (isRecording) {
-        stopRecord();
-      } else {
-        document.getElementById('mic-tip').innerText = '';
-        document.getElementById('note-input').value = '';
+        recognition = createRecognitionInstance();
         try {
           recognition.start();
         } catch (e) {
-          recognition.stop();
+          cleanupRecordUI();
         }
       }
     }
 
     function stopRecord() {
-      if (recognition && isRecording) {
-        recognition.stop();
+      isRecording = false;
+      if (recognition) {
+        try { recognition.abort(); } catch (e) {}
       }
       cleanupRecordUI();
     }
@@ -777,12 +808,16 @@
       mic.classList.remove('recording');
       mic.innerText = '🎙️';
       setTimeout(() => {
-        document.getElementById('mic-tip').innerText = '';
-      }, 2500);
+        if (!isRecording) {
+          document.getElementById('mic-tip').innerText = '';
+        }
+      }, 2000);
     }
 
     // 4. 儲存與新增備忘錄
     function addNote() {
+      if (isRecording) stopRecord();
+
       const input = document.getElementById('note-input');
       const timeInput = document.getElementById('alarm-time');
       const text = input.value.trim();
@@ -828,7 +863,7 @@
       const notes = getNotes();
 
       if (notes.length === 0) {
-        listEl.innerHTML = '<div style="color:#64748B; text-align:center; margin-top:20px; font-size:26px; font-weight:bold;">目前沒有任何備忘事項</div>';
+        listEl.innerHTML = '<div style="color:#64748B; text-align:center; margin:16px 0; font-size:26px; font-weight:bold;">目前沒有任何備忘事項</div>';
         return;
       }
 
